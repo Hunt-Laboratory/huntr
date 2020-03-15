@@ -1,4 +1,4 @@
-Package: HuntLab
+Package: huntr
 Title: Hunt Lab Analysis functions
 Version: 0.10
 Authors@R: person("Luke", "Thorburn", email = "luke.thorburn@gmail.com", role = c("aut", "cre"))
