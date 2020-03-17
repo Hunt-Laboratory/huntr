@@ -1,6 +1,41 @@
 
 # Compile Data ------------------------------------------------------------
 
+tidyProblemNames = function(dt) {
+    dt[dt == "Problem #1 - Foreign Fighters"] = "Foreign Fighters"
+    dt[dt == "Problem #2 - Forecasting Piracy"] = "Forecasting Piracy"
+    return(dt)
+}
+
+addNormalisedEngagementMetrics = function(analytics) {
+    as = c("report_count",
+           "resource_count",
+           "comment_count",
+           "chat_count",
+           "comment_vote_count",
+           "resource_vote_count",
+           "simple_rating",
+           "partial_rating",
+           "complete_rating")
+    normalise = function(x) {
+        ( x - min(x, na.rm = T) ) / ( max(x, na.rm = T) - min(x, na.rm = T ) )
+    }
+    for (a in as) {
+        analytics[[paste0(a,"_normed")]] = normalise(analytics[[a]])
+    }
+    analytics$engagement_normed = 7*analytics$report_count_normed +
+        3*analytics$resource_count_normed +
+        3*analytics$complete_rating_normed +
+        2*analytics$comment_count_normed + 
+        analytics$chat_count_normed +
+        analytics$simple_rating_normed +
+        analytics$partial_rating_normed +
+        analytics$comment_vote_count_normed +
+        analytics$resource_vote_count_normed
+    
+    return(analytics)
+}
+
 fetchPlatformData = function(path_to_data, instance_name) {
     path = paste0(path_to_data, instance_name, '/PlatformData/')
     
@@ -18,98 +53,71 @@ fetchPlatformData = function(path_to_data, instance_name) {
     instance_data$responses = fread(paste0(path, 'responses/responses.csv'))
     instance_data$timeline = fread(paste0(path, 'timeline/timeline.csv'))
     
+    # Improve consistency of column names.
+    setnames(instance_data$problems, "problem_title", "problem")
+    setnames(instance_data$top_reports, "title", "problem")
+    setnames(instance_data$analytics, "title", "problem")
+    setnames(instance_data$relations, "title", "problem")
+    setnames(instance_data$timeline, "title", "problem")
+    setnames(instance_data$timeline, "tipe", "type")
+    
+    # Add problem title as variable to tables that only have problem ID.
+    for (table_name in c("responses", "authors", "comments", "ratings", "chat")) {
+        setDT(instance_data[[table_name]])[instance_data$problems, problem := i.problem, on = c(problem_id = "problem_id")]
+    }
+    
+    # Tidy problem names.
+    for (table_name in c("responses", "analytics")) {
+        instance_data[[table_name]] = tidyProblemNames(instance_data[[table_name]])
+        
+    }
+    
+    # Add normalised engagement metrics to analytics table.
+    instance_data$analytics = addNormalisedEngagementMetrics(instance_data$analytics)
+    
     return(instance_data)
 }
 
-compile_data = function(path = "data/") {
-    
-    instances = list.files(path)
-    
-    # Initialise repo list.
-    repo = list()
-    for (instance_name in instances) {
-        repo[[instance_name]] = list()
+# helper function: reverse-score a single column
+# if a likert column with vals 1-5  is scored in reverse, then a 5 becomes a 1,
+# a 4 becomes a 2, etc. So in this example the reverse-scored value is 6 minus 
+# the original value. Generally, it's (max_value + 1) - original .
+reverse_score_column = function(column_vector, max_val, reverse = F) {
+    if (reverse == F) {
+        return(column_vector)
+    } else {
+        return((max_val + 1) - column_vector)
     }
-    
-    # Populate repo with platform data.
-    for (instance_name in instances) {
-        repo[[instance_name]][['PlatformData']] = fetchPlatformData(path, instance_name)
-    }
-    
-    # Save compiled data to package, tidy environment, and reload the package.
-    usethis::use_data(repo)
-    #save(repo,
-    #     file="huntr/R/sysdata.rda")
-    remove(repo)
-    message("Reloading package...")
-    devtools::load_all("huntr")
-    
 }
 
+# score the whole psychological scale at once by specifying which columns are
+# reverse-scored (FALSE means don't reverse), and the max value of each column
+score_likert_scale = function(my_df, scale_col_names, scale_maxes, scale_reverses){
+    mask = mapply(reverse_score_column, 
+                  my_df[, scale_col_names], 
+                  scale_maxes, scale_reverses)
+    final_score = rowSums(mask, na.rm = TRUE)
+    return(final_score)
+}
 
-#' Compile data from 'raw' SWARM, Qualtrics & Knack CSVs
-#'
-#' \code{compile_data} Compiles data from 'raw' CSVs exported from the various
-#' platforms used (SWARM, Qualtrics, Knack) for the Hunt Challenge 2020,
-#' and saves tidied versions of them to the package data file, overwriting any
-#' that were already saved.
-#'
-#' Use this function to refresh the tidied versions of the data whenever the
-#' raw data is updated.
-#'
-#' @export
-#' 
-#' @examples
-#' \dontrun{
-#' # (re-)compile data
-#' compile_data()
-#' }
-compile_data_old = function(path = "data/") {
-    
-    require(data.table)
+computeAOMT = function(dt) {
+    aomt_colnames = grep("aomt", names(dt), value=T, fixed=T)
+    aomt_max_vec = rep(max(dt[, aomt_colnames], na.rm=T), length(aomt_colnames))
+    aomt_reverse_vec <- c(FALSE, FALSE, FALSE, TRUE, TRUE, TRUE, TRUE, FALSE, TRUE, FALSE, FALSE)
+    dt$aomt = score_likert_scale(dt,
+                                 aomt_colnames,
+                                 aomt_max_vec,
+                                 aomt_reverse_vec)
+    return(dt)
+}
 
-    # LOAD PLATFORM DATA
+# Score the Actively Open-Minded Thinking Test
+
+fetchQualtricsData = function(path_to_data, instance_name) {
+    path = paste0(path_to_data, instance_name, '/QualtricsData/')
     
-    responses$problem = rep(NA, nrow(responses))
-    for (k in 1:nrow(responses)) {
-        responses$problem[k] = problems[problem_id == responses$problem_id[k]]$problem_title
-    }
-    responses[responses == "Problem #1 - Foreign Fighters"] = "Foreign Fighters"
-    responses[responses == "Problem #2 - Forecasting Piracy"] = "Forecasting Piracy"
-    
-    as = c("report_count",
-          "resource_count",
-          "comment_count",
-          "chat_count",
-          "comment_vote_count",
-          "resource_vote_count",
-          "simple_rating",
-          "partial_rating",
-          "complete_rating")
-    normalise<-function(x){(x-min(x,na.rm=T))/(max(x,na.rm=T)-min(x,na.rm=T))}
-    for (a in as) {
-        analytics[[paste0(a,"_normed")]] = normalise(analytics[[a]])
-    }
-    analytics$engagement_normed = 7*analytics$report_count_normed +
-        3*analytics$resource_count_normed +
-        3*analytics$complete_rating_normed +
-        2*analytics$comment_count_normed + 
-        analytics$chat_count_normed +
-        analytics$simple_rating_normed +
-        analytics$partial_rating_normed +
-        analytics$comment_vote_count_normed +
-        analytics$resource_vote_count_normed
-    analytics[analytics == "Problem #1 - Foreign Fighters"] = "Foreign Fighters"
-    analytics[analytics == "Problem #2 - Forecasting Piracy"] = "Forecasting Piracy"
-    
-    
-    
-    # LOAD (and tidy) QUALTRICS DATA
-    
-    qualtrics_path <- paste0(path, "QualtricsData/")
-    
-    entrySurveyPub = fread(paste0(qualtrics_path, "HC2020_EntrySurvey_Public.csv"))
-    entrySurveyOrg = fread(paste0(qualtrics_path, "HC2020_EntrySurvey_Organisations.csv"))
+    entrySurveyPub = fread(paste0(path, "HC2020_EntrySurvey_Public.csv"))
+    entrySurveyOrg = fread(paste0(path, "HC2020_EntrySurvey_Organisations.csv"))
     
     entrySurveyPub = entrySurveyPub[3:nrow(entrySurveyPub)]
     entrySurveyOrg = entrySurveyOrg[3:nrow(entrySurveyOrg)]
@@ -204,86 +212,86 @@ compile_data_old = function(path = "data/") {
     )
     
     colnames(entrySurveyOrg) <- c("startDate",
-                       "endDate",
-                       "status",
-                       "IPaddress",
-                       "progress",
-                       "duration",
-                       "finished",
-                       "recordedDate",
-                       "responseID",
-                       "recipientLastName",
-                       "user",
-                       "recipientEmail",
-                       "externalReference",
-                       "latitude",
-                       "longitude",
-                       "distributionChannel",
-                       "userLanguage",
-                       
-                       "gaveConsent1", # Problem Solving in Online Groups
-                       "gaveConsent2", # Identifying and Rating Quality of Reasoning
-                       
-                       "interests",
-                       "interestsOtherInput",
-                       
-                       "exp1", # InterestingProblems
-                       "exp2", # TimeCommitment
-                       "exp3", # DifficultProblems
-                       "exp4", # LearnSkills
-                       "exp5", # AchievableProblems
-                       "exp6", # ProductivePlatform
-                       "exp7", # AnalyticalTraining
-                       "exp8", # PositiveExperience
-                       "exp9", # EffectiveCollaboration
-                       "exp10", # ApplicableToWork
-                       
-                       "pri1", # BenchmarkTeam
-                       "pri2", # TestSkills
-                       "pri3", # Fun
-                       "pri4", # DevelopSkills
-                       "pri5", # LearnPlatform
-                       "pri6", # LearnCA
-                       "pri7", # NewCollaborationStyle
-                       "pri8", # ResearchContribution
-                       "pri9", # SuperTeam
-                       "pri10", # LensKit
-                       "pri11", # Crowdsource
-                       "priOther", # Other
-                       "priOtherInput",
-                       
-                       "aomt1",
-                       "aomt2",
-                       "aomt3",
-                       "aomt4",
-                       "aomt5",
-                       "aomt6",
-                       "aomt7",
-                       "aomt8",
-                       "aomt9",
-                       "aomt10",
-                       "aomt11",
-                       
-                       "agegroup",
-                       "gender",
-                       "occupation",
-                       "education",
-                       "studyarea",
-                       "studyareaOtherInput",
-                       "yearsWorkExperience",
-                       "typeAnalyticalExperience",
-                       "yearsAnalyticalExperience",
-                       
-                       "cap1", # ReportWriting
-                       "cap2", # UsingSATs
-                       "cap3", # OSINT
-                       "cap4", # Frameworks
-                       "cap5", # Assumptions
-                       "cap6", # EvaluatingQoR
-                       "cap7", # DecisionMaking
-                       
-                       "hasMultidisciplinaryExperience",
-                       "multidisciplinaryExperienceInput"
+                                  "endDate",
+                                  "status",
+                                  "IPaddress",
+                                  "progress",
+                                  "duration",
+                                  "finished",
+                                  "recordedDate",
+                                  "responseID",
+                                  "recipientLastName",
+                                  "user",
+                                  "recipientEmail",
+                                  "externalReference",
+                                  "latitude",
+                                  "longitude",
+                                  "distributionChannel",
+                                  "userLanguage",
+                                  
+                                  "gaveConsent1", # Problem Solving in Online Groups
+                                  "gaveConsent2", # Identifying and Rating Quality of Reasoning
+                                  
+                                  "interests",
+                                  "interestsOtherInput",
+                                  
+                                  "exp1", # InterestingProblems
+                                  "exp2", # TimeCommitment
+                                  "exp3", # DifficultProblems
+                                  "exp4", # LearnSkills
+                                  "exp5", # AchievableProblems
+                                  "exp6", # ProductivePlatform
+                                  "exp7", # AnalyticalTraining
+                                  "exp8", # PositiveExperience
+                                  "exp9", # EffectiveCollaboration
+                                  "exp10", # ApplicableToWork
+                                  
+                                  "pri1", # BenchmarkTeam
+                                  "pri2", # TestSkills
+                                  "pri3", # Fun
+                                  "pri4", # DevelopSkills
+                                  "pri5", # LearnPlatform
+                                  "pri6", # LearnCA
+                                  "pri7", # NewCollaborationStyle
+                                  "pri8", # ResearchContribution
+                                  "pri9", # SuperTeam
+                                  "pri10", # LensKit
+                                  "pri11", # Crowdsource
+                                  "priOther", # Other
+                                  "priOtherInput",
+                                  
+                                  "aomt1",
+                                  "aomt2",
+                                  "aomt3",
+                                  "aomt4",
+                                  "aomt5",
+                                  "aomt6",
+                                  "aomt7",
+                                  "aomt8",
+                                  "aomt9",
+                                  "aomt10",
+                                  "aomt11",
+                                  
+                                  "agegroup",
+                                  "gender",
+                                  "occupation",
+                                  "education",
+                                  "studyarea",
+                                  "studyareaOtherInput",
+                                  "yearsWorkExperience",
+                                  "typeAnalyticalExperience",
+                                  "yearsAnalyticalExperience",
+                                  
+                                  "cap1", # ReportWriting
+                                  "cap2", # UsingSATs
+                                  "cap3", # OSINT
+                                  "cap4", # Frameworks
+                                  "cap5", # Assumptions
+                                  "cap6", # EvaluatingQoR
+                                  "cap7", # DecisionMaking
+                                  
+                                  "hasMultidisciplinaryExperience",
+                                  "multidisciplinaryExperienceInput"
     )
     
     entrySurveyPub$isOrg = FALSE;
@@ -312,11 +320,11 @@ compile_data_old = function(path = "data/") {
                       "reservedPlace",
                       "nickname",
                       "email"
-                      )
+    )
     ES = ES[,!..colsToRemove]
     
     ES[ES == ""] <- NA
-
+    
     ES[ES == "I don't expect this"] <- 1
     ES[ES == "Neutral"] <- 2
     ES[ES == "I do expect this"] <- 3
@@ -467,9 +475,9 @@ compile_data_old = function(path = "data/") {
         ae5,
         hasMultidisciplinaryExperience,
         multidisciplinaryExperienceInput
-        )]
+    )]
     
-    orgs = fread(paste0(path,"OtherData/OrgMaster.csv"))
+    orgs = fread(paste0(path_to_data, instance_name, '/OtherData/OrgMaster.csv'))
     
     for (k in 1:nrow(ES)) {
         if (ES$isOrg[k]) {
@@ -482,66 +490,38 @@ compile_data_old = function(path = "data/") {
     ES = ES[!is.na(ES$user)]
     ES = as.data.frame(ES)
     
-    # Compute AOMT
+    # Compute AOMT construct.
+    ES = computeAOMT(ES)
     
-    ################################################################################
-    # Score tests with Likert scales
-    
-    # helper function: reverse-score a single column
-    # if a likert column with vals 1-5  is scored in reverse, then a 5 becomes a 1,
-    # a 4 becomes a 2, etc. So in this example the reverse-scored value is 6 minus 
-    # the original value. Generally, it's (max_value + 1) - original .
-    reverse_score_column <- function(column_vector, max_val, reverse=FALSE){
-        if (reverse==FALSE) {
-            return(column_vector)
-        } else {
-            return((max_val + 1) - column_vector)
-        }
-    }
-    
-    # score the whole psychological scale at once by specifying which columns are
-    # reverse-scored (FALSE means don't reverse), and the max value of each column
-    score_likert_scale <- function(my_df, scale_col_names, 
-                                   scale_maxes, scale_reverses){
-        mask <- mapply(reverse_score_column, 
-                       my_df[, scale_col_names], 
-                       scale_maxes, scale_reverses)
-        final_score <- rowSums(mask, na.rm = TRUE)
-        return(final_score)
-    }
-    
-    # Score the Actively Open-Minded Thinking Test
-    aomt_colnames <- grep("aomt", names(ES), value=T, fixed=T)
-    aomt_max_vec <- rep(max(ES[, aomt_colnames], na.rm=T), length(aomt_colnames))
-    aomt_reverse_vec <- c(FALSE, FALSE, FALSE, TRUE, TRUE, TRUE,
-                          TRUE, FALSE, TRUE, FALSE, FALSE)
-    ES$aomt = score_likert_scale(ES,
-                                 aomt_colnames,
-                                 aomt_max_vec,
-                                 aomt_reverse_vec)
+    return(list(entry_survey = ES))
+}
 
-    # LOAD KNACK DATA
+compile_teams = function(repo, path_to_data, instance_name) {
     
-    K <- as.data.frame(fread(paste0(path, "KnackData/teams2020challenge.csv")))
+    path = paste0(path_to_data, instance_name, "/KnackData/teams2020challenge.csv")
+    
+    K = as.data.frame(fread(path))
     colnames(K) <- c("team",
-                    "avgAll",
-                    "type",
-                    "points",
-                    "avg2",
-                    "avg3",
-                    "avg4",
-                    "avg1",
-                    "nRatings1",
-                    "nRatings2",
-                    "nRatings3",
-                    "nRatings4",
-                    "nRatings2020",
-                    "nGeoCorrect")
+                     "avgAll",
+                     "type",
+                     "points",
+                     "avg2",
+                     "avg3",
+                     "avg4",
+                     "avg1",
+                     "nRatings1",
+                     "nRatings2",
+                     "nRatings3",
+                     "nRatings4",
+                     "nRatings2020",
+                     "nGeoCorrect")
     K = K[K$type != "Calibration",]
+    
+    parts = repo[[instance_name]]$OtherData$parts
     
     # Create teams table.
     
-    tms = unique(ES$team)
+    tms = unique(parts$team)
     teams = data.frame(team = tms,
                        AOMT = NA,
                        divAOMT = NA,
@@ -549,13 +529,13 @@ compile_data_old = function(path = "data/") {
                        isOrg = NA)
     
     getDivAOMT = function(tm) {
-        scores = ES[ES$team == tm,]$aomt
+        scores = parts[parts$team == tm,]$aomt
         scores = scores[!is.na(scores)]
         return(mean(c(dist(scores))))
     }
     
     getMedianEdu = function(tm) {
-        eds = ES[ES$team == tm,]$education
+        eds = parts[parts$team == tm,]$education
         eds[eds == "High School"] = 1
         eds[eds == "Trade or Technical Qualification"] = 2
         eds[eds == "Bachelors"] = 3
@@ -564,36 +544,63 @@ compile_data_old = function(path = "data/") {
         eds[eds == "Phd"] = 6
         eds[eds == "Prefer not to say"] = NA
         eds = as.numeric(eds)
-
+        
         return(median(eds, na.rm = T))
     }
     
     for (k in 1:nrow(teams)) {
-        teams$AOMT[k] = median(ES[ES$team == teams$team[k],]$aomt, na.rm = T)
+        teams$AOMT[k] = median(parts[parts$team == teams$team[k],]$aomt, na.rm = T)
         teams$divAOMT[k] = getDivAOMT(teams$team[k])
         teams$medianEdu[k] = getMedianEdu(teams$team[k])
-        teams$isOrg[k] = ES[ES$team == teams$team[k],]$isOrg[1]
+        teams$isOrg[k] = parts[parts$team == teams$team[k],]$isOrg[1]
     }
     
+    return(teams)
+}
+
+compile_probteams = function(repo, path_to_data, instance_name) {
     
+    path = paste0(path_to_data, instance_name, "/KnackData/teams2020challenge.csv")
     
+    K = as.data.frame(fread(path))
+    colnames(K) <- c("team",
+                     "avgAll",
+                     "type",
+                     "points",
+                     "avg2",
+                     "avg3",
+                     "avg4",
+                     "avg1",
+                     "nRatings1",
+                     "nRatings2",
+                     "nRatings3",
+                     "nRatings4",
+                     "nRatings2020",
+                     "nGeoCorrect")
+    K = K[K$type != "Calibration",]
     
-    # Create probteam table.
-    
+    parts = repo[[instance_name]]$OtherData$parts
+    teams = repo[[instance_name]]$OtherData$teams
+    tms = unique(parts$team)
     problems = c("Foreign Fighters", "Forecasting Piracy")
+    analytics = repo[[instance_name]]$PlatformData$analytics
+    responses = repo[[instance_name]]$PlatformData$responses
+    
+    response_path = paste0(path_to_data,instance_name,"/PlatformData/responses/text/")
+    
     probteam = data.frame(team = rep(tms, length(problems)),
-                       problem = rep(problems, each = length(tms)),
-                       probNum = rep(1:length(problems), each = length(tms)),
-                       type = NA,
-                       avgODNI = NA,
-                       nODNI = NA,
-                       rankODNI = NA,
-                       nGeoCorrect = NA,
-                       activeUsersSq = NA,
-                       textSim = NA)
+                          problem = rep(problems, each = length(tms)),
+                          probNum = rep(1:length(problems), each = length(tms)),
+                          type = NA,
+                          avgODNI = NA,
+                          nODNI = NA,
+                          rankODNI = NA,
+                          nGeoCorrect = NA,
+                          activeUsersSq = NA,
+                          textSim = NA)
     
     getActiveUsersSq = function(tm, pr) {
-        team_members = analytics[teamName == tm & title == pr]
+        team_members = analytics[teamName == tm & problem == pr]
         nActive = sum(team_members$engagement_normed > 0)
         nActiveSq = nActive ^ 2
     }
@@ -602,10 +609,10 @@ compile_data_old = function(path = "data/") {
         file_names = responses[team_name == tm & problem == pr & response_type == "report"]$response_text
         
         if (length(file_names) > 1) {
-            reports = suppressWarnings(readtext(paste0(platform_path,"responses/text/",file_names[1])))  # surpress "*.md" warnings
+            reports = suppressWarnings(readtext(paste0(response_path,file_names[1])))  # surpress "*.md" warnings
             
             for (j in 2:length(file_names)) {
-                reports = rbind(reports, suppressWarnings(readtext(paste0(platform_path,"responses/text/",file_names[j]))))
+                reports = rbind(reports, suppressWarnings(readtext(paste0(response_path,file_names[j]))))
             }
             
             CORPUS = corpus(reports)
@@ -640,36 +647,68 @@ compile_data_old = function(path = "data/") {
         probteam$textSim[k] = getTextSim(probteam$team[k], probteam$problem[k])
     }
     
-    # Rename ES to parts (participants).
-    parts = ES
-    
-    save(problems,
-         responses,
-         authors,
-         relations,
-         analytics,
-         timeline,
-         parts,
-         teams,
-         probteam,
-         file="HuntLab/R/sysdata.rda")
-    remove(problems,
-           responses,
-           authors,
-           relations,
-           analytics,
-           timeline,
-           ES,
-           K,
-           parts,
-           teams,
-           probteam)
-    
-    message("Reloading package...")
-    devtools::load_all("HuntLab")
-    
+    return(probteam)
 }
 
+#' Compile data from 'raw' SWARM, Qualtrics & Knack CSVs
+#'
+#' \code{compile_data} Compiles data from 'raw' CSVs exported from the various
+#' platforms used (SWARM, Qualtrics, Knack) for the Hunt Challenge 2020,
+#' and saves tidied versions of them to the package data file, overwriting any
+#' that were already saved.
+#'
+#' Use this function to refresh the tidied versions of the data whenever the
+#' raw data is updated.
+#'
+#' @export
+#' 
+#' @examples
+#' \dontrun{
+#' # (re-)compile data
+#' compile_data()
+#' }
+compile_data = function(path = "data/") {
+    
+    require(data.table)
+    
+    instances = list.files(path)
+    
+    # Initialise repo list.
+    repo = list()
+    for (instance_name in instances) {
+        repo[[instance_name]] = list()
+    }
+    
+    # Populate repo with platform data.
+    for (instance_name in instances) {
+        repo[[instance_name]][['PlatformData']] = fetchPlatformData(path, instance_name)
+    }
+    
+    # Populate with Qualtrics data.
+    for (instance_name in instances) {
+        if (instance_name == '2020_HuntChallenge') {
+            repo[[instance_name]][['QualtricsData']] = fetchQualtricsData(path, instance_name)
+        }
+    }
+    
+    # Compile useful tables.
+    for (instance_name in instances) {
+        if (instance_name == '2020_HuntChallenge') {
+            repo[[instance_name]][['OtherData']] = list()
+            repo[[instance_name]][['OtherData']]$parts = repo[[instance_name]][['QualtricsData']]$entry_survey
+            repo[[instance_name]][['OtherData']]$teams = compile_teams(repo, path, instance_name)
+            repo[[instance_name]][['OtherData']]$probteams = compile_probteams(repo, path, instance_name)
+        }
+    }
+    
+    # Save compiled data to package, tidy environment, and reload the package.
+    save(repo,
+         file="huntr/R/sysdata.rda")
+    remove(repo)
+    message("Reloading package...")
+    devtools::load_all("huntr")
+    
+}
 
 
 
