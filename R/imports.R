@@ -1,6 +1,51 @@
 
 # Compile Data ------------------------------------------------------------
 
+fetchPlatformData = function(path_to_data, instance_name) {
+    path = paste0(path_to_data, instance_name, '/PlatformData/')
+    
+    # Initialise and populate list of instance data.
+    instance_data = list()
+    instance_data$analytics = fread(paste0(path, 'analytics/analytics.csv'))
+    instance_data$authors = fread(paste0(path, 'authors/authors.csv'))
+    instance_data$chat = fread(paste0(path, 'chat/chat.csv'))
+    instance_data$comments = fread(paste0(path, 'comments/comments.csv'))
+    instance_data$login = fread(paste0(path, 'login/login.csv'))
+    instance_data$problems = fread(paste0(path, 'problems/problems.csv'))
+    instance_data$ratings = fread(paste0(path, 'ratings/ratings.csv'))
+    instance_data$relations = fread(paste0(path, 'relations/relations.csv'))
+    instance_data$top_reports = fread(paste0(path, 'reports/top_reports.csv'))
+    instance_data$responses = fread(paste0(path, 'responses/responses.csv'))
+    instance_data$timeline = fread(paste0(path, 'timeline/timeline.csv'))
+    
+    return(instance_data)
+}
+
+compile_data = function(path = "data/") {
+    
+    instances = list.files(path)
+    
+    # Initialise repo list.
+    repo = list()
+    for (instance_name in instances) {
+        repo[[instance_name]] = list()
+    }
+    
+    # Populate repo with platform data.
+    for (instance_name in instances) {
+        repo[[instance_name]][['PlatformData']] = fetchPlatformData(path, instance_name)
+    }
+    
+    # Save compiled data to package, tidy environment, and reload the package.
+    save(repo,
+         file="huntr/R/sysdata.rda")
+    remove(repo)
+    message("Reloading package...")
+    devtools::load_all("huntr")
+    
+}
+
+
 #' Compile data from 'raw' SWARM, Qualtrics & Knack CSVs
 #'
 #' \code{compile_data} Compiles data from 'raw' CSVs exported from the various
@@ -18,7 +63,7 @@
 #' # (re-)compile data
 #' compile_data()
 #' }
-compile_data = function(path = "data/") {
+compile_data_old = function(path = "data/") {
     
     require(data.table)
 
