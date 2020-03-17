@@ -37,8 +37,9 @@ compile_data = function(path = "data/") {
     }
     
     # Save compiled data to package, tidy environment, and reload the package.
-    save(repo,
-         file="huntr/R/sysdata.rda")
+    usethis::use_data(repo)
+    #save(repo,
+    #     file="huntr/R/sysdata.rda")
     remove(repo)
     message("Reloading package...")
     devtools::load_all("huntr")
@@ -68,15 +69,6 @@ compile_data_old = function(path = "data/") {
     require(data.table)
 
     # LOAD PLATFORM DATA
-    
-    platform_path = paste0(path, "PlatformData/HC2020/")
-    
-    problems  <- fread(paste0(platform_path, "problems/problems.csv"))
-    responses <- fread(paste0(platform_path, "responses/responses.csv"))
-    authors   <- fread(paste0(platform_path, "authors/authors.csv"))
-    relations <- fread(paste0(platform_path, "relations/relations.csv"))
-    analytics <- fread(paste0(platform_path, "analytics/analytics.csv"))
-    timeline  <- fread(paste0(platform_path, "timeline/timeline.csv"))
     
     responses$problem = rep(NA, nrow(responses))
     for (k in 1:nrow(responses)) {
