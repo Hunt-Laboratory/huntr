@@ -1,0 +1,106 @@
+---
+title: "Helper Data Dictionary"
+author: "Luke Thorburn"
+date: "2020-03-18"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+## Introduction
+
+This document describes a set of datatables that are not included in the standard set of SWARM platform data, but are nonetheless often helpful for analysis. They include statistics, such as the text similarity amongst a teams reports, that have been found to be meaningful in past research, as well as external ratings of Quality of Reasoning, where available.
+
+The idea is that the tables described below (parts, teams, probteams) will have been compiled for each experiment or 'instance' of the SWARM platform.
+
+## Participants
+
+The `parts` table (short for participants) uniquely identifies each participant who was, on paper, a member of a team that competed on the given platform instance. It includes demographic and other data from any entry and exit surveys.
+
+data.table name:    parts
+
+ColumnName          Description
+--------------      ----------------------------------------
+progress            Unique identifier of the problem
+finished            Short title of the problem
+gaveConsent1        A unique filename of the problem content in markdown text format
+gaveConsent2        A unique filename in the "Problems" subfolder that contains the HTML file of the problem
+agreedToTerms
+user
+team
+agegroup
+gender
+occupation
+isOrg
+education
+studyarea
+studyareaOtherInput
+int1
+int2
+int3
+int4
+int5
+int6
+int7
+int8
+int9
+int10
+int11
+interestsOtherInput
+exp1
+exp2
+exp3
+exp4
+exp5
+exp6
+exp7
+exp8
+exp9
+exp10
+pri1
+pri2
+pri3
+pri4
+pri5
+pri6
+pri7
+pri8
+pri9
+pri10
+pri11
+priOther
+priOtherInput
+aomt1
+aomt2
+aomt3
+aomt4
+aomt5
+aomt6
+aomt7
+aomt8
+aomt9
+aomt10
+aomt11
+aom
+cap1
+cap2
+cap3
+cap4
+cap5
+cap6
+cap7
+cap8
+yearsWorkExperience
+yearsAnalyticalExperience
+ae1
+ae2
+ae3
+ae4
+ae5
+hasMultidisciplinaryExperience
+multidisciplinaryExperienceInput
+
+
+
