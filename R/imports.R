@@ -1470,17 +1470,12 @@ compile_data = function(path = "data/") {
     
     # Save compiled data to package, tidy environment, and reload the package.
     save(repo,
-         file="huntr/R/sysdata.rda")
+         file="huntr/data/repo.RData")
     remove(repo)
     message("Reloading package...")
     devtools::load_all("huntr")
     
 }
-
-
-
-
-
 
 
 
