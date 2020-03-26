@@ -60,6 +60,17 @@ fetchPlatformData = function(path_to_data, instance_name) {
     setnames(instance_data$relations, "title", "problem")
     setnames(instance_data$timeline, "title", "problem")
     setnames(instance_data$timeline, "tipe", "type")
+    setnames(instance_data$top_reports, "team_name", "team")
+    setnames(instance_data$responses, "team_name", "team")
+    setnames(instance_data$authors, "team_name", "team")
+    setnames(instance_data$comments, "team_name", "team")
+    setnames(instance_data$analytics, "teamName", "team")
+    setnames(instance_data$relations, "teamName", "team")
+    setnames(instance_data$timeline, "teamName", "team")
+    setnames(instance_data$login, "userName", "user")
+    setnames(instance_data$analytics, "userName", "user")
+    setnames(instance_data$relations, "userName", "user")
+    setnames(instance_data$timeline, "userName", "user")
     
     # Add problem title as variable to tables that only have problem ID.
     for (table_name in c("responses", "authors", "comments", "ratings", "chat")) {
@@ -74,6 +85,10 @@ fetchPlatformData = function(path_to_data, instance_name) {
     
     # Add normalised engagement metrics to analytics table.
     instance_data$analytics = addNormalisedEngagementMetrics(instance_data$analytics)
+    
+    # Add misc. other metrics to analytics table.
+    instance_data$analytics[,vote_count:=comment_vote_count + resource_vote_count]
+    instance_data$analytics[,quick_rating:=simple_rating + partial_rating]
     
     return(instance_data)
 }
@@ -115,51 +130,7 @@ computeAOMT = function(dt) {
 compile_parts_2018_SwarmChallengeExp1 = function(path_to_data, instance_name) {
     path = paste0(path_to_data, instance_name, '/QualtricsData/')
     
-    EnAA = fread(paste0(path, "EntrySurvey_AA.csv"))
-    EnGP = fread(paste0(path, "EntrySurvey_GP.csv"))
-    EnPA = fread(paste0(path, "EntrySurvey_PA.csv"))
-    EnPA_IDSonly = fread(paste0(path, "EntrySurvey_PA (IDS only).csv"))
-    
-    # Remove non-data rows at the start.
-    EnAA = EnAA[3:nrow(EnAA)]
-    EnGP = EnGP[3:nrow(EnGP)]
-    EnPA = EnPA[2:nrow(EnPA)] # Removed row of original question text in CSV due to quote issues which prevented import.
-    EnPA_IDSonly = EnPA_IDSonly[3:nrow(EnPA_IDSonly)]
-    
-    # Rename columns to be consistent.
-    setnames(EnGP, "Q984", "Q2.3")
-    setnames(EnPA_IDSonly, "math", "expertise_math")
-    setnames(EnPA_IDSonly, "quant_model", "expertise_quant_model")
-    setnames(EnPA_IDSonly, "stats", "expertise_stats")
-    setnames(EnPA_IDSonly, "prob", "expertise_prob")
-    setnames(EnPA_IDSonly, "bayes_net", "expertise_bayes_net")
-    setnames(EnPA_IDSonly, "programming", "expertise_programming")
-    setnames(EnPA_IDSonly, "exp_design", "expertise_exp_design")
-    setnames(EnPA_IDSonly, "risk_analysis", "expertise_risk_analysis")
-    setnames(EnPA_IDSonly, "forecasting", "expertise_forecasting")
-    setnames(EnPA_IDSonly, "dec_theory", "expertise_dec_theory")
-    setnames(EnPA_IDSonly, "game_theory", "expertise_game_theory")
-    setnames(EnPA_IDSonly, "sats", "expertise_sats")
-    setnames(EnPA_IDSonly, "arg_map", "expertise_arg_map")
-    setnames(EnPA_IDSonly, "inf_logic", "expertise_inf_logic")
-    setnames(EnPA_IDSonly, "sys_think", "expertise_sys_think")
-    setnames(EnPA_IDSonly, "image_analysis", "expertise_image_analysis")
-    setnames(EnPA_IDSonly, "link_analysis", "expertise_link_analysis")
-    setnames(EnPA_IDSonly, "graphic_design", "expertise_graphic_design")
-    setnames(EnPA_IDSonly, "tech_writing", "expertise_tech_writing")
-    
-    # Add column defining participant type.
-    EnAA$type = "AA"
-    EnGP$type = "GP"
-    EnPA$type = "PA"
-    EnPA_IDSonly$type = "PA"
-    
-    ES = rbind(EnAA,
-               EnGP,
-               EnPA,
-               EnPA_IDSonly,
-               use.names = TRUE,
-               fill = TRUE)
+    ES = fread(paste0(path, "ind_diffs_responses_no_scoring.csv"))
     
     colnames(ES) = c("startDate",
                      "endDate",
@@ -170,16 +141,13 @@ compile_parts_2018_SwarmChallengeExp1 = function(path_to_data, instance_name) {
                      "finished",
                      "recordedDate",
                      "responseID",
-                     "recipientLastName",
-                     "recipientFirstName",
-                     "recipientEmail",
                      "externalReference",
                      "latitude",
                      "longitude",
                      "distributionChannel",
                      "userLanguage",
                      
-                     "gaveConsent1", # Efficacy of the SWARM platform
+                     #"gaveConsent1", # Efficacy of the SWARM platform
                      
                      "yearsIntelAnalyticalExperience",
                      "yearsProfAnalyticalExperience",
@@ -369,10 +337,7 @@ compile_parts_2018_SwarmChallengeExp1 = function(path_to_data, instance_name) {
                      "pc57B",
                      "pc14AUB",
                      "pc5A",
-                     "pc35B",
-                     
-                     "type",
-                     "continue"
+                     "pc35B"
     )
     
     colsToRemove = c("startDate",
@@ -381,58 +346,45 @@ compile_parts_2018_SwarmChallengeExp1 = function(path_to_data, instance_name) {
                      "IPaddress",
                      "duration",
                      "recordedDate",
-                     #"responseID",
-                     "recipientLastName",
-                     "recipientFirstName",
-                     "recipientEmail",
                      "externalReference",
                      "latitude",
                      "longitude",
                      "distributionChannel",
-                     "userLanguage",
-                     "rmePractice",
-                     "continue"
+                     "userLanguage"
     )
     ES = ES[,!..colsToRemove]
     
     ES[ES == ""] <- NA
     
-    ES[ES == "Not familiar with this domain"] <- 1
-    ES[ES == "Studied in school, but don't use it"] <- 2
-    ES[ES == "Use this knowledge occasionally"] <- 3
-    ES[ES == "Use this knowledge regularly"] <- 4
-    ES[ES == "I am a recognized expert"] <- 5
-    ES[ES == "I am an international authority"] <- 6
-    for (i in 1:19) {
-        ES[[paste0("exp", i)]] = as.numeric(ES[[paste0("exp", i)]])
-    }
+    # ES[ES == "Not familiar with this domain"] <- 1
+    # ES[ES == "Studied in school, but don't use it"] <- 2
+    # ES[ES == "Use this knowledge occasionally"] <- 3
+    # ES[ES == "Use this knowledge regularly"] <- 4
+    # ES[ES == "I am a recognized expert"] <- 5
+    # ES[ES == "I am an international authority"] <- 6
     
-    pcQs = c("pc5A",
-             "pc5B",
-             "pc5Acomp",
-             "pc5AUB",
-             "pc14A",
-             "pc14B",
-             "pc14Acomp",
-             "pc14AUB",
-             "pc35A",
-             "pc35B",
-             "pc35Acomp",
-             "pc35AUB",
-             "pc57A",
-             "pc57B",
-             "pc57Acomp",
-             "pc57AUB",
-             "pc60A",
-             "pc60B",
-             "pc60Acomp",
-             "pc60AUB"
-    )
-    for (q in pcQs) {
-        ES[[q]] = as.numeric(ES[[q]])
-    }
+    # pcQs = c("pc5A",
+    #          "pc5B",
+    #          "pc5Acomp",
+    #          "pc5AUB",
+    #          "pc14A",
+    #          "pc14B",
+    #          "pc14Acomp",
+    #          "pc14AUB",
+    #          "pc35A",
+    #          "pc35B",
+    #          "pc35Acomp",
+    #          "pc35AUB",
+    #          "pc57A",
+    #          "pc57B",
+    #          "pc57Acomp",
+    #          "pc57AUB",
+    #          "pc60A",
+    #          "pc60B",
+    #          "pc60Acomp",
+    #          "pc60AUB"
+    # )
     
-    ES$age = as.numeric(ES$age)
     ES[age >= 18 & age <= 25, agegroup := "18-25"]
     ES[age >= 26 & age <= 35, agegroup := "26-35"]
     ES[age >= 36 & age <= 45, agegroup := "36-45"]
@@ -440,46 +392,27 @@ compile_parts_2018_SwarmChallengeExp1 = function(path_to_data, instance_name) {
     ES[age >= 56 & age <= 65, agegroup := "56-65"]
     ES[age >= 66, agegroup := "over 65"]
     
-    for (k in 1:6) {
-        ES[[paste0("crt",k)]] = as.numeric(ES[[paste0("crt",k)]])
-    }
-    
     # Re-encode AOMT and BFI questions.
-    ES[ES == "Strongly Disagree"] <- 1
-    ES[ES == "Strongly disagree"] <- 1
-    ES[ES == "Disagree"] <- 2
-    ES[ES == "Somewhat disagree"] <- 3
-    ES[ES == "Neither agree nor disagree"] <- 4
-    ES[ES == "Somewhat agree"] <- 5
-    ES[ES == "Agree"] <- 6
-    ES[ES == "Strongly agree"] <- 7
-    for (i in 1:11) {
-        ES[[paste0("aomt", i)]] = as.numeric(ES[[paste0("aomt", i)]])
-    }
-    for (k in 1:10) {
-        ES[[paste0("bfi", k)]] = as.numeric(ES[[paste0("bfi", k)]])
-    }
+    # ES[ES == "Strongly Disagree"] <- 1
+    # ES[ES == "Strongly disagree"] <- 1
+    # ES[ES == "Disagree"] <- 2
+    # ES[ES == "Somewhat disagree"] <- 3
+    # ES[ES == "Neither agree nor disagree"] <- 4
+    # ES[ES == "Somewhat agree"] <- 5
+    # ES[ES == "Agree"] <- 6
+    # ES[ES == "Strongly agree"] <- 7
     
-    for (k in 1:16) {
-        ES[[paste0("toa", k)]] = as.numeric(ES[[paste0("toa", k)]])
-    }
-    ES$yearsIntelAnalyticalExperience = as.numeric(ES$yearsIntelAnalyticalExperience)
-    ES$yearsProfAnalyticalExperience = as.numeric(ES$yearsProfAnalyticalExperience)
-    
-    ES[,`:=`(progress = as.numeric(progress),
-             finished = (finished == "True" | finished == "TRUE"),
-             gaveConsent1 = (gaveConsent1 == "Yes")
-            )]
+    ES$finished = (ES$finished == 1)
     
     ES$user = NA
     ES$team = NA
+    ES$type = NA
     
     # Reorder columns.
     ES = ES[,.(
         responseID,
         progress,
         finished,
-        gaveConsent1,
         type,
         
         user,
@@ -673,17 +606,18 @@ compile_parts_2018_SwarmChallengeExp1 = function(path_to_data, instance_name) {
         rme36
     )]
     
-    # Populate user and team.
+    # Populate user, team and type.
     lookup = fread(paste0(path_to_data, instance_name, '/AdminData/match_ind_diffs_response_to_swarm_username.csv'))
     for (k in 1:nrow(ES)) {
         if (ES$responseID[k] %in% lookup$IDS_ResponseId) {
             i = which(lookup$IDS_ResponseId == ES$responseID[k])
             ES$user[k] = lookup$username[i]
             ES$team[k] = lookup$Team[i]
+            ES$type[k] = lookup$Type.x[i]
         }
     }
     
-    ES <- ES[finished & ((gaveConsent1 == TRUE) | is.na(gaveConsent1))]
+    ES <- ES[ES$finished]
     ES = ES[!is.na(ES$user)]
     ES = as.data.frame(ES)
     
@@ -1267,13 +1201,13 @@ compile_probteams_2018_SwarmChallengeExp1 = function(repo, path_to_data, instanc
                           textSim = NA)
     
     getActiveUsersSq = function(tm, pr) {
-        team_members = analytics[teamName == tm & problem == pr]
+        team_members = analytics[team == tm & problem == pr]
         nActive = sum(team_members$engagement_normed > 0)
         nActiveSq = nActive ^ 2
     }
     
     getTextSim = function(tm, pr) {
-        file_names = responses[team_name == tm & problem == pr & response_type == "report"]$response_text
+        file_names = responses[team == tm & problem == pr & response_type == "report"]$response_text
         
         if (length(file_names) > 1) {
             reports = suppressWarnings(readtext(paste0(response_path,file_names[1])))  # surpress "*.md" warnings
@@ -1358,13 +1292,13 @@ compile_probteams_2020_HuntChallenge = function(repo, path_to_data, instance_nam
                           textSim = NA)
     
     getActiveUsersSq = function(tm, pr) {
-        team_members = analytics[teamName == tm & problem == pr]
+        team_members = analytics[team == tm & problem == pr]
         nActive = sum(team_members$engagement_normed > 0)
         nActiveSq = nActive ^ 2
     }
     
     getTextSim = function(tm, pr) {
-        file_names = responses[team_name == tm & problem == pr & response_type == "report"]$response_text
+        file_names = responses[team == tm & problem == pr & response_type == "report"]$response_text
         
         if (length(file_names) > 1) {
             reports = suppressWarnings(readtext(paste0(response_path,file_names[1])))  # surpress "*.md" warnings
@@ -1408,6 +1342,8 @@ compile_probteams_2020_HuntChallenge = function(repo, path_to_data, instance_nam
     return(probteam)
 }
 
+
+
 compile_probteams = function(repo, path_to_data, instance_name) {
     
     # Lookup table for relevant functions. This is required because demographic surveys differ
@@ -1424,6 +1360,146 @@ compile_probteams = function(repo, path_to_data, instance_name) {
     } else {
         return(NULL)
     }
+}
+
+compile_probparts = function(repo, nClusters, generatePlots = F) {
+    
+    anal = repo[[1]]$PlatformData$analytics
+    anal$probteam = NA
+    anal$teamFinished = NA
+    anal = anal[0,]
+    
+    for (nm in names(repo)) {
+        analytics = repo[[nm]]$PlatformData$analytics
+        probteams = repo[[nm]]$OtherData$probteams
+        
+        analytics$probteam = paste0(analytics$team, analytics$problem)
+        probteams$probteam = paste0(probteams$team, probteams$problem)
+        
+        teamFinished = function(pt) {
+            return(pt %in% probteams$probteam)
+        }
+        analytics$teamFinished = sapply(analytics$probteam, teamFinished)
+        analytics = analytics[analytics$teamFinished,]
+        
+        anal = rbind(anal, analytics)
+    }
+    
+    # Select contributions for each user instance.
+    anal = anal %>%
+        select(team, problem, user, report_count, resource_count, comment_count, vote_count,
+               quick_rating, complete_rating, chat_count)
+    
+    # Remove outliers: artificially capping chat counts to 100 so they don't cause outliers.
+    anal[anal$chat_count >= 100,]$chat_count = 100
+    
+    # Scale data to a mean of 0 and a standard dev of 1 (relativates high number of chat messages etc.)
+    scanal = apply(anal[, 4:10], 2, function(x) {(x-mean(x))/sd(x)})
+    scanal = cbind(anal[,1:3], scanal)
+    
+    # Get Euclidean distances 
+    d = dist(scanal[, 4:10]) 
+    
+    # Consult multiple criteria to decide on number of clusters (commented out because takes longer).
+    # nc = NbClust::NbClust(scanal[,4:10], distance = "euclidean", min.nc = 2, max.nc = 15, method = "ward.D")
+    # table(nc$Best.nc[1,])
+    # We want a bit of distinction so we look for larger number of clusters
+    # Try 10 (3 criteria)
+    
+    # Run hierarchical clustering with Ward method to determine the centers
+    fit.ward = hclust(d, method = "ward.D")
+    clusters = cutree(fit.ward, k = nClusters) # ward results are much more promising
+    
+    # Plot dendrogram.
+    if (generatePlots) {
+        plot(fit.ward, hang = -1, cex = 0.6, main = "Ward Linkage Clustering\n10 Cluster Solution")
+        rect.hclust(fit.ward, k = nClusters)
+    }
+    centers = aggregate(scanal[,4:10], list(clusters), median)
+    
+    # Test hierarchical with silhouette method.
+    sil = cluster::silhouette(clusters, d)
+    # Nice visualisation of the silhouette width.
+    p = fviz_silhouette(sil, print.summary = FALSE) +
+        theme_minimal()+
+        theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
+    if (generatePlots) {
+        print(p)
+    }
+    
+    # Now use centers as starting points for k-means clustering.
+    set.seed(42)
+    fit.km = kmeans(scanal[,4:10], centers = centers[, 2:8], nstart = 1)
+    
+    # Silhouette width now increased to 0.3
+    sil = silhouette(fit.km$cluster, d)
+    p = fviz_silhouette(sil, print.summary = FALSE) +
+        theme_minimal()+
+        theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())  
+    if (generatePlots) {
+        print(p)
+    }
+    
+    # Stripcharts for k-means: 
+    anal[['cluster']] = factor(fit.km$cluster)
+    anal[['clusterLabel']] = character(nrow(anal))
+    anal[anal$cluster == 1,]$clusterLabel = 'Talkative Multi-talent'
+    anal[anal$cluster == 2,]$clusterLabel = 'Slow-rating Multi-talent (Tier 1)'
+    anal[anal$cluster == 3,]$clusterLabel = 'Speed-rating Multi-talent (Tier 1)'
+    anal[anal$cluster == 4,]$clusterLabel = 'Allrounder (Tier 1)'
+    anal[anal$cluster == 5,]$clusterLabel = 'Slow-rating Multi-talent (Tier 2)'
+    anal[anal$cluster == 6,]$clusterLabel = 'Report Guru'
+    anal[anal$cluster == 7,]$clusterLabel = 'Allrounder (Tier 2)'
+    anal[anal$cluster == 8,]$clusterLabel = 'Speed-rating Multi-talent (Tier 2)'
+    anal[anal$cluster == 9,]$clusterLabel = 'Single-minded Raters'
+    anal[anal$cluster == 10,]$clusterLabel = 'Drop In'
+    
+    D = anal
+    for (cn in colnames(D)[4:10]) {
+        D[[cn]] = D[[cn]]/max(D[[cn]])
+    }
+    D = melt(D, id.vars = c("team","problem","user","cluster","clusterLabel"))
+    P = list()
+    for (p in 1:10) {
+        P[[p]] = ggplot(D[D$cluster == p,], aes(x = variable, y = value)) +
+            geom_jitter(aes(colour = variable), alpha = 0.3) + ylim(0,1) +
+            coord_flip() +
+            guides(color = FALSE) +
+            theme_linedraw() +
+            labs(x = "",
+                 y = "Percentile",
+                 title = paste("Cluster", p),
+                 subtitle = D[cluster == p]$clusterLabel[1]) +
+            theme(panel.grid.major = element_blank(), panel.grid.minor.y = element_line(colour="grey", size=0.2))
+    }
+    pw = P[[1]] + P[[2]] + P[[3]] + P[[4]] + P[[5]] + P[[6]] + P[[7]] + P[[8]] + P[[9]] + P[[10]]
+    
+    if (generatePlots) {
+        ggexport(pw,
+                 filename = "Cluster Overview.png",
+                 width = 4181,
+                 height = 2000,
+                 pointsize = 11,
+                 res = 300)
+        message(paste0("Exported 'Cluster Overview.png'"))
+    }
+    
+    # Create probparts tables.
+    for (nm in names(repo)) {
+        probparts = repo[[nm]]$PlatformData$analytics
+        probparts$cluster = NA
+        probparts$clusterLabel = NA
+        
+        for (k in 1:nrow(probparts)) {
+            i = which((anal$problem == probparts$problem[k]) & (anal$user == probparts$user[k]))[1]
+            probparts$cluster[k] = as.character(anal$cluster[i])
+            probparts$clusterLabel[k] = as.character(anal$clusterLabel[i])
+        }
+        
+        repo[[nm]]$OtherData$probparts = probparts
+    }
+    
+    return(repo)
 }
 
 #' Compile data from 'raw' SWARM, Qualtrics & Knack CSVs
@@ -1467,6 +1543,7 @@ compile_data = function(path = "data/") {
         repo[[instance_name]][['OtherData']]$teams = compile_teams(repo, path, instance_name)
         repo[[instance_name]][['OtherData']]$probteams = compile_probteams(repo, path, instance_name)
     }
+    repo = compile_probparts(repo, nClusters = 10)
     
     # Save compiled data to package, tidy environment, and reload the package.
     save(repo,

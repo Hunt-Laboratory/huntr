@@ -51,7 +51,7 @@ ColumnName          Description
 problem_id           Unique identifier of the problem
 problem              Short title of the problem
 team_id              Unique identifier for the team that produced the report
-team_name            Screen name for the team_id
+team                 Screen name for the team_id
 report_id            Unique identifier for the report (response of type "report")
 team_rating          The aggregate rating of the report from the (internal) team at time of submission
 rating_count         Number of received ratings
@@ -70,7 +70,7 @@ ColumnName           Description
 problem_id           Unique identifier of the problem
 problem 			 Short title of the problem
 team_id              Unique identifier for the team that produced the response
-team_name            The name of the team that produced the response
+team                 The name of the team that produced the response
 response_id          Unique identifier for the a response
 time_created         Timestamp when the response was first created
 time_last_changed    Timestamp when the response was last updated
@@ -91,7 +91,7 @@ ColumnName           Description
 problem_id           Unique identifier of the problem
 problem              Short title of the problem
 team_id              Unique identifier for the team that produced the report
-team_name            Name of the team that produced the report
+team                 Name of the team that produced the report
 response_id          Unique identifier for the a response
 author_id            Unique identifier of a user who (co-)authored the response
 originator           1 if the author was the originator of the response, otherwise 0
@@ -110,7 +110,7 @@ ColumnName           Description
 problem_id           Unique identifier of the problem
 problem              Short title of the problem
 team_id              Unique identifier for the team that produced the report
-team_name            Name of the team that produced the report
+team                 Name of the team that produced the report
 response_id          Unique identifier for the a response
 author_id            Unique identifier of the original author of the response
 author_name          Name of the orginal author of the response
@@ -197,7 +197,7 @@ We capture when users log in and out of the platform. A few caveats here: Since 
 ColumnName          Description
 ---------------         -----------------------------------------------------------
 user_id                 Unique identifier of the user who logs in/out
-user_name               Name of user who logs in/out
+user                    Name of user who logs in/out
 event                   Can either be login or logout
 time_stamp              Timestamp when login/logout occurred 
 
@@ -209,10 +209,10 @@ In this file we capture how many reports, resources, comments, resource_votes, c
 
 ColumnName                  Description
 ---------------             -----------------------------------------------------------
-team_name                   Name of team the user is in
+team                        Name of team the user is in
 team_id                     Unique identifier of the team the user is in
 problem_id                  Unique identifier of the problem the team is working on
-user_name                   Name of user
+user                        Name of user
 user_id                     Unique identifier of user
 report_count                Number of reports user contributed to problem
 resource_count              Number of resources user contributed to problem 
@@ -245,8 +245,8 @@ ColumnName          Description
 ---------------         -----------------------------------------------------------
 addressant              User addressed by the other user (e.g. mentioned in chat)
 problem_id              Unique identifier of problem
-team_name               Name of team both users are in
-user_name               User who addresses another user ( e.g. writes a chat message that contains a name tag)
+team                    Name of team both users are in
+user                    User who addresses another user ( e.g. writes a chat message that contains a name tag)
 problem                 Name of problem 
 interaction             Describes the interaction: 'comment', 'contributor' or 'chat'
 count                   Number of times this interaction happened
@@ -262,9 +262,9 @@ chunk_id                Unique identifier for the artefact contributed (can be a
 parent_id               Unique identifier for the source the artefact was contributed to (a report or resource in case of a comment or update, a problem_id in case of a report or resource, a report in case of a rating)
 problem_id              Unique identifier for the problem (e.g. in case the artefact is a report or resource parent and problem id are identical)
 team_id                 Unique identifier for team
-team_name               Name of team
+team                    Name of team
 timestamp               Timestamp when artefact was contributed, for resources, reports and comments this is their first post, for ratings only the last update is stored
 type                    The artefact type, can be report, resource, comment, rating, update
 problem                 The problem title
 user_id                 Unique indentifier of the user contributing the artefact
-user_name               Name of user
+user                    Name of user
