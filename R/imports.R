@@ -4,6 +4,8 @@
 tidyProblemNames = function(dt) {
     dt[dt == "Problem #1 - Foreign Fighters"] = "Foreign Fighters"
     dt[dt == "Problem #2 - Forecasting Piracy"] = "Forecasting Piracy"
+    dt[dt == "Problem #3 - Corporate Espionage"] = "Corporate Espionage"
+    dt[dt == "Problem #4 - The Park Young-min Case"] = "The Park Young-min Case"
     return(dt)
 }
 
@@ -72,13 +74,25 @@ fetchPlatformData = function(path_to_data, instance_name) {
     setnames(instance_data$relations, "userName", "user")
     setnames(instance_data$timeline, "userName", "user")
     
+    # Filter out dummy problems.
+    dummy_problems = c("'Sandpit' Problem",
+                       "Test Problem",
+                       "Problem #1 Teaser - 'Foreign Fighters'",
+                       "Problem #2 Teaser - 'Forecasting Piracy'",
+                       "Problem #3 Teaser - 'Corporate Espionage'",
+                       "Problem #4 Teaser - The Park Young-min Case")
+    for (problem_name in dummy_problems) {
+        instance_data$relations = instance_data$relations[problem != problem_name]   
+        instance_data$timeline = instance_data$timeline[problem != problem_name]   
+    }
+    
     # Add problem title as variable to tables that only have problem ID.
     for (table_name in c("responses", "authors", "comments", "ratings", "chat")) {
         setDT(instance_data[[table_name]])[instance_data$problems, problem := i.problem, on = c(problem_id = "problem_id")]
     }
     
     # Tidy problem names.
-    for (table_name in c("responses", "analytics")) {
+    for (table_name in c("problems", "responses", "analytics", "relations", "timeline")) {
         instance_data[[table_name]] = tidyProblemNames(instance_data[[table_name]])
         
     }
@@ -1104,7 +1118,8 @@ compile_teams_2020_HuntChallenge = function(repo, path_to_data, instance_name) {
     
     # Create teams table.
     
-    tms = unique(parts$team)
+    tms = unique(repo[[instance_name]]$PlatformData$analytics$team)
+    tms = tms[tms != "melcreate"]
     teams = data.frame(team = tms,
                        AOMT = NA,
                        divAOMT = NA,
@@ -1257,6 +1272,8 @@ compile_probteams_2020_HuntChallenge = function(repo, path_to_data, instance_nam
     K = as.data.frame(fread(path))
     colnames(K) <- c("team",
                      "avgAll",
+                     "inRound1",
+                     "inRound2",
                      "type",
                      "points",
                      "avg2",
@@ -1268,13 +1285,18 @@ compile_probteams_2020_HuntChallenge = function(repo, path_to_data, instance_nam
                      "nRatings3",
                      "nRatings4",
                      "nRatings2020",
-                     "nGeoCorrect")
+                     "nGeoCorrect",
+                     "tightness",
+                     "nRedactionEstimates",
+                     "probabilityEstimate",
+                     "misc1",
+                     "misc2")
     K = K[K$type != "Calibration",]
     
     parts = repo[[instance_name]]$OtherData$parts
     teams = repo[[instance_name]]$OtherData$teams
-    tms = unique(parts$team)
-    problems = c("Foreign Fighters", "Forecasting Piracy")
+    tms = unique(teams$team)
+    problems = c("Foreign Fighters", "Forecasting Piracy", "Corporate Espionage", "The Park Young-min Case")
     analytics = repo[[instance_name]]$PlatformData$analytics
     responses = repo[[instance_name]]$PlatformData$responses
     
@@ -1288,6 +1310,7 @@ compile_probteams_2020_HuntChallenge = function(repo, path_to_data, instance_nam
                           nODNI = NA,
                           rankODNI = NA,
                           nGeoCorrect = NA,
+                          probabilityEstimate = NA,
                           activeUsersSq = NA,
                           textSim = NA)
     
@@ -1335,9 +1358,14 @@ compile_probteams_2020_HuntChallenge = function(repo, path_to_data, instance_nam
         if (probteam$problem[k] == "Foreign Fighters") {
             probteam$nGeoCorrect[k] = K$nGeoCorrect[i]
         }
+        if (probteam$problem[k] == "Forecasting Piracy" & !is.na(probteam$avgODNI[k])) {
+            probteam$probabilityEstimate[k] = K$probabilityEstimate[i]
+        }
         probteam$activeUsersSq[k] = getActiveUsersSq(probteam$team[k], probteam$problem[k])
         probteam$textSim[k] = getTextSim(probteam$team[k], probteam$problem[k])
     }
+    
+    probteam = probteam[!is.na(probteam$avgODNI),]
     
     return(probteam)
 }
@@ -1553,9 +1581,3 @@ compile_data = function(path = "data/") {
     devtools::load_all("huntr")
     
 }
-
-
-
-
-
-
