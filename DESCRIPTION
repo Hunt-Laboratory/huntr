@@ -3,7 +3,7 @@ Title: Hunt Lab Analysis functions
 Version: 0.10
 Authors@R: person("Luke", "Thorburn", email = "luke.thorburn@gmail.com", role = c("aut", "cre"))
 Description: This package contains all code written for the Hunt Laboratory for Intelligence Research, a research group at The University of Melbourne.
-Depends: R (>= 3.3.1), ggplot2, data.table, ggpubr, ggsci, ggraph, tidygraph, patchwork, stringr, readtext, lubridate, quanteda, NbClust, cluster, factoextra, png, grid
+Depends: R (>= 3.3.1), ggplot2, data.table, ggpubr, ggsci, ggraph, tidygraph, patchwork, stringr, readtext, lubridate, quanteda, NbClust, cluster, factoextra, png, grid, gtable
 License: GPL-3
 Encoding: UTF-8
 LazyData: true

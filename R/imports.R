@@ -92,7 +92,7 @@ fetchPlatformData = function(path_to_data, instance_name) {
     }
     
     # Tidy problem names.
-    for (table_name in c("problems", "responses", "analytics", "relations", "timeline")) {
+    for (table_name in c("problems", "responses", "analytics", "relations", "timeline", "chat")) {
         instance_data[[table_name]] = tidyProblemNames(instance_data[[table_name]])
         
     }
@@ -419,7 +419,6 @@ compile_parts_2018_SwarmChallengeExp1 = function(path_to_data, instance_name) {
     ES$finished = (ES$finished == 1)
     
     ES$user = NA
-    ES$team = NA
     ES$type = NA
     
     # Reorder columns.
@@ -430,7 +429,6 @@ compile_parts_2018_SwarmChallengeExp1 = function(path_to_data, instance_name) {
         type,
         
         user,
-        team,
         
         age,
         agegroup,
@@ -626,7 +624,6 @@ compile_parts_2018_SwarmChallengeExp1 = function(path_to_data, instance_name) {
         if (ES$responseID[k] %in% lookup$IDS_ResponseId) {
             i = which(lookup$IDS_ResponseId == ES$responseID[k])
             ES$user[k] = lookup$username[i]
-            ES$team[k] = lookup$Team[i]
             ES$type[k] = lookup$Type.x[i]
         }
     }
@@ -646,9 +643,13 @@ compile_parts_2020_HuntChallenge = function(path_to_data, instance_name) {
     
     entrySurveyPub = fread(paste0(path, "HC2020_EntrySurvey_Public.csv"))
     entrySurveyOrg = fread(paste0(path, "HC2020_EntrySurvey_Organisations.csv"))
+    exitSurveyPub = fread(paste0(path, "HC2020_ExitSurvey_Public.csv"))
+    exitSurveyOrg = fread(paste0(path, "HC2020_ExitSurvey_Organisations.csv"))
     
     entrySurveyPub = entrySurveyPub[3:nrow(entrySurveyPub)]
     entrySurveyOrg = entrySurveyOrg[3:nrow(entrySurveyOrg)]
+    exitSurveyPub = exitSurveyPub[3:nrow(exitSurveyPub)]
+    exitSurveyOrg = exitSurveyOrg[3:nrow(exitSurveyOrg)]
     
     colnames(entrySurveyPub) <- c("startDate",
                                   "endDate",
@@ -677,16 +678,16 @@ compile_parts_2020_HuntChallenge = function(path_to_data, instance_name) {
                                   "interests",
                                   "interestsOtherInput",
                                   
-                                  "expct1", # InterestingProblems
-                                  "expct2", # TimeCommitment
-                                  "expct3", # DifficultProblems
-                                  "expct4", # LearnSkills
-                                  "expct5", # AchievableProblems
-                                  "expct6", # ProductivePlatform
-                                  "expct7", # AnalyticalTraining
-                                  "expct8", # PositiveExperience
-                                  "expct9", # EffectiveCollaboration
-                                  "expct10", # ApplicableToWork
+                                  "enExpct1", # InterestingProblems
+                                  "enExpct2", # TimeCommitment
+                                  "enExpct3", # DifficultProblems
+                                  "enExpct4", # LearnSkills
+                                  "enExpct5", # AchievableProblems
+                                  "enExpct6", # ProductivePlatform
+                                  "enExpct7", # AnalyticalTraining
+                                  "enExpct8", # PositiveExperience
+                                  "enExpct9", # EffectiveCollaboration
+                                  "enExpct10", # ApplicableToWork
                                   
                                   "pri1", # BenchmarkTeam
                                   "pri2", # TestSkills
@@ -724,13 +725,13 @@ compile_parts_2020_HuntChallenge = function(path_to_data, instance_name) {
                                   "typeAnalyticalExperience",
                                   "yearsAnalyticalExperience",
                                   
-                                  "cap1", # ReportWriting
-                                  "cap2", # UsingSATs
-                                  "cap3", # OSINT
-                                  "cap4", # Frameworks
-                                  "cap5", # Assumptions
-                                  "cap6", # EvaluatingQoR
-                                  "cap7", # DecisionMaking
+                                  "enCap1", # ReportWriting
+                                  "enCap2", # UsingSATs
+                                  "enCap3", # OSINT
+                                  "enCap4", # Frameworks
+                                  "enCap5", # Assumptions
+                                  "enCap6", # EvaluatingQoR
+                                  "enCap7", # DecisionMaking
                                   
                                   "hasMultidisciplinaryExperience",
                                   "multidisciplinaryExperienceInput",
@@ -763,16 +764,16 @@ compile_parts_2020_HuntChallenge = function(path_to_data, instance_name) {
                                   "interests",
                                   "interestsOtherInput",
                                   
-                                  "expct1", # InterestingProblems
-                                  "expct2", # TimeCommitment
-                                  "expct3", # DifficultProblems
-                                  "expct4", # LearnSkills
-                                  "expct5", # AchievableProblems
-                                  "expct6", # ProductivePlatform
-                                  "expct7", # AnalyticalTraining
-                                  "expct8", # PositiveExperience
-                                  "expct9", # EffectiveCollaboration
-                                  "expct10", # ApplicableToWork
+                                  "enExpct1", # InterestingProblems
+                                  "enExpct2", # TimeCommitment
+                                  "enExpct3", # DifficultProblems
+                                  "enExpct4", # LearnSkills
+                                  "enExpct5", # AchievableProblems
+                                  "enExpct6", # ProductivePlatform
+                                  "enExpct7", # AnalyticalTraining
+                                  "enExpct8", # PositiveExperience
+                                  "enExpct9", # EffectiveCollaboration
+                                  "enExpct10", # ApplicableToWork
                                   
                                   "pri1", # BenchmarkTeam
                                   "pri2", # TestSkills
@@ -810,25 +811,289 @@ compile_parts_2020_HuntChallenge = function(path_to_data, instance_name) {
                                   "typeAnalyticalExperience",
                                   "yearsAnalyticalExperience",
                                   
-                                  "cap1", # ReportWriting
-                                  "cap2", # UsingSATs
-                                  "cap3", # OSINT
-                                  "cap4", # Frameworks
-                                  "cap5", # Assumptions
-                                  "cap6", # EvaluatingQoR
-                                  "cap7", # DecisionMaking
+                                  "enCap1", # ReportWriting
+                                  "enCap2", # UsingSATs
+                                  "enCap3", # OSINT
+                                  "enCap4", # Frameworks
+                                  "enCap5", # Assumptions
+                                  "enCap6", # EvaluatingQoR
+                                  "enCap7", # DecisionMaking
                                   
                                   "hasMultidisciplinaryExperience",
                                   "multidisciplinaryExperienceInput"
     )
     
+    colnames(exitSurveyOrg) = c(
+        "startDate",
+        "endDate",
+        "status",
+        "IPaddress",
+        "progress",
+        "duration",
+        "finished",
+        "recordedDate",
+        "responseID",
+        "recipientLastName",
+        "user",
+        "recipientEmail",
+        "externalReference",
+        "latitude",
+        "longitude",
+        "distributionChannel",
+        "userLanguage",
+        "recaptcha",
+        
+        "username",
+        "starRating",
+        "timeWellSpent",
+        "bestThing",
+        "worstThing",
+        
+        "rate1", # onboarding process
+        "rate2", # our communication
+        "rate3", # the training
+        "rate4", # the feedback
+        "rate5", # the help center
+        
+        "exExpct1", # interesting problems
+        "exExpct2", # reasonable time commitment
+        "exExpct3", # difficult problems
+        "exExpct4", # learning new skills and tools
+        "exExpct5", # achievable problems
+        "exExpct6", # platform will be productive work space
+        "exExpct7", # training in OSINT tools
+        "exExpct8", # positive team working experience
+        "exExpct9", # effective collaboration, compared to normal methods
+        "exExpct10", # can be applied in my workplace
+        
+        "hoursPerWeek",
+        "enoughTime",
+        "proportionOwnTime",
+        
+        "tw1", # enjoyed the team social experience
+        "tw2", # enjoyed the team collaboration experience
+        "tw3", # could positively contribute
+        "tw4", # efforts recognised
+        "tw5", # easy to keep track
+        "tw6", # too dominant
+        "tw7", # had to lead
+        
+        "pf1", # shared mission
+        "pf2", # unified goal
+        "pf3", # managing contributions
+        "pf4", # keeping track
+        "pf5", # flexible and agile
+        "pf6", # innovative problem solving
+        "pf7", # enabling efficient workflow
+        "pf8", # meeting deadlines
+        "pf9", # clear communication
+        "pf10", # engaging/disengaging
+        "pf11", # information sharing
+        "pf12", # working together positively
+        "pf13", # making decisions
+        "pf14", # production of useful output
+        "pfComments",
+        
+        "fb1", # accurately reflected
+        "fb2", # understand strengths and weeknesses
+        "fb3", # build expertise
+        "fb4", # used feedback
+        
+        "exCap1", # analytic report writing
+        "exCap2", # using SATs
+        "exCap3", # using OSINT tools
+        "exCap4", # applying strategic thinking
+        "exCap5", # identifying and analysing assumptions
+        "exCap6", # evaluating QoR
+        "exCap7", # using decision making frameworks
+        
+        "mostValuable",
+        "cha1", # more effective
+        "cha2", # more engaging
+        "cha3", # some people but not others
+        
+        "career1",
+        "career2",
+        
+        "ca1", # understood CA
+        "ca2", # used CA
+        "ca3", # understoodimproved QoR
+        "ca4", # intend to apply
+        
+        "swarm1", # better reasoned reports
+        "swarm2", # team > individual
+        "swarm3", # would improve intelligence analysis in org
+        "swarm4", # would use it
+        
+        "lk1", # easy to find relevant tools
+        "lk2", # tools were well explained
+        "lk3", # was helpful
+        "lk4", # preferred existing tools
+        "lk5", # difficult to navigate
+        "lk6", # used it often
+        "lkSuggestions",
+        
+        "responseStatements",
+        
+        "ratingTool",
+        "ratingToolWhyNot",
+        "ratingToolPurpose",
+        
+        "featureResquests",
+        "externalTools",
+        "externalToolsComments",
+        
+        "bestQuestionNotAsked",
+        
+        "testimonial",
+        "otherComments"
+    )
+    
+    colnames(exitSurveyPub) = c(
+        "startDate",
+        "endDate",
+        "status",
+        "IPaddress",
+        "progress",
+        "duration",
+        "finished",
+        "recordedDate",
+        "responseID",
+        "recipientLastName",
+        "recipientFirstName",
+        "recipientEmail",
+        "externalReference",
+        "latitude",
+        "longitude",
+        "distributionChannel",
+        "userLanguage",
+        "recaptcha",
+        
+        "username",
+        "starRating",
+        "timeWellSpent",
+        "bestThing",
+        "worstThing",
+        
+        "rate1", # onboarding process
+        "rate2", # our communication
+        "rate3", # the training
+        "rate4", # the feedback
+        "rate5", # the help center
+        
+        "exExpct1", # interesting problems
+        "exExpct2", # reasonable time commitment
+        "exExpct3", # difficult problems
+        "exExpct4", # learning new skills and tools
+        "exExpct5", # achievable problems
+        "exExpct6", # platform will be productive work space
+        "exExpct7", # training in OSINT tools
+        "exExpct8", # positive team working experience
+        "exExpct9", # effective collaboration, compared to normal methods
+        "exExpct10", # can be applied in my workplace
+        
+        # "hoursPerWeek",
+        # "enoughTime",
+        # "proportionOwnTime",
+        
+        "tw1", # enjoyed the team social experience
+        "tw2", # enjoyed the team collaboration experience
+        "tw3", # could positively contribute
+        "tw4", # efforts recognised
+        "tw5", # easy to keep track
+        "tw6", # too dominant
+        "tw7", # had to lead
+        
+        "pf1", # shared mission
+        "pf2", # unified goal
+        "pf3", # managing contributions
+        "pf4", # keeping track
+        "pf5", # flexible and agile
+        "pf6", # innovative problem solving
+        "pf7", # enabling efficient workflow
+        "pf8", # meeting deadlines
+        "pf9", # clear communication
+        "pf10", # engaging/disengaging
+        "pf11", # information sharing
+        "pf12", # working together positively
+        "pf13", # making decisions
+        "pf14", # production of useful output
+        "pfComments",
+        
+        "fb1", # accurately reflected
+        "fb2", # understand strengths and weeknesses
+        "fb3", # build expertise
+        "fb4", # used feedback
+        
+        "exCap1", # analytic report writing
+        "exCap2", # using SATs
+        "exCap3", # using OSINT tools
+        "exCap4", # applying strategic thinking
+        "exCap5", # identifying and analysing assumptions
+        "exCap6", # evaluating QoR
+        "exCap7", # using decision making frameworks
+        
+        "mostValuable",
+        "cha1", # more effective
+        "cha2", # more engaging
+        "cha3", # some people but not others
+        
+        "career1",
+        
+        "ca1", # understood CA
+        "ca2", # used CA
+        "ca3", # understoodimproved QoR
+        "ca4", # intend to apply
+        
+        "swarm1", # better reasoned reports
+        "swarm2", # team > individual
+        "swarm3", # would improve intelligence analysis in org
+        "swarm4", # would use it
+        
+        "lk1", # easy to find relevant tools
+        "lk2", # tools were well explained
+        "lk3", # was helpful
+        "lk4", # preferred existing tools
+        "lk5", # difficult to navigate
+        "lk6", # used it often
+        "lkSuggestions",
+        
+        "responseStatements",
+        
+        "ratingTool",
+        "ratingToolWhyNot",
+        "ratingToolPurpose",
+        
+        "featureResquests",
+        "externalTools",
+        "externalToolsComments",
+        
+        "bestQuestionNotAsked",
+        
+        "testimonial",
+        "otherComments"
+    )
+    
     entrySurveyPub$isOrg = FALSE;
     entrySurveyOrg$isOrg = TRUE;
+    exitSurveyPub$isOrg = FALSE;
+    exitSurveyOrg$isOrg = TRUE;
+    
     
     ES = rbind(entrySurveyPub,
                entrySurveyOrg,
                use.names = TRUE,
                fill = TRUE)
+    ExS = rbind(exitSurveyPub,
+               exitSurveyOrg,
+               use.names = TRUE,
+               fill = TRUE)
+    
+    for (k in 1:nrow(ExS)) {
+        if (!ExS$isOrg[k]) {
+            ExS$user[k] = as.character(ES[recipientEmail == ExS$recipientEmail[k]]$user[1])
+        }
+    }
     
     colsToRemove <- c("startDate",
                       "endDate",
@@ -847,9 +1112,31 @@ compile_parts_2020_HuntChallenge = function(path_to_data, instance_name) {
                       "userLanguage",
                       "reservedPlace",
                       "nickname",
-                      "email"
+                      "email",
+                      "team"
     )
     ES = ES[,!..colsToRemove]
+    
+    colsToRemove <- c("startDate",
+                      "endDate",
+                      "status",
+                      "IPaddress",
+                      "duration",
+                      "recordedDate",
+                      "responseID",
+                      "recipientLastName",
+                      "recipientFirstName",
+                      "recipientEmail",
+                      "externalReference",
+                      "latitude",
+                      "longitude",
+                      "distributionChannel",
+                      "userLanguage",
+                      "recaptcha",
+                      "username",
+                      "career2"
+    )
+    ExS = ExS[,!..colsToRemove]
     
     ES[ES == ""] <- NA
     
@@ -919,6 +1206,119 @@ compile_parts_2020_HuntChallenge = function(path_to_data, instance_name) {
                      "typeAnalyticalExperience")
     ES = ES[,!..colsToRemove]
     
+    ExS[ExS == ""] <- NA
+    ExS[timeWellSpent == "No", timeWellSpent := 1]
+    ExS[timeWellSpent == "Unsure", timeWellSpent := 2]
+    ExS[timeWellSpent == "Yes", timeWellSpent := 3]
+    
+    for (cl in paste0('rate', 1:5)) {
+        ExS[get(cl) == "Poor", (cl) := 1]
+        ExS[get(cl) == "Average", (cl) := 2]
+        ExS[get(cl) == "Good", (cl) := 3]
+    }
+    
+    for (cl in paste0('exExpct', 1:10)) {
+        ExS[get(cl) == "Below", (cl) := 1]
+        ExS[get(cl) == "Below ", (cl) := 1]
+        ExS[get(cl) == "Met", (cl) := 2]
+        ExS[get(cl) == "Exceeded", (cl) := 3]
+        ExS[get(cl) == "I had no expectations", (cl) := 4]
+    }
+    
+    for (cl in paste0('tw', 1:7)) {
+        ExS[get(cl) == "Disagree", (cl) := 1]
+        ExS[get(cl) == "Neutral", (cl) := 2]
+        ExS[get(cl) == "Agree", (cl) := 3]
+    }
+    
+    for (cl in paste0('pf', 1:14)) {
+        ExS[get(cl) == "No", (cl) := 1]
+        ExS[get(cl) == "Yes", (cl) := 2]
+        ExS[get(cl) == "Not sure", (cl) := 3]
+    }
+    
+    for (cl in paste0('fb', 1:4)) {
+        ExS[get(cl) == "Disagree", (cl) := 1]
+        ExS[get(cl) == "Neutral", (cl) := 2]
+        ExS[get(cl) == "Agree", (cl) := 3]
+    }
+    
+    for (cl in paste0('exCap', 1:7)) {
+        ExS[get(cl) == "No", (cl) := 1]
+        ExS[get(cl) == "Somewhat", (cl) := 2]
+        ExS[get(cl) == "Significantly", (cl) := 3]
+    }
+    
+    for (cl in paste0('cha', 1:3)) {
+        ExS[get(cl) == "Disagree", (cl) := 1]
+        ExS[get(cl) == "Neutral", (cl) := 2]
+        ExS[get(cl) == "Agree", (cl) := 3]
+    }
+    
+    for (cl in paste0('career', 1)) {
+        ExS[get(cl) == "No change", (cl) := 1]
+        ExS[get(cl) == "Not changed", (cl) := 1]
+        ExS[get(cl) == "No change\t", (cl) := 1]
+        ExS[get(cl) == "Positively\t", (cl) := 2]
+        ExS[get(cl) == "Increased", (cl) := 2]
+    }
+    
+    for (cl in paste0('ca', 1:4)) {
+        ExS[get(cl) == "No", (cl) := 1]
+        ExS[get(cl) == "Yes", (cl) := 2]
+        ExS[get(cl) == "Not Sure", (cl) := 3]
+    }
+    
+    for (cl in paste0('swarm', 1:4)) {
+        ExS[get(cl) == "Strongly disagree", (cl) := 1]
+        ExS[get(cl) == "Disagree", (cl) := 2]
+        ExS[get(cl) == "Neutral", (cl) := 3]
+        ExS[get(cl) == "Agree", (cl) := 4]
+        ExS[get(cl) == "Strongly agree", (cl) := 5]
+    }
+    
+    for (cl in paste0('lk', 1:6)) {
+        ExS[get(cl) == "Disagree", (cl) := 1]
+        ExS[get(cl) == "Neutral", (cl) := 2]
+        ExS[get(cl) == "Agree", (cl) := 3]
+    }
+    
+    ExS[ratingTool == "No", ratingTool := 1]
+    ExS[ratingTool == "Yes", ratingTool := 2]
+    
+    ExS[externalTools == "No", externalTools := 1]
+    ExS[externalTools == "Yes", externalTools := 2]
+    
+    ExS[enoughTime == "No", enoughTime := 1]
+    ExS[enoughTime == "Yes", enoughTime := 2]
+    
+    ExS[,`:=`(progress = as.numeric(progress),
+              finished = (finished == "True"),
+              starRating = as.integer(substr(starRating,1,1)),
+              responseStatements = lapply(strsplit(responseStatements, ","), trimws),
+              ratingToolPurpose = lapply(strsplit(ratingToolPurpose, ","), trimws)
+    )]
+    
+    # Separate out responseStatements into own column.
+    suppressWarnings(ExS[,`:=`(
+        res1 = stringr::str_detect(responseStatements, "The resources were an important contribution to problem solving"),
+        res2 = stringr::str_detect(responseStatements, "It was easy to keep track of all the resources posted on the Platform"),
+        res3 = stringr::str_detect(responseStatements, "My team created a lot of resources"),
+        res4 = stringr::str_detect(responseStatements, "It was too time consuming to read through everyone's resources.")
+    )])
+    
+    # Seperate out analytical experience into own column.
+    suppressWarnings(ExS[,`:=`(
+        whyRate1 = stringr::str_detect(ratingToolPurpose, "I used rating to fairly indicate the readiness or quality of a report"),
+        whyRate2 = stringr::str_detect(ratingToolPurpose, "I used rating to give guidance to the author"),
+        whyRate3 = stringr::str_detect(ratingToolPurpose, "I used rating to push my prefered report to the top")
+    )])
+    
+    colsToRemove = c("responseStatements",
+                     "ratingToolPurpose")
+    ExS = ExS[,!..colsToRemove]
+    
+    
     # REORDER COLUMNS
     ES = ES[, .(
         progress,
@@ -927,7 +1327,6 @@ compile_parts_2020_HuntChallenge = function(path_to_data, instance_name) {
         gaveConsent3,
         agreedToTerms,
         user,
-        team,
         agegroup,
         gender,
         occupation,
@@ -947,16 +1346,16 @@ compile_parts_2020_HuntChallenge = function(path_to_data, instance_name) {
         int10,
         int11,
         interestsOtherInput,
-        expct1,
-        expct2,
-        expct3,
-        expct4,
-        expct5,
-        expct6,
-        expct7,
-        expct8,
-        expct9,
-        expct10,
+        enExpct1,
+        enExpct2,
+        enExpct3,
+        enExpct4,
+        enExpct5,
+        enExpct6,
+        enExpct7,
+        enExpct8,
+        enExpct9,
+        enExpct10,
         pri1,
         pri2,
         pri3,
@@ -981,13 +1380,13 @@ compile_parts_2020_HuntChallenge = function(path_to_data, instance_name) {
         aomt9,
         aomt10,
         aomt11,
-        cap1,
-        cap2,
-        cap3,
-        cap4,
-        cap5,
-        cap6,
-        cap7,
+        enCap1,
+        enCap2,
+        enCap3,
+        enCap4,
+        enCap5,
+        enCap6,
+        enCap7,
         yearsWorkExperience,
         yearsAnalyticalExperience,
         ae1,
@@ -999,18 +1398,133 @@ compile_parts_2020_HuntChallenge = function(path_to_data, instance_name) {
         multidisciplinaryExperienceInput
     )]
     
-    orgs = fread(paste0(path_to_data, instance_name, '/AdminData/OrgMaster.csv'))
-    
-    for (k in 1:nrow(ES)) {
-        if (ES$isOrg[k]) {
-            team = orgs$group_code[which(orgs$username == ES$user[k])][1]
-            ES$team[k] = team
-        }
-    }
-    
+    ExS = ExS[, .(
+        progress,
+        finished,
+        isOrg,
+        user,
+        starRating,
+        timeWellSpent,
+        bestThing,
+        worstThing,
+        
+        hoursPerWeek,
+        enoughTime,
+        proportionOwnTime,
+        
+        rate1,
+        rate2,
+        rate3,
+        rate4,
+        rate5,
+        
+        exExpct1,
+        exExpct2,
+        exExpct3,
+        exExpct4,
+        exExpct5,
+        exExpct6,
+        exExpct7,
+        exExpct8,
+        exExpct9,
+        exExpct10,
+        
+        tw1,
+        tw2,
+        tw3,
+        tw4,
+        tw5,
+        tw6,
+        tw7,
+        
+        pf1,
+        pf2,
+        pf3,
+        pf4,
+        pf5,
+        pf6,
+        pf7,
+        pf8,
+        pf9,
+        pf10,
+        pf11,
+        pf12,
+        pf13,
+        pf14,
+        pfComments,
+        
+        fb1,
+        fb2,
+        fb3,
+        fb4,
+        
+        exCap1,
+        exCap2,
+        exCap3,
+        exCap4,
+        exCap5,
+        exCap6,
+        exCap7,
+        
+        mostValuable,
+        
+        cha1,
+        cha2,
+        cha3,
+        
+        career1,
+        
+        ca1,
+        ca2,
+        ca3,
+        ca4,
+        
+        swarm1,
+        swarm2,
+        swarm3,
+        swarm4,
+        
+        lk1,
+        lk2,
+        lk3,
+        lk4,
+        lk5,
+        lk6,
+        lkSuggestions,
+        
+        res1,
+        res2,
+        res3,
+        res4,
+        
+        whyRate1,
+        whyRate2,
+        whyRate3,
+        
+        ratingTool,
+        ratingToolWhyNot,
+        featureResquests,
+        externalTools,
+        externalToolsComments,
+        bestQuestionNotAsked,
+        testimonial,
+        otherComments
+    )]
+
     ES <- ES[finished & ((gaveConsent3 == TRUE) | is.na(gaveConsent3))]
     ES = ES[!is.na(ES$user)]
+    
+    ExS <- ExS[(finished)]
+    ExS = ExS[!is.na(ExS$user)]
+    
+    ES = merge(ES, ExS, by = c("user", "isOrg"), all = T)
     ES = as.data.frame(ES)
+    
+    colsToRemove = c('finished.x', 'progress.x',
+                     'finished.y', 'progress.y')
+    for (cl in colsToRemove) {
+        ES[[cl]] = NULL
+    }
     
     # Compute AOMT construct.
     ES = computeAOMT(ES)
@@ -1035,6 +1549,90 @@ compile_parts = function(path_to_data, instance_name) {
     }
 }
 
+
+compile_teamparts_2018_SwarmChallengeExp1 = function(repo, path_to_data, instance_name) {
+    path = paste0(path_to_data, instance_name, '/QualtricsData/')
+    
+    parts = repo[[instance_name]]$OtherData$parts
+    tmprt = data.table(
+        user = parts$user,
+        team = rep(NA, nrow(parts))
+    )
+
+    # Populate team.
+    lookup = fread(paste0(path_to_data, instance_name, '/AdminData/match_ind_diffs_response_to_swarm_username.csv'))
+    for (k in 1:nrow(tmprt)) {
+        if (tmprt$user[k] %in% lookup$username) {
+            i = which(lookup$username == tmprt$user[k])
+            tmprt$team[k] = lookup$Team[i]
+        }
+    }
+    
+    tmprt = tmprt[!is.na(tmprt$team)]
+    tmprt = as.data.frame(tmprt)
+    
+    return(tmprt)
+}
+
+compile_teamparts_2020_HuntChallenge = function(repo, path_to_data, instance_name) {
+    path = paste0(path_to_data, instance_name, '/QualtricsData/')
+    
+    parts = repo[[instance_name]]$OtherData$parts
+    
+    pubLookup = fread(paste0(path, "HC2020_EntrySurvey_Public.csv"))
+    supLookup = fread(paste0(path_to_data, instance_name, '/AdminData/Superteams.csv'))
+    orgLookup = fread(paste0(path_to_data, instance_name, '/AdminData/OrgMaster.csv'))
+    
+    pubLookup = pubLookup[,user:team]
+    supLookup = supLookup[,.(username, group_code)]
+    supLookup = supLookup[, `:=`(
+        user = username,
+        team = group_code
+    )]
+    supLookup = supLookup[,user:team]
+    orgLookup = orgLookup[,.(username, group_code)]
+    orgLookup = orgLookup[, `:=`(
+        user = username,
+        team = group_code
+    )]
+    orgLookup = orgLookup[,user:team]
+    
+    pubLookup = pubLookup[user %in% parts$user]
+    supLookup = supLookup[user %in% parts$user]
+    orgLookup = orgLookup[user %in% parts$user]
+    
+    supLookup$team = sapply(strsplit(supLookup$team, ','), function(x) {return(x[2])})
+    
+    tmprt = rbind(
+        pubLookup,
+        supLookup,
+        orgLookup
+    )
+    
+    tmprt = tmprt[!is.na(tmprt$team)]
+    tmprt = as.data.frame(tmprt)
+    
+    return(tmprt)
+}
+
+compile_teamparts = function(repo, path_to_data, instance_name) {
+    
+    # Lookup table for relevant functions. This is required because demographic surveys differ
+    # syntactically across different experiements, and so each require custom code to tidy the
+    # data into a consistent format.
+    compile_teamparts = list(
+        "2018_SwarmChallengeExp1" = compile_teamparts_2018_SwarmChallengeExp1,
+        "2020_HuntChallenge" = compile_teamparts_2020_HuntChallenge
+    )
+    
+    if (instance_name %in% names(compile_teamparts)) {
+        return(compile_teamparts[[instance_name]](repo, path_to_data, instance_name))
+    } else {
+        return(NULL)
+    }
+}
+
+
 compile_teams_2018_SwarmChallengeExp1 = function(repo, path_to_data, instance_name) {
     
     path = paste0(path_to_data, instance_name, "/KnackData/products.csv")
@@ -1054,10 +1652,12 @@ compile_teams_2018_SwarmChallengeExp1 = function(repo, path_to_data, instance_na
                      "submitted")
     
     parts = repo[[instance_name]]$OtherData$parts
+    teamparts = repo[[instance_name]]$OtherData$teamparts
+    parts = merge(teamparts, parts, by = c("user"))
     
     # Create teams table.
     
-    tms = unique(parts$team)
+    tms = unique(teamparts$team)
     teams = data.frame(team = tms,
                        AOMT = NA,
                        divAOMT = NA,
@@ -1115,15 +1715,19 @@ compile_teams_2020_HuntChallenge = function(repo, path_to_data, instance_name) {
     K = K[K$type != "Calibration",]
     
     parts = repo[[instance_name]]$OtherData$parts
+    teamparts = repo[[instance_name]]$OtherData$teamparts
+    parts = merge(teamparts, parts, by = c("user"))
     
     # Create teams table.
     
-    tms = unique(repo[[instance_name]]$PlatformData$analytics$team)
+    # tms = unique(repo[[instance_name]]$PlatformData$analytics$team)
+    tms = unique(teamparts$team)
     tms = tms[tms != "melcreate"]
     teams = data.frame(team = tms,
                        AOMT = NA,
                        divAOMT = NA,
                        medianEdu = NA,
+                       type = NA,
                        isOrg = NA)
     
     getDivAOMT = function(tm) {
@@ -1146,11 +1750,33 @@ compile_teams_2020_HuntChallenge = function(repo, path_to_data, instance_name) {
         return(median(eds, na.rm = T))
     }
     
+    OTs = c("kosciuszko00219",
+            "otway00219",
+            "noosa00219",
+            "uluru00219",
+            "kakadu00219",
+            "grampians00219",
+            "daintree00219")
+    STs = c("tongariro00311",
+            "joondalup00311",
+            "murramang00311",
+            "warrumbungle00311",
+            "aoraki00311")
+    
     for (k in 1:nrow(teams)) {
         teams$AOMT[k] = median(parts[parts$team == teams$team[k],]$aomt, na.rm = T)
         teams$divAOMT[k] = getDivAOMT(teams$team[k])
         teams$medianEdu[k] = getMedianEdu(teams$team[k])
-        teams$isOrg[k] = parts[parts$team == teams$team[k],]$isOrg[1]
+        if (teams$team[k] %in% STs) {
+            teams$isOrg[k] = FALSE
+            teams$type[k] = 'ST'
+        } else if (teams$team[k] %in% OTs) {
+            teams$isOrg[k] = TRUE
+            teams$type[k] = 'OT'
+        } else {
+            teams$isOrg[k] = FALSE
+            teams$type[k] = 'PT'
+        }
     }
     
     return(teams)
@@ -1198,7 +1824,7 @@ compile_probteams_2018_SwarmChallengeExp1 = function(repo, path_to_data, instanc
     
     parts = repo[[instance_name]]$OtherData$parts
     teams = repo[[instance_name]]$OtherData$teams
-    tms = unique(parts$team)
+    tms = unique(teams$team)
     problems = c("How Did Arthur Allen Die?", "Kalukistan", "Three Nations", "Drug Interdiction")
     analytics = repo[[instance_name]]$PlatformData$analytics
     responses = repo[[instance_name]]$PlatformData$responses
@@ -1267,9 +1893,9 @@ compile_probteams_2018_SwarmChallengeExp1 = function(repo, path_to_data, instanc
 
 compile_probteams_2020_HuntChallenge = function(repo, path_to_data, instance_name) {
     
-    path = paste0(path_to_data, instance_name, "/KnackData/teams2020challenge.csv")
+    path = paste0(path_to_data, instance_name, "/KnackData/")
     
-    K = as.data.frame(fread(path))
+    K = as.data.frame(fread(paste0(path, "teams2020challenge.csv")))
     colnames(K) <- c("team",
                      "avgAll",
                      "inRound1",
@@ -1292,6 +1918,120 @@ compile_probteams_2020_HuntChallenge = function(repo, path_to_data, instance_nam
                      "misc1",
                      "misc2")
     K = K[K$type != "Calibration",]
+    for (k in 1:4) {
+        if (sum( !is.na(K[[paste0('avg',k)]]) & K[[paste0('avg',k)]] == 0 ) > 0) {
+            K[!is.na(K[[paste0('avg',k)]]) & K[[paste0('avg',k)]] == 0,][[paste0('avg',k)]] = NA
+        }
+    }
+    
+    ratings = fread(paste0(path, "ratings2020challenge.csv"))
+    colnames(ratings) = c(
+        "reportID",
+        "password1",
+        "password2",
+        "password3",
+        "problem",
+        "team",
+        "participant",
+        "created",
+        "rater",
+        "c1", "c1comment", "c1distinction",
+        "c2", "c2comment", "c2distinction",
+        "c3", "c3distinction", "c3comment",
+        "c4", "c4comment",
+        "c5", "c5comment",
+        "c6", "c6comment",
+        "c7", "c7comment",
+        "c8",
+        "geo1",
+        "geo2",
+        "geo3",
+        "geo4",
+        "c8comment",
+        "c1score",
+        "c2score",
+        "c3score",
+        "c4score",
+        "c5score",
+        "c6score",
+        "c7score",
+        "c8score",
+        "ODNI",
+        "c1na",
+        "c2na",
+        "c3na",
+        "c4na",
+        "c5na",
+        "c6na",
+        "c7na",
+        "c8na",
+        "ruleBased",
+        "ruleBasedScore",
+        "ruleBaseAlexAns",
+        "c4distinction",
+        "c5distinction",
+        "c6distinction",
+        "c7distinction",
+        "c8distinction",
+        "lensKit",
+        "geo1score",
+        "geo2score",
+        "geo3score",
+        "geo4score",
+        "geoOverall",
+        "isRedactionTestRating",
+        "raterProbabilityEstimate",
+        "estTimeTaken",
+        "estJustification",
+        "estComments",
+        "bayes1",
+        "bayes2",
+        "bayes3",
+        "bayes1score",
+        "bayes2score",
+        "bayes3score",
+        "flaw1",
+        "flaw2",
+        "flaw3",
+        "flaw4"
+    )
+    ratings[ratings == ""] = NA
+    ratings[ODNI == 0,"ODNI"] = NA
+    ratings = ratings[,.(
+        problem,
+        team,
+        participant,
+        rater,
+        geo1,
+        geo2,
+        geo3,
+        geo4,
+        ODNI,
+        geo1score,
+        geo2score,
+        geo3score,
+        geo4score,
+        geoOverall,
+        isRedactionTestRating,
+        raterProbabilityEstimate,
+        estTimeTaken,
+        estJustification,
+        estComments,
+        bayes1,
+        bayes2,
+        bayes3,
+        bayes1score,
+        bayes2score,
+        bayes3score,
+        flaw1,
+        flaw2,
+        flaw3,
+        flaw4
+    )]
+    ratings[,bayesScore := bayes1score + bayes2score + bayes3score]
+    
+    # RFDratings = fread(paste0(path, "extraRFDratings.csv"))
+    # RFDratings[,nFlawsDetected := flaw1 + flaw2 + flaw3 + flaw4]
     
     parts = repo[[instance_name]]$OtherData$parts
     teams = repo[[instance_name]]$OtherData$teams
@@ -1311,6 +2051,9 @@ compile_probteams_2020_HuntChallenge = function(repo, path_to_data, instance_nam
                           rankODNI = NA,
                           nGeoCorrect = NA,
                           probabilityEstimate = NA,
+                          tightness = NA,
+                          nBayesCorrect = NA,
+                          nFlawsDetected = NA,
                           activeUsersSq = NA,
                           textSim = NA)
     
@@ -1343,12 +2086,40 @@ compile_probteams_2020_HuntChallenge = function(repo, path_to_data, instance_nam
         mean(Distances)
     }
     
-    orgTeams = c("kosciuszko00219","otway00219","noosa00219","uluru00219","kakadu00219","grampians00219","daintree00219")
+    getNumFlawsDetected = function(tm) {
+        rts = ratings[team == tm & problem == "Park Young-min Case",.(flaw1, flaw2, flaw3, flaw4)]
+        rts[rts == "Yes"] = 1
+        rts[rts == "No"] = 0
+
+        flaw1 = round(mean(as.numeric(rts$flaw1)))
+        flaw2 = round(mean(as.numeric(rts$flaw2)))
+        flaw3 = round(mean(as.numeric(rts$flaw3)))
+        flaw4 = round(mean(as.numeric(rts$flaw4)))
+
+        return(flaw1 + flaw2 + flaw3 + flaw4)
+    }
+    
+    getTightness = function(tm, k) {
+        i = which(probteam$team == tm & probteam$problem == "Forecasting Piracy")
+        team_prob = probteam$probabilityEstimate[k]
+        rater_probs = ratings[team == tm & isRedactionTestRating == "Yes"]$raterProbabilityEstimate/100
+        tightness = mean((rater_probs - team_prob)^2)
+        return(tightness)
+    }
+    
+    OTs = c("kosciuszko00219","otway00219","noosa00219","uluru00219","kakadu00219","grampians00219","daintree00219")
+    STs = c("tongariro00311",
+            "joondalup00311",
+            "murramang00311",
+            "warrumbungle00311",
+            "aoraki00311")
     
     for (k in 1:nrow(probteam)) {
         i = which(K$team == probteam$team[k])
-        if (probteam$team[k] %in% orgTeams) {
+        if (probteam$team[k] %in% OTs) {
             probteam$type[k] = "OT"
+        } else if (probteam$team[k] %in% STs) {
+            probteam$type[k] = "ST"
         } else {
             probteam$type[k] = "PT"
         }
@@ -1359,7 +2130,15 @@ compile_probteams_2020_HuntChallenge = function(repo, path_to_data, instance_nam
             probteam$nGeoCorrect[k] = K$nGeoCorrect[i]
         }
         if (probteam$problem[k] == "Forecasting Piracy" & !is.na(probteam$avgODNI[k])) {
-            probteam$probabilityEstimate[k] = K$probabilityEstimate[i]
+            probteam$probabilityEstimate[k] = K$probabilityEstimate[i]/100
+            probteam$tightness[k] = getTightness(probteam$team[k], k)
+        }
+        if (probteam$problem[k] == "Corporate Espionage" & !is.na(probteam$avgODNI[k])) {
+            probteam$nBayesCorrect[k] = round(mean(ratings[team == probteam$team[k] & problem == "Corporate Espionage"]$bayesScore))
+        }
+        if (probteam$problem[k] == "The Park Young-min Case" & !is.na(probteam$avgODNI[k])) {
+            probteam$nFlawsDetected[k] = getNumFlawsDetected(probteam$team[k])
+            
         }
         probteam$activeUsersSq[k] = getActiveUsersSq(probteam$team[k], probteam$problem[k])
         probteam$textSim[k] = getTextSim(probteam$team[k], probteam$problem[k])
@@ -1383,14 +2162,15 @@ compile_probteams = function(repo, path_to_data, instance_name) {
     )
     
     if (instance_name %in% names(compile_probteams)) {
-        dt = 
-            return(compile_probteams[[instance_name]](repo, path_to_data, instance_name))
+        return(compile_probteams[[instance_name]](repo, path_to_data, instance_name))
     } else {
         return(NULL)
     }
 }
 
 compile_probparts = function(repo, nClusters, generatePlots = F) {
+    
+    set.seed(5678)
     
     anal = repo[[1]]$PlatformData$analytics
     anal$probteam = NA
@@ -1471,16 +2251,16 @@ compile_probparts = function(repo, nClusters, generatePlots = F) {
     # Stripcharts for k-means: 
     anal[['cluster']] = factor(fit.km$cluster)
     anal[['clusterLabel']] = character(nrow(anal))
-    anal[anal$cluster == 1,]$clusterLabel = 'Talkative Multi-talent'
-    anal[anal$cluster == 2,]$clusterLabel = 'Slow-rating Multi-talent (Tier 1)'
-    anal[anal$cluster == 3,]$clusterLabel = 'Speed-rating Multi-talent (Tier 1)'
-    anal[anal$cluster == 4,]$clusterLabel = 'Allrounder (Tier 1)'
-    anal[anal$cluster == 5,]$clusterLabel = 'Slow-rating Multi-talent (Tier 2)'
-    anal[anal$cluster == 6,]$clusterLabel = 'Report Guru'
-    anal[anal$cluster == 7,]$clusterLabel = 'Allrounder (Tier 2)'
-    anal[anal$cluster == 8,]$clusterLabel = 'Speed-rating Multi-talent (Tier 2)'
-    anal[anal$cluster == 9,]$clusterLabel = 'Single-minded Raters'
-    anal[anal$cluster == 10,]$clusterLabel = 'Drop In'
+    anal[anal$cluster == 1,]$clusterLabel = 'Talkative Multi-talent (Tier 2)'
+    anal[anal$cluster == 2,]$clusterLabel = 'Talkative Multi-talent (Tier 1)' # 'Slow-rating Multi-talent (Tier 1)'
+    anal[anal$cluster == 3,]$clusterLabel = 'Resource Guru' # 'Speed-rating Multi-talent (Tier 1)'
+    anal[anal$cluster == 4,]$clusterLabel = 'Speed-rating Multi-talent (Tier 1)' # 'Allrounder (Tier 1)'
+    anal[anal$cluster == 5,]$clusterLabel = 'Report Guru' # 'Slow-rating Multi-talent (Tier 2)'
+    anal[anal$cluster == 6,]$clusterLabel = 'Allrounder' # 'Report Guru'
+    anal[anal$cluster == 7,]$clusterLabel = 'Slow-rating Multi-talent (Tier 1)' # 'Allrounder (Tier 2)'
+    anal[anal$cluster == 8,]$clusterLabel = 'Drop In' # 'Speed-rating Multi-talent (Tier 2)'
+    anal[anal$cluster == 9,]$clusterLabel = 'Speed-rating Multi-talent (Tier 2)' # 'Single-minded Raters'
+    anal[anal$cluster == 10,]$clusterLabel = 'Slow-rating Multi-talent (Tier 2)' # 'Drop In'
     
     D = anal
     for (cn in colnames(D)[4:10]) {
@@ -1530,6 +2310,144 @@ compile_probparts = function(repo, nClusters, generatePlots = F) {
     return(repo)
 }
 
+compile_rates_2020_HuntChallenge = function(repo, path_to_data, instance_name) {
+    
+    path = paste0(path_to_data, instance_name, "/KnackData/")
+    
+    ratings = fread(paste0(path, "ratings2020challenge.csv"))
+    colnames(ratings) = c(
+        "reportID",
+        "password1",
+        "password2",
+        "password3",
+        "problem",
+        "team",
+        "participant",
+        "created",
+        "rater",
+        "c1", "c1comment", "c1distinction",
+        "c2", "c2comment", "c2distinction",
+        "c3", "c3distinction", "c3comment",
+        "c4", "c4comment",
+        "c5", "c5comment",
+        "c6", "c6comment",
+        "c7", "c7comment",
+        "c8",
+        "geo1",
+        "geo2",
+        "geo3",
+        "geo4",
+        "c8comment",
+        "c1score",
+        "c2score",
+        "c3score",
+        "c4score",
+        "c5score",
+        "c6score",
+        "c7score",
+        "c8score",
+        "ODNI",
+        "c1na",
+        "c2na",
+        "c3na",
+        "c4na",
+        "c5na",
+        "c6na",
+        "c7na",
+        "c8na",
+        "ruleBased",
+        "ruleBasedScore",
+        "ruleBaseAlexAns",
+        "c4distinction",
+        "c5distinction",
+        "c6distinction",
+        "c7distinction",
+        "c8distinction",
+        "lensKit",
+        "geo1score",
+        "geo2score",
+        "geo3score",
+        "geo4score",
+        "geoOverall",
+        "isRedactionTestRating",
+        "raterProbabilityEstimate",
+        "estTimeTaken",
+        "estJustification",
+        "estComments",
+        "bayes1",
+        "bayes2",
+        "bayes3",
+        "bayes1score",
+        "bayes2score",
+        "bayes3score",
+        "flaw1",
+        "flaw2",
+        "flaw3",
+        "flaw4"
+    )
+    ratings[ratings == ""] = NA
+    ratings[ODNI == 0,"ODNI"] = NA
+    ratings = ratings[,.(
+        problem,
+        team,
+        participant,
+        rater,
+        c1, c1comment, c1distinction, c1na,
+        c2, c2comment, c2distinction, c2na,
+        c3, c3comment, c3distinction, c3na,
+        c4, c4comment, c4distinction, c4na,
+        c5, c5comment, c5distinction, c5na,
+        c6, c6comment, c6distinction, c6na,
+        c7, c7comment, c7distinction, c7na,
+        c8, c8comment, c8distinction, c8na,
+        geo1,
+        geo2,
+        geo3,
+        geo4,
+        ODNI,
+        geo1score,
+        geo2score,
+        geo3score,
+        geo4score,
+        geoOverall,
+        isRedactionTestRating,
+        raterProbabilityEstimate,
+        estTimeTaken,
+        estJustification,
+        estComments,
+        bayes1,
+        bayes2,
+        bayes3,
+        bayes1score,
+        bayes2score,
+        bayes3score,
+        flaw1,
+        flaw2,
+        flaw3,
+        flaw4
+    )]
+    
+    ratings$raterProbabilityEstimate = ratings$raterProbabilityEstimate/100
+    
+    return(ratings)
+}
+
+compile_rates = function(repo, path_to_data, instance_name) {
+    
+    # Lookup table for relevant functions. This is required because ratings format differ
+    # syntactically across different experiements, and so each require custom code to tidy the
+    # data into a consistent format.
+    compile_rates = list(
+        "2020_HuntChallenge" = compile_rates_2020_HuntChallenge
+    )
+    
+    if (instance_name %in% names(compile_rates)) {
+        return(compile_rates[[instance_name]](repo, path_to_data, instance_name))
+    } else {
+        return(NULL)
+    }
+}
+
 #' Compile data from 'raw' SWARM, Qualtrics & Knack CSVs
 #'
 #' \code{compile_data} Compiles data from 'raw' CSVs exported from the various
@@ -1568,8 +2486,10 @@ compile_data = function(path = "data/") {
     for (instance_name in instances) {
         repo[[instance_name]][['OtherData']] = list()
         repo[[instance_name]][['OtherData']]$parts = compile_parts(path, instance_name)
+        repo[[instance_name]][['OtherData']]$teamparts = compile_teamparts(repo, path, instance_name)
         repo[[instance_name]][['OtherData']]$teams = compile_teams(repo, path, instance_name)
         repo[[instance_name]][['OtherData']]$probteams = compile_probteams(repo, path, instance_name)
+        repo[[instance_name]][['OtherData']]$rates = compile_rates(repo, path, instance_name)
     }
     repo = compile_probparts(repo, nClusters = 10)
     
