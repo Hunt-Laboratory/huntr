@@ -1,13 +1,33 @@
 Package: huntr
-Title: Hunt Lab Analysis functions
+Title: Hunt Lab Experiment Data
 Version: 0.10
 Authors@R: person("Luke", "Thorburn", email = "luke.thorburn@gmail.com", role = c("aut", "cre"))
 Description: This package contains all code written for the Hunt Laboratory for Intelligence Research, a research group at The University of Melbourne.
-Depends: R (>= 3.3.1), ggplot2, data.table, ggpubr, ggsci, ggraph, tidygraph, patchwork, stringr, readtext, lubridate, quanteda, NbClust, cluster, factoextra, png, grid, gtable
 License: GPL-3
 Encoding: UTF-8
+Depends: R (>= 3.3.1)
+Imports:
+    data.table,
+    ggplot2,
+    patchwork
+Suggests:
+    ggpubr,
+    ggsci,
+    ggraph,
+    tidygraph,
+    stringr,
+    readtext,
+    lubridate,
+    quanteda,
+    NbClust,
+    cluster,
+    factoextra,
+    png,
+    grid,
+    gtable,
+    likert,
+    plyr,
+    knitr
 LazyData: true
 RoxygenNote: 6.1.1
-Imports: ggplot2, data.table, ggpubr, ggsci, ggraph, tidygraph, patchwork, lubridate, stringr, readtext
-Suggests: knitr
 VignetteBuilder: knitr

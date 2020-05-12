@@ -26,15 +26,16 @@ generate_feedback_plots = function(instance_name) {
   teams = repo[[instance_name]]$OtherData$teams
   teams = as.character(teams[teams$isOrg,]$team)
   
-  for (team_name in teams[7]) {
+  for (team_name in teams) {
     message(team_name)
     # plots_demographic(instance_name, team_name, export = T)
     # plot_slopegraph(instance_name, team_name, export = T)
     # plot_network(instance_name, team_name, export = T)
-    # # plot_network_reference(instance_name, team_name, export = T)
+    # plot_network_reference(instance_name, team_name, export = T)
     # plot_timeline(instance_name, team_name, export = T)
     # # plot_timeline_reference(instance_name, team_name, export = T)
     # plot_qor_teamsize(instance_name, team_name, export = T)
+    # plot_qor_activity(instance_name, team_name, export = T)
     # plot_qor_education(instance_name, team_name, export = T)
     # plot_qor_AOMT(instance_name, team_name, export = T)
     # plot_qor_divAOMT(instance_name, team_name, export = T)
@@ -45,6 +46,7 @@ generate_feedback_plots = function(instance_name) {
     # plot_qor_nBayesCorrect(instance_name, team_name, export = T)
     # plot_qor_nFlawsDetected(instance_name, team_name, export = T)
     # plot_dot_qor(instance_name, team_name, export = T)
+    # plot_qor_subscales(instance_name, team_name, export = T)
     # plot_dot_aggregated_performance(instance_name, team_name, export = T)
     # plot_dot_engagement(instance_name, team_name, export = T)
     # plot_dot_engagement_user(instance_name, team_name, export = T)
@@ -54,7 +56,7 @@ generate_feedback_plots = function(instance_name) {
     # plot_redaction_estimates(instance_name, team_name, export = T)
     # plot_dot_tightness(instance_name, team_name, export = T)
     # plot_dot_bayes(instance_name, team_name, export = T)
-    # plot_dot_flawdetection(instance_name, team_name, export = T)
+    plot_dot_flawdetection(instance_name, team_name, export = T)
     # # plot_cluster_stripchart(instance_name, team_name, e xport = T)
     # plot_user_engagement(instance_name, team_name, export = T)
     # plot_bar_expectations(instance_name, team_name, export = T)
@@ -63,7 +65,7 @@ generate_feedback_plots = function(instance_name) {
     # plot_bar_challenge(instance_name, team_name, export = T)
     # plot_bar_CA(instance_name, team_name, export = T)
     # plot_bar_swarm(instance_name, team_name, export = T)
-    plot_qor_boxplot(instance_name, team_name, export = T)
+    # plot_qor_boxplot(instance_name, team_name, export = T)
   }
     
 }
@@ -79,17 +81,19 @@ export_plot = function(plot_object, file_name, instance_name, team_name, export_
       "(A4-title)/2.5" = 2181,
       "(A4-title)/3" = 2181,
       "(A4-title)/3.5" = 2181,
+      "(A4-title)/3.8" = 2181,
       "(A4-title)/4" = 2181,
       "square" = 2181
   )
   heights = list(
       "A4" = 2800,
       "A4-title" = 2747,
-      "A4-title-subtitle" = 2650,
+      "A4-title-subtitle" = 2600,
       "(A4-title)/2" = 1650,
       "(A4-title)/2.5" = 1420,
       "(A4-title)/3" = 1180,
       "(A4-title)/3.5" = 1000,
+      "(A4-title)/3.8" = 930,
       "(A4-title)/4" = 600,
       "square" = 2250
   )
@@ -151,7 +155,7 @@ plot_demographic_old = function (instance_name, team_name, dem) {
     Q$prop = 100*Q$prop
     
     if (key == "occupation") {
-        ylab = "Percentage of Participants (%)"
+        ylab = "% Participants"
     } else {
         ylab = ""
     }
@@ -250,7 +254,7 @@ plot_demographic = function (instance_name, team_name, dem) {
   Q$prop = 100*Q$prop
   
   if (key == "occupation") {
-    ylab = "Percentage of Participants (%)"
+    ylab = "% Participants"
   } else {
     ylab = ""
   }
@@ -456,7 +460,7 @@ plot_slopegraph = function(instance_name, team_name, export = F) {
         labs(title = "TEAM PERFORMANCE OVER TIME",
              subtitle = "Slopegraph of the quality of reasoning for each team across problems. Each line is a team,\ncoloured by type. The teams' rank in each problem is indicated at the end of the lines.",
              x = "Problem",
-             y = "Average Quality of Reasoning (ODNI)",
+             y = "Average Quality of Reasoning (IC Rating Scale)",
              colour = "Type",
              size = "Type",
              alpha = "Type") +
@@ -587,7 +591,7 @@ plot_network = function(instance_name, team_name, export = F) {
                               end = 0.95,
                               name = "Interaction\nCount",
                               direction = -1) +
-    geom_node_point(size = 5) +
+    geom_node_point(size = 1) +
     scale_x_continuous(expand = expansion(mult = .1)) +
     scale_y_continuous(expand = expansion(mult = .1)) +
     facet_edges(vars(problem),
@@ -597,28 +601,28 @@ plot_network = function(instance_name, team_name, export = F) {
                 drop = F) +
     theme_huntlab()
   
-  for (k in 1:nrow(layout)) {
-    animal = avatarLookup[[sub("\\d+", "", layout$name[k])]]
-    avtr = readPNG(paste0("/home/luke/Documents/Hunt Lab/wd_HuntLab/huntr/R/avatars/",animal,"@2x.png"))
-    grb = rasterGrob(avtr, interpolate = T)
-    x = layout$x[k]
-    y = layout$y[k]
-    p = p + annotation_custom(grb, xmin = x - 0.25, xmax = x + 0.25, ymin = y - 0.25, ymax = y + 0.25)
-  }
+  # for (k in 1:nrow(layout)) {
+  #   animal = avatarLookup[[sub("\\d+", "", layout$name[k])]]
+  #   avtr = readPNG(paste0("/home/luke/Documents/Hunt Lab/wd_HuntLab/huntr/R/avatars/",animal,"@2x.png"))
+  #   grb = rasterGrob(avtr, interpolate = T)
+  #   x = layout$x[k]
+  #   y = layout$y[k]
+  #   p = p + annotation_custom(grb, xmin = x - 0.25, xmax = x + 0.25, ymin = y - 0.25, ymax = y + 0.25)
+  # }
   
-  p = p + geom_node_label(aes(label = name),
-                          size = 1.8,
-                          fill = "#f6f6f6",
-                          alpha = .4,
-                          label.size = 0,
-                          label.padding = unit(0, "lines"),
-                          label.r = unit(0, "lines"),
-                          nudge_y = -.4)
+  # p = p + geom_node_label(aes(label = name),
+  #                         size = 1.8,
+  #                         fill = "#f6f6f6",
+  #                         alpha = .4,
+  #                         label.size = 0,
+  #                         label.padding = unit(0, "lines"),
+  #                         label.r = unit(0, "lines"),
+  #                         nudge_y = -.4)
   
   p = p + plot_layout(guides = 'collect') +
       plot_annotation(
           title = 'INTERACTION NETWORKS',
-          subtitle = 'Interaction patterns for your team by problem. Each vertex is a user, labelled with their SWARM\nplatform avatar. Edges between vertices represent interactions between users, coloured by the\nnumber of interactions.',
+          subtitle = 'Interaction patterns for your team by problem. Each vertex is a user, labelled with their SWARM\nplatform avatar. Edges between vertices represent interactions between users, coloured by the\nnumber of interactions. Interactions are directional, so there may be two edges between any pair of users.',
           theme = theme(plot.margin = margin(10, 10, 10, 10, "pt"),
                         plot.background = element_rect(fill = "#f6f6f6"),
                         plot.title = element_text(face = "bold",
@@ -630,7 +634,7 @@ plot_network = function(instance_name, team_name, export = F) {
                   "team_dynamics.png",
                   instance_name,
                   team_name,
-                  "square")
+                  "(A4-title)/2")
   }
 
 }
@@ -734,7 +738,7 @@ plot_network_reference = function(instance_name, team_name, export = F) {
                             end = 0.95,
                             name = "Interaction\nCount",
                             direction = -1) +
-    geom_node_point(size = 5) +
+    geom_node_point(size = 1) +
     scale_x_continuous(expand = expansion(mult = .1)) +
     scale_y_continuous(expand = expansion(mult = .1)) +
     facet_edges(vars(problem),
@@ -757,7 +761,7 @@ plot_network_reference = function(instance_name, team_name, export = F) {
                               end = 0.95,
                               name = "Interaction\nCount",
                               direction = -1) +
-    geom_node_point(size = 5) +
+    geom_node_point(size = 1) +
     scale_x_continuous(expand = expansion(mult = .1)) +
     scale_y_continuous(expand = expansion(mult = .1)) +
     facet_edges(vars(problem),
@@ -767,28 +771,28 @@ plot_network_reference = function(instance_name, team_name, export = F) {
                 drop = T) +
     theme_huntlab()
   
-  for (k in 1:nrow(layout1)) {
-    animal = avatarLookup[[sub("\\d+", "", layout1$name[k])]]
-    avtr = readPNG(paste0("/home/luke/Documents/Hunt Lab/wd_HuntLab/huntr/R/avatars/",animal,"@2x.png"))
-    grb = rasterGrob(avtr, interpolate = T)
-    x = layout1$x[k]
-    y = layout1$y[k]
-    p1 = p1 + annotation_custom(grb, xmin = x - 0.17, xmax = x + 0.17, ymin = y - 0.17, ymax = y + 0.17)
-  }
-  
-  for (k in 1:nrow(layout2)) {
-    animal = avatarLookup[[sub("\\d+", "", layout2$name[k])]]
-    avtr = readPNG(paste0("/home/luke/Documents/Hunt Lab/wd_HuntLab/huntr/R/avatars/",animal,"@2x.png"))
-    grb = rasterGrob(avtr, interpolate = T)
-    x = layout2$x[k]
-    y = layout2$y[k]
-    p2 = p2 + annotation_custom(grb, xmin = x - 0.32, xmax = x + 0.32, ymin = y - 0.32, ymax = y + 0.32)
-  }
+  # for (k in 1:nrow(layout1)) {
+  #   animal = avatarLookup[[sub("\\d+", "", layout1$name[k])]]
+  #   avtr = readPNG(paste0("/home/luke/Documents/Hunt Lab/wd_HuntLab/huntr/R/avatars/",animal,"@2x.png"))
+  #   grb = rasterGrob(avtr, interpolate = T)
+  #   x = layout1$x[k]
+  #   y = layout1$y[k]
+  #   p1 = p1 + annotation_custom(grb, xmin = x - 0.17, xmax = x + 0.17, ymin = y - 0.17, ymax = y + 0.17)
+  # }
+  # 
+  # for (k in 1:nrow(layout2)) {
+  #   animal = avatarLookup[[sub("\\d+", "", layout2$name[k])]]
+  #   avtr = readPNG(paste0("/home/luke/Documents/Hunt Lab/wd_HuntLab/huntr/R/avatars/",animal,"@2x.png"))
+  #   grb = rasterGrob(avtr, interpolate = T)
+  #   x = layout2$x[k]
+  #   y = layout2$y[k]
+  #   p2 = p2 + annotation_custom(grb, xmin = x - 0.32, xmax = x + 0.32, ymin = y - 0.32, ymax = y + 0.32)
+  # }
   
   p = p1 + p2 + plot_layout(guides = 'collect') +
     plot_annotation(
       title = 'COMPARISON NETWORKS',
-      subtitle = 'Two comparison networks, provided for context. Each vertex is a user, labelled with their SWARM\nplatform avatar. Edges between vertices represent interactions between users, coloured by the\nnumber of interactions.',
+      subtitle = 'Two comparison networks, provided for context.',
       theme = theme(plot.margin = margin(10, 10, 10, 10, "pt"),
                     plot.background = element_rect(fill = "#f6f6f6"),
                     plot.title = element_text(face = "bold",
@@ -800,7 +804,7 @@ plot_network_reference = function(instance_name, team_name, export = F) {
                 "team_dynamics_reference.png",
                 instance_name,
                 team_name,
-                "(A4-title)/2.5")
+                "(A4-title)/3.8")
   }
   
 }
@@ -1088,7 +1092,7 @@ plot_timeline_reference = function(instance_name, team_name, export = F) {
                 "timeline_reference.png",
                 instance_name,
                 team_name,
-                "(A4-title)/3")
+                "(A4-title)/3.8")
     
   }
   
@@ -1110,8 +1114,8 @@ plot_qor_teamsize = function(instance_name, team_name, export = F) {
                         values = c("#00a087", "#f9a825", "#3c5488", "#e64b35")) +
     scale_size_manual(breaks = c("PT","ST","OT","Your Team"),
                         values = c(1, 1, 1, 1.5)) +
-    labs(x = "Number of Active Users",
-         y = "Average ODNI",
+    labs(x = "Active Team Size",
+         y = "Average IC Rating Scale",
          colour = "Type",
          size = "Type") +
     theme_huntlab() +
@@ -1123,8 +1127,8 @@ plot_qor_teamsize = function(instance_name, team_name, export = F) {
   
   p = p + plot_layout(guides = 'collect') +
     plot_annotation(
-      title = 'QOR v. TEAM SIZE',
-      subtitle = 'Scatterplot of quality of reasoning scores (average ODNI) against number of active team members.\nThere is one point for each instance of a team participating in a problem. A quadratic regression line\nand 95% confidence interval (in yellow) is overlaid on the plot.',
+      title = 'QOR v. ACTIVE TEAM SIZE',
+      subtitle = 'Scatterplot of quality of reasoning scores (average IC Rating Scale) against number of active team\nmembers. There is one point for each instance of a team participating in a problem. A quadratic\nregression line and 95% confidence interval (in yellow) is overlaid on the plot.',
       theme = theme(plot.margin = margin(11, 10, 10, 10, "pt"),
                     plot.background = element_rect(fill = "#f6f6f6"),
                     plot.title = element_text(face = "bold",
@@ -1162,7 +1166,7 @@ plot_qor_education = function(instance_name, team_name, export = F) {
     scale_x_continuous(breaks = 3:6,
                      labels = c('Bachelors\nDegree','Graduate Certificate,\nDiploma or equiv.','Masters','PhD')) +
     labs(x = "Median Education Level of Team Members",
-         y = "Average ODNI",
+         y = "Average IC Rating Scale",
          colour = "Type",
          size = "Type") +
     theme_huntlab() +
@@ -1175,7 +1179,7 @@ plot_qor_education = function(instance_name, team_name, export = F) {
   p = p + plot_layout(guides = 'collect') +
     plot_annotation(
       title = 'QOR v. EDUCATION LEVEL',
-      subtitle = 'Scatterplot of quality of reasoning scores (average ODNI) against median education level of team\nmembers. There is one point for each instance of a team participating in a problem. A quadratic\nregression line and 95% confidence interval (in yellow) is overlaid on the plot.',
+      subtitle = 'Scatterplot of quality of reasoning scores (average IC Rating Scale) against median education level of\nteam members. There is one point for each instance of a team participating in a problem. A quadratic\nregression line and 95% confidence interval (in yellow) is overlaid on the plot.',
       theme = theme(plot.margin = margin(11, 10, 10, 10, "pt"),
                     plot.background = element_rect(fill = "#f6f6f6"),
                     plot.title = element_text(face = "bold",
@@ -1215,7 +1219,7 @@ plot_qor_AOMT = function(instance_name, team_name, export = F) {
     scale_size_manual(breaks = c("PT","ST","OT","Your Team"),
                       values = c(1, 1, 1, 1.5)) +
     labs(x = "Actively Open-Minded Thinking",
-         y = "Average ODNI",
+         y = "Average IC Rating Scale",
          colour = "Type",
          size = "Type") +
     theme_huntlab() +
@@ -1228,7 +1232,7 @@ plot_qor_AOMT = function(instance_name, team_name, export = F) {
   p = p + plot_layout(guides = 'collect') +
     plot_annotation(
       title = 'QOR v. ACTIVELY OPEN-MINDED THINKING (AOMT)',
-      subtitle = 'Scatterplot of quality of reasoning scores (average ODNI) against median AOMT score of team members.\nThere is one point for each instance of a team participating in a problem. A quadratic regression line\nand 95% confidence interval (in yellow) is overlaid on the plot.',
+      subtitle = 'Scatterplot of quality of reasoning scores (average IC Rating Scale) against the median AOMT score of\nteam members. There is one point for each instance of a team participating in a problem. A\nquadratic regression line and 95% confidence interval (in yellow) is overlaid on the plot.',
       theme = theme(plot.margin = margin(11, 10, 10, 10, "pt"),
                     plot.background = element_rect(fill = "#f6f6f6"),
                     plot.title = element_text(face = "bold",
@@ -1268,7 +1272,7 @@ plot_qor_divAOMT = function(instance_name, team_name, export = F) {
     scale_size_manual(breaks = c("PT","ST","OT","Your Team"),
                       values = c(1, 1, 1, 1.5)) +
     labs(x = "Diversity in Actively Open-Minded Thinking",
-         y = "Average ODNI",
+         y = "Average IC Rating Scale",
          colour = "Type",
          size = "Type") +
     theme_huntlab() +
@@ -1281,7 +1285,7 @@ plot_qor_divAOMT = function(instance_name, team_name, export = F) {
   p = p + plot_layout(guides = 'collect') +
     plot_annotation(
       title = 'QOR v. AOMT DIVERSITY',
-      subtitle = 'Scatterplot of quality of reasoning scores (average ODNI) against diversity of AOMT among team\nmembers. There is one point for each instance of a team participating in a problem. A quadratic\nregression line and 95% confidence interval (in yellow) is overlaid on the plot.',
+      subtitle = 'Scatterplot of quality of reasoning scores (average IC Rating Scale) against diversity of AOMT among\nteam members. There is one point for each instance of a team participating in a problem. A quadratic\nregression line and 95% confidence interval (in yellow) is overlaid on the plot.',
       theme = theme(plot.margin = margin(11, 10, 10, 10, "pt"),
                     plot.background = element_rect(fill = "#f6f6f6"),
                     plot.title = element_text(face = "bold",
@@ -1314,7 +1318,7 @@ plot_qor_textSim = function(instance_name, team_name, export = F) {
     scale_size_manual(breaks = c("PT","ST","OT","Your Team"),
                       values = c(1, 1, 1, 1.5)) +
     labs(x = "Text Similarity",
-         y = "Average ODNI",
+         y = "Average IC Rating Scale",
          colour = "Type",
          size = "Type") +
     theme_huntlab() +
@@ -1327,7 +1331,7 @@ plot_qor_textSim = function(instance_name, team_name, export = F) {
   p = p + plot_layout(guides = 'collect') +
     plot_annotation(
       title = 'QOR v. TEXT SIMILARITY',
-      subtitle = 'Scatterplot of quality of reasoning scores (average ODNI) against text similarity amongst a teams\'\nreports produced for a given problem. There is one point for each instance of a team participating\nin a problem. A quadratic regression line and 95% confidence interval (in yellow) is overlaid on the plot.',
+      subtitle = 'Scatterplot of quality of reasoning scores (average IC Rating Scale) against text similarity amongst a\nteams\' reports produced for a given problem. There is one point for each instance of a team participating\nin a problem. A quadratic regression line and 95% confidence interval (in yellow) is overlaid on the plot.',
       theme = theme(plot.margin = margin(11, 10, 10, 10, "pt"),
                     plot.background = element_rect(fill = "#f6f6f6"),
                     plot.title = element_text(face = "bold",
@@ -1342,6 +1346,62 @@ plot_qor_textSim = function(instance_name, team_name, export = F) {
                   "(A4-title)/3")
   }
 
+}
+
+plot_qor_activity = function(instance_name, team_name, export = F) {
+  
+  probteams = repo[[instance_name]]$OtherData$probteams
+  probteams = probteams[!is.na(probteams$avgODNI) & probteams$avgODNI > 0,]
+  probteams = setDT(probteams)
+  probteams = probteams[,.(team, type, problem, avgODNI)]
+  probparts = repo[[instance_name]]$OtherData$probparts
+  probparts = probparts[,sum(engagement), by = c('team', 'problem')]
+  probparts = probparts[!(problem %in% c('Test Problem',
+                                         "'Sandpit' Problem",
+                                         "Problem #1 Teaser - 'Foreign Fighters'"))]
+  colnames(probparts)[3] = 'engagement'
+  probteams = merge(probteams, probparts, by = c('team','problem'), all.x = T)
+  
+  probteams[probteams$team == team_name,]$type = "Your Team"
+  probteams = as.data.frame(probteams)
+  
+  p = ggplot(probteams, aes(x = engagement, y = avgODNI)) +
+    stat_smooth(data = probteams, method = "lm", formula = y ~ x + I(x^2), size = 0.5,
+                colour = "#000000", fill = "#fedb4a", alpha = 0.2) +
+    geom_point(aes(size = type, colour = type)) +
+    scale_colour_manual(breaks = c("PT","ST","OT","Your Team"),
+                        values = c("#00a087", "#f9a825", "#3c5488", "#e64b35")) +
+    scale_size_manual(breaks = c("PT","ST","OT","Your Team"),
+                      values = c(1, 1, 1, 1.5)) +
+    labs(x = "Total Engagement Count",
+         y = "Average IC Rating Scale",
+         colour = "Type",
+         size = "Type") +
+    theme_huntlab() +
+    theme(panel.grid.major.y = element_line(size = .5, colour = "#f6f6f6"),
+          panel.grid.minor.y = element_line(size = .5, colour = "#f6f6f6"),
+          panel.grid.major.x = element_line(size = .5, colour = "#f6f6f6"),
+          panel.grid.minor.x = element_line(size = .5, colour = "#f6f6f6")
+    )
+  
+  p = p + plot_layout(guides = 'collect') +
+    plot_annotation(
+      title = 'QOR v. ENGAGEMENT',
+      subtitle = 'Scatterplot of quality of reasoning scores (average IC Rating Scale) against total activity counts for each\nteam and problem. There is one point for each instance of a team participating in a problem. A\nquadratic regression line and 95% confidence interval (in yellow) is overlaid on the plot.',
+      theme = theme(plot.margin = margin(11, 10, 10, 10, "pt"),
+                    plot.background = element_rect(fill = "#f6f6f6"),
+                    plot.title = element_text(face = "bold",
+                                              colour = "#014085"))
+    )
+  
+  if (export) {
+    export_plot(p,
+                "qor_v_activity.png",
+                instance_name,
+                team_name,
+                "(A4-title)/3")
+  }
+  
 }
 
 plot_qor_nGeoCorrect = function(instance_name, team_name, export = F) {
@@ -1359,7 +1419,7 @@ plot_qor_nGeoCorrect = function(instance_name, team_name, export = F) {
                         values = c("#00a087", "#f9a825", "#3c5488", "#e64b35")) +
     scale_size_manual(breaks = c("PT","ST","OT","Your Team"),
                       values = c(1, 1, 1, 1.5)) +
-    labs(x = "Average ODNI",
+    labs(x = "Average IC Rating Scale",
          y = "# Geolocation Challenges Correct",
          colour = "Type",
          size = "Type") +
@@ -1396,7 +1456,9 @@ plot_qor_forecasting = function(instance_name, team_name, export = F) {
   probteams = probteams[!is.na(probteams$avgODNI) & probteams$avgODNI > 0 & !is.na(probteams$probabilityEstimate),]
   probteams[probteams$team == team_name,]$type = "Your Team"
   
-  p = ggplot(probteams, aes(x = avgODNI, y = probabilityEstimate)) +
+  probteams$brier = probteams$probabilityEstimate^2
+  
+  p = ggplot(probteams, aes(x = avgODNI, y = brier)) +
     # stat_smooth(data = probteams, method = "lm", formula = y ~ x + I(x^2), size = 0.5,
     #             colour = "#000000", fill = "#fedb4a", alpha = 0.2) +
     geom_point(aes(size = type, colour = type)) +
@@ -1405,8 +1467,8 @@ plot_qor_forecasting = function(instance_name, team_name, export = F) {
                         values = c("#00a087", "#f9a825", "#3c5488", "#e64b35")) +
     scale_size_manual(breaks = c("PT","ST","OT","Your Team"),
                       values = c(1, 1, 1, 1.5)) +
-    labs(x = "Average ODNI",
-         y = "Forecast Probability",
+    labs(x = "Average IC Rating Scale",
+         y = "Brier Score",
          colour = "Type",
          size = "Type") +
     theme_huntlab() +
@@ -1418,8 +1480,8 @@ plot_qor_forecasting = function(instance_name, team_name, export = F) {
   
   p = p + plot_layout(guides = 'collect') +
     plot_annotation(
-      title = 'FORECAST PROBABILITY v. QOR',
-      subtitle = 'Scatterplot of the forecast probabilities against quality of reasoning for each team that participated in the\n\'Forecasting Piracy\' problem.',
+      title = 'BRIER SCORE v. QOR',
+      subtitle = 'Scatterplot of the Brier scores against quality of reasoning for each team that participated in the\n\'Forecasting Piracy\' problem.',
       theme = theme(plot.margin = margin(11, 10, 10, 10, "pt"),
                     plot.background = element_rect(fill = "#f6f6f6"),
                     plot.title = element_text(face = "bold",
@@ -1451,7 +1513,7 @@ plot_qor_tightness = function(instance_name, team_name, export = F) {
                         values = c("#00a087", "#f9a825", "#3c5488", "#e64b35")) +
     scale_size_manual(breaks = c("PT","ST","OT","Your Team"),
                       values = c(1, 1, 1, 1.5)) +
-    labs(x = "Average ODNI",
+    labs(x = "Average IC Rating Scale",
          y = "Tightness Score",
          colour = "Type",
          size = "Type") +
@@ -1486,10 +1548,9 @@ plot_qor_nBayesCorrect = function(instance_name, team_name, export = F) {
   
   probteams = repo[[instance_name]]$OtherData$probteams
   probteams = probteams[!is.na(probteams$avgODNI) & probteams$avgODNI > 0 & !is.na(probteams$nBayesCorrect),]
-  if (!(team_name %in% probteams$team)) {
-    return();
+  if (team_name %in% probteams$team) {
+    probteams[probteams$team == team_name,]$type = "Your Team"
   }
-  probteams[probteams$team == team_name,]$type = "Your Team"
   
   p = ggplot(probteams, aes(x = avgODNI, y = nBayesCorrect)) +
     # stat_smooth(data = probteams, method = "lm", formula = y ~ x + I(x^2), size = 0.5,
@@ -1500,7 +1561,7 @@ plot_qor_nBayesCorrect = function(instance_name, team_name, export = F) {
                         values = c("#00a087", "#f9a825", "#3c5488", "#e64b35")) +
     scale_size_manual(breaks = c("PT","ST","OT","Your Team"),
                       values = c(1, 1, 1, 1.5)) +
-    labs(x = "Average ODNI",
+    labs(x = "Average IC Rating Scale",
          y = "# Bayesian Problems Correct",
          colour = "Type",
          size = "Type") +
@@ -1535,10 +1596,9 @@ plot_qor_nFlawsDetected = function(instance_name, team_name, export = F) {
   
   probteams = repo[[instance_name]]$OtherData$probteams
   probteams = probteams[!is.na(probteams$avgODNI) & probteams$avgODNI > 0 & !is.na(probteams$nFlawsDetected),]
-  if (!(team_name %in% probteams$team)) {
-    return();
+  if (team_name %in% probteams$team) {
+    probteams[probteams$team == team_name,]$type = "Your Team"
   }
-  probteams[probteams$team == team_name,]$type = "Your Team"
   
   p = ggplot(probteams, aes(x = avgODNI, y = nFlawsDetected)) +
     # stat_smooth(data = probteams, method = "lm", formula = y ~ x + I(x^2), size = 0.5,
@@ -1549,7 +1609,7 @@ plot_qor_nFlawsDetected = function(instance_name, team_name, export = F) {
                         values = c("#00a087", "#f9a825", "#3c5488", "#e64b35")) +
     scale_size_manual(breaks = c("PT","ST","OT","Your Team"),
                       values = c(1, 1, 1, 1.5)) +
-    labs(x = "Average ODNI",
+    labs(x = "Average IC Rating Scale",
          y = "# Reasoning Flaws Detected",
          colour = "Type",
          size = "Type") +
@@ -1563,7 +1623,7 @@ plot_qor_nFlawsDetected = function(instance_name, team_name, export = F) {
   p = p + plot_layout(guides = 'collect') +
     plot_annotation(
       title = 'REASONING FLAW DETECTION v. QOR',
-      subtitle = 'Scatterplot of the number of reaosning flaws detected against quality of reasoning for each\nteam that participated in the \'Park Young-min Case\' problem.',
+      subtitle = 'Scatterplot of the number of reasoning flaws detected against quality of reasoning for each\nteam that participated in the \'Park Young-min Case\' problem.',
       theme = theme(plot.margin = margin(11, 10, 10, 10, "pt"),
                     plot.background = element_rect(fill = "#f6f6f6"),
                     plot.title = element_text(face = "bold",
@@ -1769,39 +1829,46 @@ plot_dot_qor = function(instance_name, team_name, export = F) {
     
     pcs[[pb]] = ggplot() +
       scale_x_continuous(expand = c(0,0), limits = c(1,5)) + 
-      scale_y_continuous(expand = c(0,0), limits = c(0,100)) + 
-      annotate("text",
-               x = 1, y = 80,
-               hjust = 0, vjust = 1,
-               label = paste0("Your teams' QoR score of ", teamVal, " was as good or better than that of:")) +
-      annotate("text",
-               x = 1.8, y = 40, size = 6, fontface = 2, vjust = 0,
-               label = paste0(round(100*mean(probteams[probteams$probNum == pb,]$avgODNI <= teamVal)),'%'),
-               colour = "#000000") +
-      annotate("text",
-               x = 1.8, y = 33, vjust = 1,
-               label = "of all teams",
-               colour = "#000000") +
-      annotate("text",
-               x = 2.8, y = 40, size = 6, fontface = 2, vjust = 0,
-               label = paste0(round(100*mean(probteams[probteams$probNum == pb & probteams$type == pubtype,]$avgODNI <= teamVal)),'%'),
-               colour = pubcolour) +
-      annotate("text",
-               x = 2.8, y = 33, vjust = 1,
-               label = pubcaption,
-               colour = pubcolour) +
-      annotate("text",
-               x = 4, y = 40, size = 6, fontface = 2, vjust = 0,
-               label = paste0(round(100*mean(probteams[probteams$probNum == pb & probteams$type == "OT",]$avgODNI <= teamVal)),'%'),
-               colour = "#3c5488") +
-      annotate("text",
-               x = 4, y = 33, vjust = 1,
-               label = "of organisational teams",
-               colour = "#3c5488") +
+      scale_y_continuous(expand = c(0,0), limits = c(0,100))
+    
+    if (!is.na(teamVal)) {
+      pcs[[pb]] = pcs[[pb]] + 
+        annotate("text",
+                 x = 1, y = 80,
+                 hjust = 0, vjust = 1,
+                 label = paste0("Your teams' QoR score of ", teamVal, " was as good or better than that of:")) +
+        annotate("text",
+                 x = 1.8, y = 40, size = 6, fontface = 2, vjust = 0,
+                 label = paste0(round(100*mean(probteams[probteams$probNum == pb,]$avgODNI <= teamVal)),'%'),
+                 colour = "#000000") +
+        annotate("text",
+                 x = 1.8, y = 33, vjust = 1,
+                 label = "of all teams",
+                 colour = "#000000") +
+        annotate("text",
+                 x = 2.8, y = 40, size = 6, fontface = 2, vjust = 0,
+                 label = paste0(round(100*mean(probteams[probteams$probNum == pb & probteams$type == pubtype,]$avgODNI <= teamVal)),'%'),
+                 colour = pubcolour) +
+        annotate("text",
+                 x = 2.8, y = 33, vjust = 1,
+                 label = pubcaption,
+                 colour = pubcolour) +
+        annotate("text",
+                 x = 4, y = 40, size = 6, fontface = 2, vjust = 0,
+                 label = paste0(round(100*mean(probteams[probteams$probNum == pb & probteams$type == "OT",]$avgODNI <= teamVal)),'%'),
+                 colour = "#3c5488") +
+        annotate("text",
+                 x = 4, y = 33, vjust = 1,
+                 label = "of organisational teams",
+                 colour = "#3c5488")
+    }
+    
+    pcs[[pb]] = pcs[[pb]] +
       theme_void() +
       theme(panel.background = element_rect(fill = "#f6f6f6",
                                             linetype = 0),
             legend.position = "right")
+      
   }
   
   p = (ps[[1]]/pcs[[1]]/ps[[2]]/pcs[[2]]/ps[[3]]/pcs[[3]]/ps[[4]]/pcs[[4]]) +
@@ -1809,7 +1876,7 @@ plot_dot_qor = function(instance_name, team_name, export = F) {
                 heights = c(2,3,2,3,2,3,2,3)) +
     plot_annotation(
       title = 'DISTRIBUTION OF AVERAGE QUALITY OF REASONING',
-      subtitle = 'Dot plot of average ODNI Rating Scale scores on each problem. Your team is indicated in red.',
+      subtitle = 'Dot plot of average IC Rating Scale scores on each problem. Your team is indicated in red.',
       theme = theme(plot.margin = margin(11, 10, 10, 10, "pt"),
                     plot.background = element_rect(fill = "#f6f6f6"),
                     plot.title = element_text(face = "bold",
@@ -1826,7 +1893,7 @@ plot_dot_qor = function(instance_name, team_name, export = F) {
   
 }
 
-plot_dot_qor_subscales = function(instance_name, team_name, export = F) {
+plot_dot_qor_subscales_old = function(instance_name, team_name, export = F) {
   
   rates = repo[[instance_name]]$OtherData$rates
   rates = rates[!is.na(c1) & team != 'Calibration_team', .(problem, team,
@@ -1843,28 +1910,42 @@ plot_dot_qor_subscales = function(instance_name, team_name, export = F) {
   
   rates = rates[, lapply(.SD, mean), by = 'team', .SDcols = paste0('c',1:8)]
   
+  teams = setDT(repo[[instance_name]]$OtherData$teams[,c('team', 'type')])
+  teams = merge(teams, rates, by = c('team'), all = T)
+  teams = as.data.frame(teams)
   
-  probteams = repo[[instance_name]]$OtherData$probteams
-  probteams = probteams[!is.na(probteams$avgODNI),]
-  probteams[probteams$team == team_name,]$type = "Your Team"
-  probteams$type = factor(probteams$type, levels = c('PT','ST','OT','Your Team'))
+  teams[teams$team == team_name,]$type = "Your Team"
+  teams$type = factor(teams$type, levels = c('PT','ST','OT','Your Team'))
+  
+  criteriaDescriptions = c(
+    'Criterion 1 - Describes sources, data, methodologies',
+    'Criterion 2 - Expresses and explains uncertainties',
+    'Criterion 3 - Properly distinguishes underlying intelligence information and assumptions\nand judgments',
+    'Criterion 4 - Incorporates analysis of alternatives',
+    'Criterion 5 - Demonstrates relevance and addresses implications',
+    'Criterion 6 - Uses clear and logical argumentation',
+    'Criterion 7 - Makes accurate judgements and assessments',
+    'Criterion 8 - Incorporates effective visual information where appropriate'
+  )
   
   ps = list()
   pcs = list()
-  for (pb in 1:4) {
-    ps[[pb]] = ggplot(probteams[probteams$probNum == pb,], aes(avgODNI)) +
+  for (k in 1:8) {
+    criteria = sym(paste0('c',k))
+    ps[[k]] = ggplot(teams, aes(!!criteria)) +
       geom_dotplot(aes(fill = type), 
-                   binwidth = .5, 
+                   binwidth = .05, 
                    # stroke = 0,
                    method = "histodot",
                    stackgroups = T) +
       scale_y_continuous(NULL, breaks = NULL) +
-      scale_x_continuous(breaks = c(8,12,16,20,24,28,32),
-                         limits = c(8,32)) +
+      scale_x_continuous(breaks = 1:4,
+                         limits = c(1,4),
+                         labels = c('Poor', 'Fair', 'Good', 'Excellent')) +
       scale_fill_manual(breaks = c("PT","ST","OT","Your Team"),
                         values = c("#00a087", "#f9a825", "#3c5488", "#e64b35"),
                         drop = F) +
-      labs(title = probteams[probteams$probNum == pb,]$problem[1],
+      labs(title = criteriaDescriptions[k],
            x = NULL,
            y = NULL,
            fill = "Type") +
@@ -1876,49 +1957,48 @@ plot_dot_qor_subscales = function(instance_name, team_name, export = F) {
             legend.position = "right"
       )
     
-    teamVal = probteams[probteams$probNum == pb & probteams$type == "Your Team",]$avgODNI[1]
+    teamVal = teams[teams$type == "Your Team",][[paste0('c', k)]][1]
     
     # PT, ST, OT
     # "#00a087", "#f9a825", "#3c5488"
-    if (pb %in% 1:2) {
-      pubtype = "PT"
-      pubcaption = "of public teams"
-      pubcolour = "#00a087"
-    } else {
-      pubtype = "ST"
-      pubcaption = "of superteams"
-      pubcolour = "#f9a825"
-    }
     
-    pcs[[pb]] = ggplot() +
+    pcs[[k]] = ggplot() +
       scale_x_continuous(expand = c(0,0), limits = c(1,5)) + 
       scale_y_continuous(expand = c(0,0), limits = c(0,100)) + 
       annotate("text",
                x = 1, y = 80,
                hjust = 0, vjust = 1,
-               label = paste0("Your teams' QoR score of ", teamVal, " was as good or better than that of:")) +
+               label = paste0("Your teams' average rating on Criteria ", k, " was as high or higher than that of:")) +
       annotate("text",
-               x = 1.8, y = 40, size = 6, fontface = 2, vjust = 0,
-               label = paste0(round(100*mean(probteams[probteams$probNum == pb,]$avgODNI <= teamVal)),'%'),
+               x = 1.6, y = 40, size = 6, fontface = 2, vjust = 0,
+               label = paste0(round(100*mean(teams[[paste0('c',k)]] <= teamVal)),'%'),
                colour = "#000000") +
       annotate("text",
-               x = 1.8, y = 33, vjust = 1,
+               x = 1.6, y = 33, vjust = 1,
                label = "of all teams",
                colour = "#000000") +
       annotate("text",
-               x = 2.8, y = 40, size = 6, fontface = 2, vjust = 0,
-               label = paste0(round(100*mean(probteams[probteams$probNum == pb & probteams$type == pubtype,]$avgODNI <= teamVal)),'%'),
-               colour = pubcolour) +
+               x = 2.4, y = 40, size = 6, fontface = 2, vjust = 0,
+               label = paste0(round(100*mean(teams[teams$type == 'PT',][[paste0('c',k)]] <= teamVal)),'%'),
+               colour = "#00a087") +
       annotate("text",
-               x = 2.8, y = 33, vjust = 1,
-               label = pubcaption,
-               colour = pubcolour) +
+               x = 2.4, y = 33, vjust = 1,
+               label = "of public teams",
+               colour = "#00a087") +
       annotate("text",
-               x = 4, y = 40, size = 6, fontface = 2, vjust = 0,
-               label = paste0(round(100*mean(probteams[probteams$probNum == pb & probteams$type == "OT",]$avgODNI <= teamVal)),'%'),
+               x = 3.3, y = 40, size = 6, fontface = 2, vjust = 0,
+               label = paste0(round(100*mean(teams[teams$type == 'ST',][[paste0('c',k)]] <= teamVal)),'%'),
+               colour = "#f9a825") +
+      annotate("text",
+               x = 3.3, y = 33, vjust = 1,
+               label = "of superteams",
+               colour = "#f9a825") +
+      annotate("text",
+               x = 4.3, y = 40, size = 6, fontface = 2, vjust = 0,
+               label = paste0(round(100*mean(teams[teams$type == 'OT',][[paste0('c',k)]] <= teamVal)),'%'),
                colour = "#3c5488") +
       annotate("text",
-               x = 4, y = 33, vjust = 1,
+               x = 4.3, y = 33, vjust = 1,
                label = "of organisational teams",
                colour = "#3c5488") +
       theme_void() +
@@ -1927,12 +2007,127 @@ plot_dot_qor_subscales = function(instance_name, team_name, export = F) {
             legend.position = "right")
   }
   
-  p = (ps[[1]]/pcs[[1]]/ps[[2]]/pcs[[2]]/ps[[3]]/pcs[[3]]/ps[[4]]/pcs[[4]]) +
+  p1234 = (ps[[1]]/pcs[[1]]/ps[[2]]/pcs[[2]]/ps[[3]]/pcs[[3]]/ps[[4]]/pcs[[4]]) +
     plot_layout(guides = "collect",
                 heights = c(2,3,2,3,2,3,2,3)) +
     plot_annotation(
-      title = 'DISTRIBUTION OF AVERAGE QUALITY OF REASONING',
-      subtitle = 'Dot plot of average ODNI Rating Scale scores on each problem. Your team is indicated in red.',
+      title = 'AVERAGE SCORES ON QOR SUBSCALES (1-4) ',
+      subtitle = 'Dot plot of the average rating (across all problems) for each team on each of the IC Rating Scale\ncriteria. Your team is indicated in red.',
+      theme = theme(plot.margin = margin(11, 10, 10, 10, "pt"),
+                    plot.background = element_rect(fill = "#f6f6f6"),
+                    plot.title = element_text(face = "bold",
+                                              colour = "#014085"))
+    )
+  
+  p5678 = (ps[[5]]/pcs[[5]]/ps[[6]]/pcs[[6]]/ps[[7]]/pcs[[7]]/ps[[8]]/pcs[[8]]) +
+    plot_layout(guides = "collect",
+                heights = c(2,3,2,3,2,3,2,3)) +
+    plot_annotation(
+      title = 'AVERAGE SCORES ON QOR SUBSCALES (5-8) ',
+      subtitle = 'Dot plot of the average rating (across all problems) for each team on each of the IC Rating Scale\ncriteria. Your team is indicated in red.',
+      theme = theme(plot.margin = margin(11, 10, 10, 10, "pt"),
+                    plot.background = element_rect(fill = "#f6f6f6"),
+                    plot.title = element_text(face = "bold",
+                                              colour = "#014085"))
+    )
+  
+  if (export) {
+    export_plot(p1234,
+                "dot_qor_subscales_1234.png",
+                instance_name,
+                team_name,
+                "A4")
+    export_plot(p5678,
+                "dot_qor_subscales_5678.png",
+                instance_name,
+                team_name,
+                "A4")
+  }
+  
+}
+
+plot_qor_subscales = function(instance_name, team_name, export = F) {
+  
+  rates = repo[[instance_name]]$OtherData$rates
+  rates = rates[!is.na(c1) & team != 'Calibration_team', .(problem, team,
+                                                           c1, c2, c3, c4, c5, c6, c7, c8)]
+  rates = rates[team != 'tongariro00311*']
+  rates[rates == 'Poor'] = 1
+  rates[rates == 'Fair'] = 2
+  rates[rates == 'Good'] = 3
+  rates[rates == 'Excellent'] = 4
+  
+  for (cl in paste0('c',1:8)) {
+    rates[[cl]] = as.numeric(rates[[cl]])
+  }
+  
+  rates = rates[, lapply(.SD, mean), by = c('team', 'problem'), .SDcols = paste0('c',1:8)]
+  
+  teams = setDT(repo[[instance_name]]$OtherData$teams[,c('team', 'type')])
+  teams = merge(teams, rates, by = c('team'), all = T)
+  teams = melt(teams, id.vars = c('team', 'type', 'problem'))
+  teams = as.data.frame(teams)
+  teams[teams$team == team_name,]$type = "Your Team"
+  teams$type = factor(teams$type, levels = c('PT','ST','OT','Your Team'))
+  teams$variable = factor(teams$variable, levels = paste0('c', 8:1))
+  
+  criteriaDescriptions = c(
+    '(1) Describes sources,\ndata, methodologies',
+    '(2) Expresses and\nexplains uncertainties',
+    '(3) Properly distinguishes\nunderlying intelligence\ninformation and assumptions\nand judgments',
+    '(4) Incorporates analysis\nof alternatives',
+    '(5) Demonstrates relevance and\naddresses implications',
+    '(6) Uses clear and\nlogical argumentation',
+    '(7) Makes accurate\njudgements and assessments',
+    '(8) Incorporates effective visual\ninformation where appropriate'
+  )
+  
+  means = copy(setDT(teams))
+  means2 = copy(means)
+  means2 = means2[type == 'Your Team']
+  means2[,type := 'OT']
+  means = rbind(means, means2)
+  means = means[, mean(value), by = c('type', 'variable')]
+  colnames(means)[3] = 'value'
+  means = as.data.frame(means)
+  set.seed(5678)
+  means$value = means$value + runif(nrow(means), -0.05, .05)
+  
+  p = ggplot(teams, aes(x = value, y = variable, colour = type, fill = type)) +
+    geom_jitter(data = teams[teams$type != 'Your Team'], height = 0.1, width = 0.2, alpha = 0.2) +
+    geom_jitter(data = teams[teams$type == 'Your Team'], height = 0.1, width = 0.2, alpha = 1) +
+    geom_tile(data = means,
+              size = 1.5,
+              width = 0,
+              height = .5) +
+    scale_colour_manual(breaks = c("PT","ST","OT","Your Team"),
+                      values = c("#00a087", "#f9a825", "#3c5488", "#e64b35"),
+                      drop = F) +
+    scale_fill_manual(breaks = c("PT","ST","OT","Your Team"),
+                        values = c("#00a087", "#f9a825", "#3c5488", "#e64b35"),
+                        drop = F) +
+    scale_y_discrete(breaks = paste0('c', 1:8),
+                     labels = criteriaDescriptions) +
+    scale_x_continuous(breaks = 1:4,
+                       limits = c(1,4),
+                       labels = c('Poor', 'Fair', 'Good', 'Excellent')) +
+    theme_huntlab() +
+    labs(
+      x = 'Average Score',
+      y = NULL,
+      colour = 'Type',
+      size = 'Type',
+      fill = 'Type'
+    ) +
+    theme(
+      panel.grid.major.y = element_line(size = .5, colour = "#f6f6f6"),
+      legend.position = "top"
+    )
+  
+  p = p + plot_layout(guides = "keep") +
+    plot_annotation(
+      title = 'AVERAGE SCORES ON QOR SUBSCALES',
+      subtitle = 'Stripchart of the average rating for each team and problem on each of the IC Rating Scale criteria. The\noverall average for each team type is indicated by the vertical bars. Your team is indicated in red.',
       theme = theme(plot.margin = margin(11, 10, 10, 10, "pt"),
                     plot.background = element_rect(fill = "#f6f6f6"),
                     plot.title = element_text(face = "bold",
@@ -1941,10 +2136,10 @@ plot_dot_qor_subscales = function(instance_name, team_name, export = F) {
   
   if (export) {
     export_plot(p,
-                "dot_qor_subscales_1_4.png",
+                "qor_subscales.png",
                 instance_name,
                 team_name,
-                "A4")
+                "(A4-title)/2")
   }
   
 }
@@ -1957,7 +2152,7 @@ plot_dot_geolocation = function(instance_name, team_name, export = F) {
   
   p = ggplot(probteams, aes(nGeoCorrect)) +
     geom_dotplot(aes(fill = type), 
-                 binwidth = .1,
+                 binwidth = .07,
                  # stroke = 0,
                  method = "histodot",
                  stackgroups = T) +
@@ -2031,7 +2226,7 @@ plot_dot_geolocation = function(instance_name, team_name, export = F) {
                 "dot_geolocation.png",
                 instance_name,
                 team_name,
-                "(A4-title)/2.5")
+                "(A4-title)/3")
   }
   
 }
@@ -2221,7 +2416,7 @@ plot_dot_tightness = function(instance_name, team_name, export = F) {
   
   p = ggplot(probteams, aes(tightness)) +
     geom_dotplot(aes(fill = type), 
-                 binwidth = 0.0003, 
+                 binwidth = 0.0002, 
                  # stroke = 0,
                  method = "histodot",
                  stackgroups = T) +
@@ -2280,7 +2475,7 @@ plot_dot_tightness = function(instance_name, team_name, export = F) {
     theme(panel.background = element_rect(fill = "#f6f6f6",
                                           linetype = 0))
   
-  p = (p/pc) + plot_layout(guides = "keep") +
+  p = (p/pc) + plot_layout(guides = "keep", height = c(2,3)) +
     plot_annotation(
       title = 'DISTRIBUTION OF TIGHTNESS SCORES',
       subtitle = 'Dot plot of tightness scores in team reports. The lower the score, the tighter the reasoning. Your teams\'\nscore is indicated in red.',
@@ -2295,7 +2490,7 @@ plot_dot_tightness = function(instance_name, team_name, export = F) {
                 "dot_tightness.png",
                 instance_name,
                 team_name,
-                "(A4-title)/3")
+                "(A4-title)/3.5")
   }
   
 }
@@ -2519,7 +2714,7 @@ plot_dot_aggregated_performance = function(instance_name, team_name, export = F)
   
   p = ggplot(tmqor, aes(qor)) +
     geom_dotplot(aes(fill = type), 
-                 binwidth = 0.2, 
+                 binwidth = 0.17, 
                  # stroke = 0,
                  method = "histodot",
                  stackgroups = T) +
@@ -2528,7 +2723,7 @@ plot_dot_aggregated_performance = function(instance_name, team_name, export = F)
     #                    limits = c(0,1)) +
     scale_fill_manual(breaks = c("PT","ST","OT","Your Team"),
                       values = c("#00a087", "#f9a825", "#3c5488", "#e64b35")) +
-    labs(x = NULL,
+    labs(x = 'Aggregated Performance Score (first principal component)',
          y = NULL,
          fill = "Type") +
     # guides(colour = guide_legend(override.aes = list(stroke = 0))) +
@@ -2551,35 +2746,35 @@ plot_dot_aggregated_performance = function(instance_name, team_name, export = F)
              hjust = 0, vjust = 1,
              label = paste0("Your teams' aggregated performance score was as high or higher than that of:")) +
     annotate("text",
-             x = 1.6, y = 25, size = 10, fontface = 2, vjust = 0,
+             x = 1.6, y = 30, size = 6, fontface = 2, vjust = 0,
              label = paste0(round(100*mean(tmqor$qor <= teamVal)),'%'),
              colour = "#000000") +
     annotate("text",
-             x = 1.6, y = 18, vjust = 1,
+             x = 1.6, y = 23, vjust = 1,
              label = "of all teams",
              colour = "#000000") +
     annotate("text",
-             x = 2.4, y = 25, size = 10, fontface = 2, vjust = 0,
+             x = 2.4, y = 30, size = 6, fontface = 2, vjust = 0,
              label = paste0(round(100*mean(tmqor[tmqor$type == "PT",]$qor <= teamVal)),'%'),
              colour = "#00a087") +
     annotate("text",
-             x = 2.4, y = 18, vjust = 1,
+             x = 2.4, y = 23, vjust = 1,
              label = "of public teams",
              colour = "#00a087") +
     annotate("text",
-             x = 3.3, y = 25, size = 10, fontface = 2, vjust = 0,
+             x = 3.3, y = 30, size = 6, fontface = 2, vjust = 0,
              label = paste0(round(100*mean(tmqor[tmqor$type == "ST",]$qor <= teamVal)),'%'),
              colour = "#f9a825") +
     annotate("text",
-             x = 3.3, y = 18, vjust = 1,
+             x = 3.3, y = 23, vjust = 1,
              label = "of superteams",
              colour = "#f9a825") +
     annotate("text",
-             x = 4.3, y = 25, size = 10, fontface = 2, vjust = 0,
+             x = 4.3, y = 30, size = 6, fontface = 2, vjust = 0,
              label = paste0(round(100*mean(tmqor[tmqor$type == "OT",]$qor <= teamVal)),'%'),
              colour = "#3c5488") +
     annotate("text",
-             x = 4.3, y = 18, vjust = 1,
+             x = 4.3, y = 23, vjust = 1,
              label = "of organisational teams",
              colour = "#3c5488") +
     theme_void() +
@@ -2587,10 +2782,10 @@ plot_dot_aggregated_performance = function(instance_name, team_name, export = F)
                                           linetype = 0))
   
   p = (p/pc) + plot_layout(guides = "keep",
-                           heights = c(2,2)) +
+                           heights = c(4,5)) +
     plot_annotation(
       title = 'AGGREGATED CHALLENGE PERFORMANCE',
-      subtitle = 'Dot plot of aggregated performance scores for each team across the whole challenge. For each team,\nthe score is the projection of their multidimensional vector of performance measures onto the first\nprincipal component of also such vectors (see below for more explanation). Higher is better. Your teams\'\nscore is indicated in red.',
+      subtitle = 'Dot plot of aggregated performance scores for each team across the whole challenge. For each team,\nthe score is the projection of their multidimensional vector of performance measures onto the first\nprincipal component of all such vectors (see footnote for more explanation). Higher is better. Your teams\'\nscore is indicated in red.',
       theme = theme(plot.margin = margin(11, 10, 10, 10, "pt"),
                     plot.background = element_rect(fill = "#f6f6f6"),
                     plot.title = element_text(face = "bold",
@@ -2713,14 +2908,13 @@ plot_dot_bayes = function(instance_name, team_name, export = F) {
   
   probteams = repo[[instance_name]]$OtherData$probteams
   probteams = probteams[!is.na(probteams$avgODNI) & !is.na(probteams$nBayesCorrect),]
-  if (!(team_name %in% probteams$team)) {
-    return();
+  if (team_name %in% probteams$team) {
+    probteams[probteams$team == team_name,]$type = "Your Team"
   }
-  probteams[probteams$team == team_name,]$type = "Your Team"
   
   p = ggplot(probteams, aes(nBayesCorrect)) +
     geom_dotplot(aes(fill = type), 
-                 binwidth = .08,
+                 binwidth = .06,
                  # stroke = 0,
                  # method = "histodot",
                  stackgroups = T) +
@@ -2742,43 +2936,49 @@ plot_dot_bayes = function(instance_name, team_name, export = F) {
   # PT, ST, OT
   # "#00a087", "#f9a825", "#3c5488"
   
-  teamVal = probteams[probteams$type == "Your Team",]$nBayesCorrect[1]
-  
   pc = ggplot() +
     scale_x_continuous(expand = c(0,0), limits = c(1,5)) + 
-    scale_y_continuous(expand = c(0,0), limits = c(0,100)) + 
-    annotate("text",
-             x = 1, y = 80,
-             hjust = 0, vjust = 1,
-             label = paste0("Your teams' correctly solved as many or more Bayesian problems than:")) +
-    annotate("text",
-             x = 1.8, y = 25, size = 10, fontface = 2, vjust = 0,
-             label = paste0(round(100*mean(probteams$nBayesCorrect <= teamVal)),'%'),
-             colour = "#000000") +
-    annotate("text",
-             x = 1.8, y = 18, vjust = 1,
-             label = "of all teams",
-             colour = "#000000") +
-    annotate("text",
-             x = 2.8, y = 25, size = 10, fontface = 2, vjust = 0,
-             label = paste0(round(100*mean(probteams[probteams$type == "ST",]$nBayesCorrect <= teamVal)),'%'),
-             colour = "#f9a825") +
-    annotate("text",
-             x = 2.8, y = 18, vjust = 1,
-             label = "of superteams",
-             colour = "#f9a825") +
-    annotate("text",
-             x = 4, y = 25, size = 10, fontface = 2, vjust = 0,
-             label = paste0(round(100*mean(probteams[probteams$type == "OT",]$nBayesCorrect <= teamVal)),'%'),
-             colour = "#3c5488") +
-    annotate("text",
-             x = 4, y = 18, vjust = 1,
-             label = "of organisational teams",
-             colour = "#3c5488") +
-    theme_void() +
+    scale_y_continuous(expand = c(0,0), limits = c(0,100))
+  
+  if (team_name %in% probteams$team) {
+    teamVal = probteams[probteams$type == "Your Team",]$nBayesCorrect[1]
+    
+    pc = pc + 
+      annotate("text",
+               x = 1, y = 80,
+               hjust = 0, vjust = 1,
+               label = paste0("Your team correctly solved as many or more Bayesian problems than:")) +
+      annotate("text",
+               x = 1.8, y = 25, size = 10, fontface = 2, vjust = 0,
+               label = paste0(round(100*mean(probteams$nBayesCorrect <= teamVal)),'%'),
+               colour = "#000000") +
+      annotate("text",
+               x = 1.8, y = 18, vjust = 1,
+               label = "of all teams",
+               colour = "#000000") +
+      annotate("text",
+               x = 2.8, y = 25, size = 10, fontface = 2, vjust = 0,
+               label = paste0(round(100*mean(probteams[probteams$type == "ST",]$nBayesCorrect <= teamVal)),'%'),
+               colour = "#f9a825") +
+      annotate("text",
+               x = 2.8, y = 18, vjust = 1,
+               label = "of superteams",
+               colour = "#f9a825") +
+      annotate("text",
+               x = 4, y = 25, size = 10, fontface = 2, vjust = 0,
+               label = paste0(round(100*mean(probteams[probteams$type == "OT",]$nBayesCorrect <= teamVal)),'%'),
+               colour = "#3c5488") +
+      annotate("text",
+               x = 4, y = 18, vjust = 1,
+               label = "of organisational teams",
+               colour = "#3c5488")
+    
+  }
+  
+  pc = pc + theme_void() +
     theme(panel.background = element_rect(fill = "#f6f6f6",
                                           linetype = 0))
-  
+
   p = (p/pc) + plot_layout(guides = "keep") +
     plot_annotation(
       title = 'NUMBER OF CORRECT BAYESIAN PROBLEMS',
@@ -2794,7 +2994,7 @@ plot_dot_bayes = function(instance_name, team_name, export = F) {
                 "dot_bayes.png",
                 instance_name,
                 team_name,
-                "(A4-title)/2.5")
+                "(A4-title)/3")
   }
   
 }
@@ -2803,20 +3003,19 @@ plot_dot_flawdetection = function(instance_name, team_name, export = F) {
   
   probteams = repo[[instance_name]]$OtherData$probteams
   probteams = probteams[!is.na(probteams$avgODNI) & !is.na(probteams$nFlawsDetected),]
-  if (!(team_name %in% probteams$team)) {
-    return();
+  if (team_name %in% probteams$team) {
+    probteams[probteams$team == team_name,]$type = "Your Team"
   }
-  probteams[probteams$team == team_name,]$type = "Your Team"
   
   p = ggplot(probteams, aes(nFlawsDetected)) +
     geom_dotplot(aes(fill = type), 
-                 binwidth = .1,
+                 binwidth = .06,
                  # stroke = 0,
                  method = "histodot",
                  stackgroups = T) +
     scale_y_continuous(NULL, breaks = NULL) +
     scale_x_continuous(breaks = 0:4,
-                       limits = c(0,4)) +
+                       limits = c(-0.1,4.1)) +
     scale_fill_manual(breaks = c("PT","ST","OT","Your Team"),
                       values = c("#00a087", "#f9a825", "#3c5488", "#e64b35")) +
     labs(x = NULL,
@@ -2832,44 +3031,48 @@ plot_dot_flawdetection = function(instance_name, team_name, export = F) {
   # PT, ST, OT
   # "#00a087", "#f9a825", "#3c5488"
   
-  teamVal = probteams[probteams$type == "Your Team",]$nFlawsDetected[1]
+  if (team_name %in% probteams$team) {
+    teamVal = probteams[probteams$type == "Your Team",]$nFlawsDetected[1]
+    
+    pc = ggplot() +
+      scale_x_continuous(expand = c(0,0), limits = c(1,5)) + 
+      scale_y_continuous(expand = c(0,0), limits = c(0,100)) + 
+      annotate("text",
+               x = 1, y = 80,
+               hjust = 0, vjust = 1,
+               label = paste0("Your team detected as many or more reasoning flaws than:")) +
+      annotate("text",
+               x = 1.8, y = 25, size = 10, fontface = 2, vjust = 0,
+               label = paste0(round(100*mean(probteams$nFlawsDetected <= teamVal)),'%'),
+               colour = "#000000") +
+      annotate("text",
+               x = 1.8, y = 18, vjust = 1,
+               label = "of all teams",
+               colour = "#000000") +
+      annotate("text",
+               x = 2.8, y = 25, size = 10, fontface = 2, vjust = 0,
+               label = paste0(round(100*mean(probteams[probteams$type == "ST",]$nFlawsDetected <= teamVal)),'%'),
+               colour = "#f9a825") +
+      annotate("text",
+               x = 2.8, y = 18, vjust = 1,
+               label = "of superteams",
+               colour = "#f9a825") +
+      annotate("text",
+               x = 4, y = 25, size = 10, fontface = 2, vjust = 0,
+               label = paste0(round(100*mean(probteams[probteams$type == "OT",]$nFlawsDetected <= teamVal)),'%'),
+               colour = "#3c5488") +
+      annotate("text",
+               x = 4, y = 18, vjust = 1,
+               label = "of organisational teams",
+               colour = "#3c5488") +
+      theme_void() +
+      theme(panel.background = element_rect(fill = "#f6f6f6",
+                                            linetype = 0))
+    
+    p = p/pc
+  }
   
-  pc = ggplot() +
-    scale_x_continuous(expand = c(0,0), limits = c(1,5)) + 
-    scale_y_continuous(expand = c(0,0), limits = c(0,100)) + 
-    annotate("text",
-             x = 1, y = 80,
-             hjust = 0, vjust = 1,
-             label = paste0("Your teams' detected as many or more reasoning flaws than:")) +
-    annotate("text",
-             x = 1.8, y = 25, size = 10, fontface = 2, vjust = 0,
-             label = paste0(round(100*mean(probteams$nFlawsDetected <= teamVal)),'%'),
-             colour = "#000000") +
-    annotate("text",
-             x = 1.8, y = 18, vjust = 1,
-             label = "of all teams",
-             colour = "#000000") +
-    annotate("text",
-             x = 2.8, y = 25, size = 10, fontface = 2, vjust = 0,
-             label = paste0(round(100*mean(probteams[probteams$type == "ST",]$nFlawsDetected <= teamVal)),'%'),
-             colour = "#f9a825") +
-    annotate("text",
-             x = 2.8, y = 18, vjust = 1,
-             label = "of superteams",
-             colour = "#f9a825") +
-    annotate("text",
-             x = 4, y = 25, size = 10, fontface = 2, vjust = 0,
-             label = paste0(round(100*mean(probteams[probteams$type == "OT",]$nFlawsDetected <= teamVal)),'%'),
-             colour = "#3c5488") +
-    annotate("text",
-             x = 4, y = 18, vjust = 1,
-             label = "of organisational teams",
-             colour = "#3c5488") +
-    theme_void() +
-    theme(panel.background = element_rect(fill = "#f6f6f6",
-                                          linetype = 0))
-  
-  p = (p/pc) + plot_layout(guides = "keep") +
+  p = p + plot_layout(guides = "keep", height = c(2,3)) +
     plot_annotation(
       title = 'NUMBER OF REASONING FLAWS DETECTED',
       subtitle = 'Dot plot of the number of reasoning flaws detected by each team. Your team is indicated in red.',
@@ -2884,7 +3087,7 @@ plot_dot_flawdetection = function(instance_name, team_name, export = F) {
                 "dot_flawsdetected.png",
                 instance_name,
                 team_name,
-                "(A4-title)/3")
+                "(A4-title)/3.5")
   }
   
 }
@@ -3008,7 +3211,7 @@ plot_user_engagement = function(instance_name, team_name, export = F) {
   }
   
   analytics = as.data.frame(analytics)
-  analytics$user = factor(analytics$user, levels = usrs)
+  analytics$user = factor(analytics$user, levels = usrs, labels = paste('User', 1:length(usrs)))
   analytics$problem = factor(analytics$problem, levels = prbs)
   analytics = analytics[!is.na(analytics$problem),]
   
@@ -3022,7 +3225,7 @@ plot_user_engagement = function(instance_name, team_name, export = F) {
   probparts$value = 1.4
   probparts$variable = 'resource'
   probparts$problem = factor(probparts$problem, levels = prbs)
-  probparts$user = factor(probparts$user, levels = usrs)
+  probparts$user = factor(probparts$user, levels = usrs, labels = paste('User', 1:length(usrs)))
   
   analytics$variable = factor(analytics$variable,
                               levels = c('resource',
@@ -3059,7 +3262,7 @@ plot_user_engagement = function(instance_name, team_name, export = F) {
          y = NULL,
          fill = NULL,
          title = 'ENGAGEMENT BY USER AND PROBLEM',
-         subtitle = 'Column graph of the activity counts for different on-platform tasks by problem for each of the\nmembers of your team.') +
+         subtitle = 'Column graph of the activity counts for different on-platform tasks by problem for each of the members\nof your team. Note that each activity type is on a different scale, to make it easier to see differences\nbetween users. Users are annotated with the \'User Role\' they played in each problem.') +
     scale_fill_manual(breaks = c('resource',
                                  'report',
                                  'chat',
@@ -3085,7 +3288,10 @@ plot_user_engagement = function(instance_name, team_name, export = F) {
           # axis.text.x = element_text(angle = -45, hjust = 0),
           axis.text = element_blank(),
           axis.ticks = element_blank(),
-          strip.text.y.left = element_text(angle = 0, vjust = -.05, colour = "#000000", size = 8),
+          strip.text.y.left = element_text(angle = 0,
+                                           # vjust = -.05,
+                                           colour = "#000000",
+                                           size = 8),
           legend.position = 'bottom',
           plot.margin = margin(11, 10, 10, 10, "pt"),
           plot.background = element_rect(fill = "#f6f6f6"),
@@ -3095,31 +3301,30 @@ plot_user_engagement = function(instance_name, team_name, export = F) {
           plot.caption.position = 'plot'
     )
   
-  g = ggplot_gtable(ggplot_build(p))
-  
-  avtrs = list()
-  for (k in 1:length(usrs)) {
-    if (!(sub("\\d+", "", usrs[k]) %in% names(avatarLookup))) {
-      message(sub("\\d+", "", usrs[k]))
-    }
-    animal = avatarLookup[[sub("\\d+", "", usrs[k])]]
-    avtr = readPNG(paste0("/home/luke/Documents/Hunt Lab/wd_HuntLab/huntr/R/avatars/",animal,"@2x.png"))
-    avtrs[[k]] = rasterGrob(avtr, width = unit(.6, 'cm'), height = unit(.6, 'cm'),
-                            y = .65)
-  }
-  
-  strips = grep("strip-l", g$layout$name)
-  g = with(g$layout[strips,],
-            gtable_add_grob(g, avtrs,
-                            t=t, l=l, b=b, r=r, name="strip_avatar") )
+  # g = ggplot_gtable(ggplot_build(p))
+  # 
+  # avtrs = list()
+  # for (k in 1:length(usrs)) {
+  #   if (!(sub("\\d+", "", usrs[k]) %in% names(avatarLookup))) {
+  #     message(sub("\\d+", "", usrs[k]))
+  #   }
+  #   animal = avatarLookup[[sub("\\d+", "", usrs[k])]]
+  #   avtr = readPNG(paste0("/home/luke/Documents/Hunt Lab/wd_HuntLab/huntr/R/avatars/",animal,"@2x.png"))
+  #   avtrs[[k]] = rasterGrob(avtr, width = unit(.6, 'cm'), height = unit(.6, 'cm'),
+  #                           y = .65)
+  # }
+  # 
+  # strips = grep("strip-l", g$layout$name)
+  # g = with(g$layout[strips,],
+  #           gtable_add_grob(g, avtrs,
+  #                           t=t, l=l, b=b, r=r, name="strip_avatar") )
   
   if (export) {
-    export_plot(g,
+    export_plot(p,
                 "user_engagement.png",
                 instance_name,
                 team_name,
-                "A4",
-                plot_object_type = "grob")
+                "A4")
   }
   
 }
@@ -3610,7 +3815,7 @@ plot_bar_challenge = function(instance_name, team_name, export = F) {
   
   p = p + plot_layout(guides = "keep") +
     plot_annotation(
-      title = 'CHALLENGE FORMAT',
+      title = 'IS THE CHALLENGE BETTER TRAINING?',
       subtitle = 'Stacked bar chart describing participants responses to the prompt: "If you consider participating in an\nexercise like the HC2020 as analytical skills training, how does it compare with more typical training\nmethods?"',
       theme = theme(plot.margin = margin(11, 10, 10, 10, "pt"),
                     plot.background = element_rect(fill = "#f6f6f6"),
@@ -3688,7 +3893,7 @@ plot_bar_CA = function(instance_name, team_name, export = F) {
                 "bar_CA.png",
                 instance_name,
                 team_name,
-                "(A4-title)/3.5")
+                "(A4-title)/3.8")
   }
   
 }
