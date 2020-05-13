@@ -5,11 +5,12 @@ Authors@R: person("Luke", "Thorburn", email = "luke.thorburn@gmail.com", role = 
 Description: This package contains all code written for the Hunt Laboratory for Intelligence Research, a research group at The University of Melbourne.
 License: GPL-3
 Encoding: UTF-8
-Depends: R (>= 3.3.1)
-Imports:
+Depends:
+    R (>= 3.3.1),
     data.table,
     ggplot2,
     patchwork
+Imports:
 Suggests:
     ggpubr,
     ggsci,
@@ -26,7 +27,7 @@ Suggests:
     grid,
     gtable,
     likert,
-    plyr,
+    dplyr,
     knitr
 LazyData: true
 RoxygenNote: 6.1.1

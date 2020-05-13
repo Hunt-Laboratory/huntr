@@ -131,7 +131,7 @@ score_likert_scale = function(my_df, scale_col_names, scale_maxes, scale_reverse
 
 computeAOMT = function(dt) {
     aomt_colnames = grep("aomt", names(dt), value=T, fixed=T)
-    aomt_max_vec = rep(max(dt[, aomt_colnames], na.rm=T), length(aomt_colnames))
+    aomt_max_vec = rep(7, length(aomt_colnames))
     aomt_reverse_vec <- c(FALSE, FALSE, FALSE, TRUE, TRUE, TRUE, TRUE, FALSE, TRUE, FALSE, FALSE)
     dt$aomt = score_likert_scale(dt,
                                  aomt_colnames,
@@ -939,7 +939,7 @@ compile_parts_2020_HuntChallenge = function(path_to_data, instance_name) {
         "ratingToolWhyNot",
         "ratingToolPurpose",
         
-        "featureResquests",
+        "featureRequests",
         "externalTools",
         "externalToolsComments",
         
@@ -1064,7 +1064,7 @@ compile_parts_2020_HuntChallenge = function(path_to_data, instance_name) {
         "ratingToolWhyNot",
         "ratingToolPurpose",
         
-        "featureResquests",
+        "featureRequests",
         "externalTools",
         "externalToolsComments",
         
@@ -1140,12 +1140,18 @@ compile_parts_2020_HuntChallenge = function(path_to_data, instance_name) {
     
     ES[ES == ""] <- NA
     
+    for (cl in paste0('pri', 1:11)) {
+        ES[get(cl) == "Not important", (cl) := 1]
+        ES[get(cl) == "Neutral", (cl) := 2]
+        ES[get(cl) == "Important", (cl) := 3]
+    }
+    
     ES[ES == "I don't expect this"] <- 1
     ES[ES == "Neutral"] <- 2
     ES[ES == "I do expect this"] <- 3
     
-    ES[ES == "Not important"] <- 1
-    ES[ES == "Important"] <- 2
+    # ES[ES == "Not important"] <- 1
+    # ES[ES == "Important"] <- 2
     
     ES[ES == "Strongly Disagree"] <- 1
     ES[ES == "Strongly disagree"] <- 1
@@ -1503,7 +1509,7 @@ compile_parts_2020_HuntChallenge = function(path_to_data, instance_name) {
         
         ratingTool,
         ratingToolWhyNot,
-        featureResquests,
+        featureRequests,
         externalTools,
         externalToolsComments,
         bestQuestionNotAsked,
@@ -1851,17 +1857,17 @@ compile_probteams_2018_SwarmChallengeExp1 = function(repo, path_to_data, instanc
         file_names = responses[team == tm & problem == pr & response_type == "report"]$response_text
         
         if (length(file_names) > 1) {
-            reports = suppressWarnings(readtext(paste0(response_path,file_names[1])))  # surpress "*.md" warnings
+            reports = suppressWarnings(readtext::readtext(paste0(response_path,file_names[1])))  # surpress "*.md" warnings
             
             for (j in 2:length(file_names)) {
-                reports = rbind(reports, suppressWarnings(readtext(paste0(response_path,file_names[j]))))
+                reports = rbind(reports, suppressWarnings(readtext::readtext(paste0(response_path,file_names[j]))))
             }
             
-            CORPUS = corpus(reports)
-            DFM = dfm(CORPUS,
-                      remove = stopwords("english"),
-                      stem = TRUE, remove_punct = TRUE, remove_numbers = TRUE)
-            DistMat = textstat_simil(DFM, method="cosine")
+            CORPUS = quanteda::corpus(reports)
+            DFM = quanteda::dfm(CORPUS,
+                                remove = quanteda::stopwords("english"),
+                                stem = TRUE, remove_punct = TRUE, remove_numbers = TRUE)
+            DistMat = quanteda::textstat_simil(DFM, method="cosine")
             Distances = DistMat[lower.tri(DistMat)]
         } else {
             Distances = c(1) # If 1 or 0 reports, assign similarity of 1.
@@ -2067,17 +2073,17 @@ compile_probteams_2020_HuntChallenge = function(repo, path_to_data, instance_nam
         file_names = responses[team == tm & problem == pr & response_type == "report"]$response_text
         
         if (length(file_names) > 1) {
-            reports = suppressWarnings(readtext(paste0(response_path,file_names[1])))  # surpress "*.md" warnings
+            reports = suppressWarnings(readtext::readtext(paste0(response_path,file_names[1])))  # surpress "*.md" warnings
             
             for (j in 2:length(file_names)) {
-                reports = rbind(reports, suppressWarnings(readtext(paste0(response_path,file_names[j]))))
+                reports = rbind(reports, suppressWarnings(readtext::readtext(paste0(response_path,file_names[j]))))
             }
             
-            CORPUS = corpus(reports)
-            DFM = dfm(CORPUS,
-                      remove = stopwords("english"),
+            CORPUS = quanteda::corpus(reports)
+            DFM = quanteda::dfm(CORPUS,
+                      remove = quanteda::stopwords("english"),
                       stem = TRUE, remove_punct = TRUE, remove_numbers = TRUE)
-            DistMat = textstat_simil(DFM, method="cosine")
+            DistMat = quanteda::textstat_simil(DFM, method="cosine")
             Distances = DistMat[lower.tri(DistMat)]
         } else {
             Distances = c(1) # If 1 or 0 reports, assign similarity of 1.
@@ -2228,7 +2234,7 @@ compile_probparts = function(repo, nClusters, generatePlots = F) {
     # Test hierarchical with silhouette method.
     sil = cluster::silhouette(clusters, d)
     # Nice visualisation of the silhouette width.
-    p = fviz_silhouette(sil, print.summary = FALSE) +
+    p = factoextra::fviz_silhouette(sil, print.summary = FALSE) +
         theme_minimal()+
         theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
     if (generatePlots) {
@@ -2240,8 +2246,8 @@ compile_probparts = function(repo, nClusters, generatePlots = F) {
     fit.km = kmeans(scanal[,4:10], centers = centers[, 2:8], nstart = 1)
     
     # Silhouette width now increased to 0.3
-    sil = silhouette(fit.km$cluster, d)
-    p = fviz_silhouette(sil, print.summary = FALSE) +
+    sil = cluster::silhouette(fit.km$cluster, d)
+    p = factoextra::fviz_silhouette(sil, print.summary = FALSE) +
         theme_minimal()+
         theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())  
     if (generatePlots) {
@@ -2390,16 +2396,15 @@ compile_rates_2020_HuntChallenge = function(repo, path_to_data, instance_name) {
     ratings = ratings[,.(
         problem,
         team,
-        participant,
         rater,
-        c1, c1comment, c1distinction, c1na,
-        c2, c2comment, c2distinction, c2na,
-        c3, c3comment, c3distinction, c3na,
-        c4, c4comment, c4distinction, c4na,
-        c5, c5comment, c5distinction, c5na,
-        c6, c6comment, c6distinction, c6na,
-        c7, c7comment, c7distinction, c7na,
-        c8, c8comment, c8distinction, c8na,
+        c1, c1comment,
+        c2, c2comment,
+        c3, c3comment,
+        c4, c4comment,
+        c5, c5comment,
+        c6, c6comment,
+        c7, c7comment,
+        c8, c8comment,
         geo1,
         geo2,
         geo3,
@@ -2467,6 +2472,7 @@ compile_rates = function(repo, path_to_data, instance_name) {
 #' }
 compile_data = function(path = "data/") {
     
+    require(dplyr)
     require(data.table)
     
     instances = list.files(path)
