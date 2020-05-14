@@ -20,9 +20,9 @@ Tidy data from each experiment is stored in a list called `repo`. The `repo` lis
 
 ```
 repo
-	<experiment_label>
-		<folder_name>
-			<table_name>
+   <experiment_label>
+      <folder_name>
+         <table_name>
 ```
 
 The easiest way to extract a particular table from the `repo` list is to use RStudio's suggested autocomplete functionality, as illustrated in the following GIF.
