@@ -10,7 +10,7 @@ The huntr package is the quickest and easiest way to get most experiment data in
 
 ## How to use this package
 
-To install the huntr package, use the following line of code in R.
+To install the huntr package, use the following line of code in R (you will need to have the `devtools` package already installed).
 
 ```R
 devtools::install_github("Hunt-Laboratory/huntr")
@@ -43,5 +43,5 @@ vignette("PlatformData", package = "huntr")
 
 ## Getting help
 
-If you need help with any aspect of this package, or want to suggest any improves, please either open an issue on this GitHub repository, or send an email to Luke Thorburn at luke.thorburn@unimelb.edu.au.
+If you need help with any aspect of this package, or want to suggest an improvement, please either open an issue on this GitHub repository, or send an email to Luke Thorburn at luke.thorburn@unimelb.edu.au.
 
