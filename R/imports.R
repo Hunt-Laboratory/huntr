@@ -9,7 +9,7 @@ tidyProblemNames = function(dt) {
     return(dt)
 }
 
-addNormalisedEngagementMetrics = function(analytics) {
+addRescaledEngagementMetrics = function(analytics) {
     as = c("report_count",
            "resource_count",
            "comment_count",
@@ -19,21 +19,21 @@ addNormalisedEngagementMetrics = function(analytics) {
            "simple_rating",
            "partial_rating",
            "complete_rating")
-    normalise = function(x) {
+    rescale = function(x) {
         ( x - min(x, na.rm = T) ) / ( max(x, na.rm = T) - min(x, na.rm = T ) )
     }
     for (a in as) {
-        analytics[[paste0(a,"_normed")]] = normalise(analytics[[a]])
+        analytics[[paste0(a,"_scaled")]] = rescale(analytics[[a]])
     }
-    analytics$engagement_normed = 7*analytics$report_count_normed +
-        3*analytics$resource_count_normed +
-        3*analytics$complete_rating_normed +
-        2*analytics$comment_count_normed + 
-        analytics$chat_count_normed +
-        analytics$simple_rating_normed +
-        analytics$partial_rating_normed +
-        analytics$comment_vote_count_normed +
-        analytics$resource_vote_count_normed
+    analytics$engagement_scaled = 7*analytics$report_count_scaled +
+        3*analytics$resource_count_scaled +
+        3*analytics$complete_rating_scaled +
+        2*analytics$comment_count_scaled + 
+        analytics$chat_count_scaled +
+        analytics$simple_rating_scaled +
+        analytics$partial_rating_scaled +
+        analytics$comment_vote_count_scaled +
+        analytics$resource_vote_count_scaled
     
     return(analytics)
 }
@@ -57,22 +57,55 @@ fetchPlatformData = function(path_to_data, instance_name) {
     
     # Improve consistency of column names.
     setnames(instance_data$problems, "problem_title", "problem")
-    setnames(instance_data$top_reports, "title", "problem")
+    
     setnames(instance_data$analytics, "title", "problem")
+    setnames(instance_data$analytics, "teamName", "team")
+    setnames(instance_data$analytics, "userName", "user")
+    setnames(instance_data$analytics, "teamId", "team_id")
+    setnames(instance_data$analytics, "problemId", "problem_id")
+    setnames(instance_data$analytics, "userId", "user_id")
+    
+    setnames(instance_data$authors, "team_name", "team")
+    setnames(instance_data$authors, "author_id", "user_id")
+    setnames(instance_data$authors, "author_name", "user")
+    
+    setnames(instance_data$chat, "author_name", "user")
+    setnames(instance_data$chat, "author_id", "user_id")
+    instance_data$chat$problem_title = NULL
+    setnames(instance_data$chat, "team_name", "team")
+    
+    setnames(instance_data$comments, "team_name", "team")
+    setnames(instance_data$comments, "author_name", "author")
+    setnames(instance_data$comments, "commenter_name", "commenter")
+    
+    setnames(instance_data$login, "userName", "user")
+    setnames(instance_data$login, "userId", "user_id")
+    setnames(instance_data$login, "eventType", "event_type")
+    setnames(instance_data$login, "timeStamp", "timestamp")
+    
+    setnames(instance_data$ratings, "author_name", "author")
+    setnames(instance_data$ratings, "rater_name", "rater")
+    
+    setnames(instance_data$relations, "userName", "user")
     setnames(instance_data$relations, "title", "problem")
+    setnames(instance_data$relations, "teamName", "team")
+    setnames(instance_data$relations, "problemId", "problem_id")
+    
+    setnames(instance_data$top_reports, "title", "problem")
+    setnames(instance_data$top_reports, "team_name", "team")
+    
+    setnames(instance_data$responses, "team_name", "team")
+    
+    setnames(instance_data$timeline, "userName", "user")
     setnames(instance_data$timeline, "title", "problem")
     setnames(instance_data$timeline, "tipe", "type")
-    setnames(instance_data$top_reports, "team_name", "team")
-    setnames(instance_data$responses, "team_name", "team")
-    setnames(instance_data$authors, "team_name", "team")
-    setnames(instance_data$comments, "team_name", "team")
-    setnames(instance_data$analytics, "teamName", "team")
-    setnames(instance_data$relations, "teamName", "team")
     setnames(instance_data$timeline, "teamName", "team")
-    setnames(instance_data$login, "userName", "user")
-    setnames(instance_data$analytics, "userName", "user")
-    setnames(instance_data$relations, "userName", "user")
-    setnames(instance_data$timeline, "userName", "user")
+    setnames(instance_data$timeline, "chunkId", "chunk_id")
+    setnames(instance_data$timeline, "parentId", "parent_id")
+    setnames(instance_data$timeline, "problemId", "problem_id")
+    setnames(instance_data$timeline, "teamId", "team_id")
+    setnames(instance_data$timeline, "timeStamp", "timestamp")
+    setnames(instance_data$timeline, "userId", "user_id")
     
     # Filter out dummy problems.
     dummy_problems = c("'Sandpit' Problem",
@@ -98,7 +131,7 @@ fetchPlatformData = function(path_to_data, instance_name) {
     }
     
     # Add normalised engagement metrics to analytics table.
-    instance_data$analytics = addNormalisedEngagementMetrics(instance_data$analytics)
+    instance_data$analytics = addRescaledEngagementMetrics(instance_data$analytics)
     
     # Add misc. other metrics to analytics table.
     instance_data$analytics[,vote_count:=comment_vote_count + resource_vote_count]
@@ -635,7 +668,7 @@ compile_parts_2018_SwarmChallengeExp1 = function(path_to_data, instance_name) {
     # Compute AOMT construct.
     ES = computeAOMT(ES)
     
-    return(ES)
+    return(setDT(ES))
 }
 
 compile_parts_2020_HuntChallenge = function(path_to_data, instance_name) {
@@ -1535,7 +1568,7 @@ compile_parts_2020_HuntChallenge = function(path_to_data, instance_name) {
     # Compute AOMT construct.
     ES = computeAOMT(ES)
     
-    return(ES)
+    return(setDT(ES))
 }
 
 compile_parts = function(path_to_data, instance_name) {
@@ -1559,7 +1592,7 @@ compile_parts = function(path_to_data, instance_name) {
 compile_teamparts_2018_SwarmChallengeExp1 = function(repo, path_to_data, instance_name) {
     path = paste0(path_to_data, instance_name, '/QualtricsData/')
     
-    parts = repo[[instance_name]]$OtherData$parts
+    parts = repo[[instance_name]]$CoreData$parts
     tmprt = data.table(
         user = parts$user,
         team = rep(NA, nrow(parts))
@@ -1577,13 +1610,13 @@ compile_teamparts_2018_SwarmChallengeExp1 = function(repo, path_to_data, instanc
     tmprt = tmprt[!is.na(tmprt$team)]
     tmprt = as.data.frame(tmprt)
     
-    return(tmprt)
+    return(setDT(tmprt))
 }
 
 compile_teamparts_2020_HuntChallenge = function(repo, path_to_data, instance_name) {
     path = paste0(path_to_data, instance_name, '/QualtricsData/')
     
-    parts = repo[[instance_name]]$OtherData$parts
+    parts = repo[[instance_name]]$CoreData$parts
     
     pubLookup = fread(paste0(path, "HC2020_EntrySurvey_Public.csv"))
     supLookup = fread(paste0(path_to_data, instance_name, '/AdminData/Superteams.csv'))
@@ -1618,7 +1651,7 @@ compile_teamparts_2020_HuntChallenge = function(repo, path_to_data, instance_nam
     tmprt = tmprt[!is.na(tmprt$team)]
     tmprt = as.data.frame(tmprt)
     
-    return(tmprt)
+    return(setDT(tmprt))
 }
 
 compile_teamparts = function(repo, path_to_data, instance_name) {
@@ -1647,7 +1680,7 @@ compile_teams_2018_SwarmChallengeExp1 = function(repo, path_to_data, instance_na
     colnames(K) <- c("reportCode",
                      "problem",
                      "nRatings",
-                     "avgODNI",
+                     "avgIC",
                      "min",
                      "max",
                      "range",
@@ -1657,8 +1690,8 @@ compile_teams_2018_SwarmChallengeExp1 = function(repo, path_to_data, instance_na
                      "week",
                      "submitted")
     
-    parts = repo[[instance_name]]$OtherData$parts
-    teamparts = repo[[instance_name]]$OtherData$teamparts
+    parts = repo[[instance_name]]$CoreData$parts
+    teamparts = repo[[instance_name]]$CoreData$teamparts
     parts = merge(teamparts, parts, by = c("user"))
     
     # Create teams table.
@@ -1696,7 +1729,7 @@ compile_teams_2018_SwarmChallengeExp1 = function(repo, path_to_data, instance_na
         teams$type[k] = parts[parts$team == teams$team[k],]$type[1]
     }
     
-    return(teams)
+    return(setDT(teams))
 }
 
 compile_teams_2020_HuntChallenge = function(repo, path_to_data, instance_name) {
@@ -1720,8 +1753,8 @@ compile_teams_2020_HuntChallenge = function(repo, path_to_data, instance_name) {
                      "nGeoCorrect")
     K = K[K$type != "Calibration",]
     
-    parts = repo[[instance_name]]$OtherData$parts
-    teamparts = repo[[instance_name]]$OtherData$teamparts
+    parts = repo[[instance_name]]$CoreData$parts
+    teamparts = repo[[instance_name]]$CoreData$teamparts
     parts = merge(teamparts, parts, by = c("user"))
     
     # Create teams table.
@@ -1733,8 +1766,7 @@ compile_teams_2020_HuntChallenge = function(repo, path_to_data, instance_name) {
                        AOMT = NA,
                        divAOMT = NA,
                        medianEdu = NA,
-                       type = NA,
-                       isOrg = NA)
+                       type = NA)
     
     getDivAOMT = function(tm) {
         scores = parts[parts$team == tm,]$aomt
@@ -1774,18 +1806,15 @@ compile_teams_2020_HuntChallenge = function(repo, path_to_data, instance_name) {
         teams$divAOMT[k] = getDivAOMT(teams$team[k])
         teams$medianEdu[k] = getMedianEdu(teams$team[k])
         if (teams$team[k] %in% STs) {
-            teams$isOrg[k] = FALSE
             teams$type[k] = 'ST'
         } else if (teams$team[k] %in% OTs) {
-            teams$isOrg[k] = TRUE
             teams$type[k] = 'OT'
         } else {
-            teams$isOrg[k] = FALSE
             teams$type[k] = 'PT'
         }
     }
     
-    return(teams)
+    return(setDT(teams))
 }
 
 compile_teams = function(repo, path_to_data, instance_name) {
@@ -1814,7 +1843,7 @@ compile_probteams_2018_SwarmChallengeExp1 = function(repo, path_to_data, instanc
     colnames(K) <- c("reportCode",
                      "problem",
                      "nRatings",
-                     "avgODNI",
+                     "avgIC",
                      "min",
                      "max",
                      "range",
@@ -1828,8 +1857,8 @@ compile_probteams_2018_SwarmChallengeExp1 = function(repo, path_to_data, instanc
     K[K$team == "Witjirra4","team"] = "Witjira4"
     K[K$team == "Garawilla1","team"] = "Garrawilla1"
     
-    parts = repo[[instance_name]]$OtherData$parts
-    teams = repo[[instance_name]]$OtherData$teams
+    parts = repo[[instance_name]]$CoreData$parts
+    teams = repo[[instance_name]]$CoreData$teams
     tms = unique(teams$team)
     problems = c("How Did Arthur Allen Die?", "Kalukistan", "Three Nations", "Drug Interdiction")
     analytics = repo[[instance_name]]$PlatformData$analytics
@@ -1841,15 +1870,15 @@ compile_probteams_2018_SwarmChallengeExp1 = function(repo, path_to_data, instanc
                           problem = rep(problems, each = length(tms)),
                           probNum = NA,
                           type = NA,
-                          avgODNI = NA,
-                          nODNI = NA,
-                          rankODNI = NA,
+                          avgIC = NA,
+                          nIC = NA,
+                          rankIC = NA,
                           activeUsersSq = NA,
                           textSim = NA)
     
     getActiveUsersSq = function(tm, pr) {
         team_members = analytics[team == tm & problem == pr]
-        nActive = sum(team_members$engagement_normed > 0)
+        nActive = sum(team_members$engagement_scaled > 0)
         nActiveSq = nActive ^ 2
     }
     
@@ -1885,16 +1914,16 @@ compile_probteams_2018_SwarmChallengeExp1 = function(repo, path_to_data, instanc
         j = which(teams$team == probteam$team[k])
         probteam$probNum[k] = K$week[i]
         probteam$type[k] = teams$type[j]
-        probteam$avgODNI[k] = K$avgODNI[i]
-        probteam$nODNI[k] = K$nRatings[i]
-        probteam$rankODNI[k] = rank(-K[K$problem == probteam$problem[k] & nchar(K$team) > 0,]$avgODNI, ties.method = "min")[l]
+        probteam$avgIC[k] = K$avgIC[i]
+        probteam$nIC[k] = K$nRatings[i]
+        probteam$rankIC[k] = rank(-K[K$problem == probteam$problem[k] & nchar(K$team) > 0,]$avgIC, ties.method = "min")[l]
         probteam$activeUsersSq[k] = getActiveUsersSq(probteam$team[k], probteam$problem[k])
         probteam$textSim[k] = getTextSim(probteam$team[k], probteam$problem[k])
     }
     
-    probteam = probteam[!is.na(probteam$avgODNI),]
+    probteam = probteam[!is.na(probteam$avgIC),]
     
-    return(probteam)
+    return(setDT(probteam))
 }
 
 compile_probteams_2020_HuntChallenge = function(repo, path_to_data, instance_name) {
@@ -1962,7 +1991,7 @@ compile_probteams_2020_HuntChallenge = function(repo, path_to_data, instance_nam
         "c6score",
         "c7score",
         "c8score",
-        "ODNI",
+        "IC",
         "c1na",
         "c2na",
         "c3na",
@@ -2002,7 +2031,7 @@ compile_probteams_2020_HuntChallenge = function(repo, path_to_data, instance_nam
         "flaw4"
     )
     ratings[ratings == ""] = NA
-    ratings[ODNI == 0,"ODNI"] = NA
+    ratings[IC == 0,"IC"] = NA
     ratings = ratings[,.(
         problem,
         team,
@@ -2012,7 +2041,7 @@ compile_probteams_2020_HuntChallenge = function(repo, path_to_data, instance_nam
         geo2,
         geo3,
         geo4,
-        ODNI,
+        IC,
         geo1score,
         geo2score,
         geo3score,
@@ -2039,8 +2068,8 @@ compile_probteams_2020_HuntChallenge = function(repo, path_to_data, instance_nam
     # RFDratings = fread(paste0(path, "extraRFDratings.csv"))
     # RFDratings[,nFlawsDetected := flaw1 + flaw2 + flaw3 + flaw4]
     
-    parts = repo[[instance_name]]$OtherData$parts
-    teams = repo[[instance_name]]$OtherData$teams
+    parts = repo[[instance_name]]$CoreData$parts
+    teams = repo[[instance_name]]$CoreData$teams
     tms = unique(teams$team)
     problems = c("Foreign Fighters", "Forecasting Piracy", "Corporate Espionage", "The Park Young-min Case")
     analytics = repo[[instance_name]]$PlatformData$analytics
@@ -2052,9 +2081,9 @@ compile_probteams_2020_HuntChallenge = function(repo, path_to_data, instance_nam
                           problem = rep(problems, each = length(tms)),
                           probNum = rep(1:length(problems), each = length(tms)),
                           type = NA,
-                          avgODNI = NA,
-                          nODNI = NA,
-                          rankODNI = NA,
+                          avgIC = NA,
+                          nIC = NA,
+                          rankIC = NA,
                           nGeoCorrect = NA,
                           probabilityEstimate = NA,
                           tightness = NA,
@@ -2065,7 +2094,7 @@ compile_probteams_2020_HuntChallenge = function(repo, path_to_data, instance_nam
     
     getActiveUsersSq = function(tm, pr) {
         team_members = analytics[team == tm & problem == pr]
-        nActive = sum(team_members$engagement_normed > 0)
+        nActive = sum(team_members$engagement_scaled > 0)
         nActiveSq = nActive ^ 2
     }
     
@@ -2129,20 +2158,20 @@ compile_probteams_2020_HuntChallenge = function(repo, path_to_data, instance_nam
         } else {
             probteam$type[k] = "PT"
         }
-        probteam$avgODNI[k] = K[[paste0("avg", probteam$probNum[k])]][i]
-        probteam$nODNI[k] = K[[paste0("nRatings", probteam$probNum[k])]][i]
-        probteam$rankODNI[k] = rank(-K[[paste0("avg", probteam$probNum[k])]], ties.method = "min")[i]
+        probteam$avgIC[k] = K[[paste0("avg", probteam$probNum[k])]][i]
+        probteam$nIC[k] = K[[paste0("nRatings", probteam$probNum[k])]][i]
+        probteam$rankIC[k] = rank(-K[[paste0("avg", probteam$probNum[k])]], ties.method = "min")[i]
         if (probteam$problem[k] == "Foreign Fighters") {
             probteam$nGeoCorrect[k] = K$nGeoCorrect[i]
         }
-        if (probteam$problem[k] == "Forecasting Piracy" & !is.na(probteam$avgODNI[k])) {
+        if (probteam$problem[k] == "Forecasting Piracy" & !is.na(probteam$avgIC[k])) {
             probteam$probabilityEstimate[k] = K$probabilityEstimate[i]/100
             probteam$tightness[k] = getTightness(probteam$team[k], k)
         }
-        if (probteam$problem[k] == "Corporate Espionage" & !is.na(probteam$avgODNI[k])) {
+        if (probteam$problem[k] == "Corporate Espionage" & !is.na(probteam$avgIC[k])) {
             probteam$nBayesCorrect[k] = round(mean(ratings[team == probteam$team[k] & problem == "Corporate Espionage"]$bayesScore))
         }
-        if (probteam$problem[k] == "The Park Young-min Case" & !is.na(probteam$avgODNI[k])) {
+        if (probteam$problem[k] == "The Park Young-min Case" & !is.na(probteam$avgIC[k])) {
             probteam$nFlawsDetected[k] = getNumFlawsDetected(probteam$team[k])
             
         }
@@ -2150,9 +2179,9 @@ compile_probteams_2020_HuntChallenge = function(repo, path_to_data, instance_nam
         probteam$textSim[k] = getTextSim(probteam$team[k], probteam$problem[k])
     }
     
-    probteam = probteam[!is.na(probteam$avgODNI),]
+    probteam = probteam[!is.na(probteam$avgIC),]
     
-    return(probteam)
+    return(setDT(probteam))
 }
 
 
@@ -2185,7 +2214,7 @@ compile_probparts = function(repo, nClusters, generatePlots = F) {
     
     for (nm in names(repo)) {
         analytics = repo[[nm]]$PlatformData$analytics
-        probteams = repo[[nm]]$OtherData$probteams
+        probteams = repo[[nm]]$CoreData$probteams
         
         analytics$probteam = paste0(analytics$team, analytics$problem)
         probteams$probteam = paste0(probteams$team, probteams$problem)
@@ -2310,7 +2339,11 @@ compile_probparts = function(repo, nClusters, generatePlots = F) {
             probparts$clusterLabel[k] = as.character(anal$clusterLabel[i])
         }
         
-        repo[[nm]]$OtherData$probparts = probparts
+        probparts$team_id = NULL
+        probparts$problem_id = NULL
+        probparts$user_id = NULL
+        
+        repo[[nm]]$CoreData$probparts = probparts
     }
     
     return(repo)
@@ -2352,7 +2385,7 @@ compile_rates_2020_HuntChallenge = function(repo, path_to_data, instance_name) {
         "c6score",
         "c7score",
         "c8score",
-        "ODNI",
+        "IC",
         "c1na",
         "c2na",
         "c3na",
@@ -2392,7 +2425,7 @@ compile_rates_2020_HuntChallenge = function(repo, path_to_data, instance_name) {
         "flaw4"
     )
     ratings[ratings == ""] = NA
-    ratings[ODNI == 0,"ODNI"] = NA
+    ratings[IC == 0,"IC"] = NA
     ratings = ratings[,.(
         problem,
         team,
@@ -2409,7 +2442,7 @@ compile_rates_2020_HuntChallenge = function(repo, path_to_data, instance_name) {
         geo2,
         geo3,
         geo4,
-        ODNI,
+        IC,
         geo1score,
         geo2score,
         geo3score,
@@ -2475,7 +2508,10 @@ compile_data = function(path = "data/") {
     require(dplyr)
     require(data.table)
     
-    instances = list.files(path)
+    instances = c(
+        '2020_HuntChallenge',
+        '2018_SwarmChallengeExp1'
+    )
     
     # Initialise repo list.
     repo = list()
@@ -2490,14 +2526,22 @@ compile_data = function(path = "data/") {
     
     # Compile useful tables.
     for (instance_name in instances) {
-        repo[[instance_name]][['OtherData']] = list()
-        repo[[instance_name]][['OtherData']]$parts = compile_parts(path, instance_name)
-        repo[[instance_name]][['OtherData']]$teamparts = compile_teamparts(repo, path, instance_name)
-        repo[[instance_name]][['OtherData']]$teams = compile_teams(repo, path, instance_name)
-        repo[[instance_name]][['OtherData']]$probteams = compile_probteams(repo, path, instance_name)
-        repo[[instance_name]][['OtherData']]$rates = compile_rates(repo, path, instance_name)
+        repo[[instance_name]][['CoreData']] = list()
+        repo[[instance_name]][['CoreData']]$parts = compile_parts(path, instance_name)
+        repo[[instance_name]][['CoreData']]$teamparts = compile_teamparts(repo, path, instance_name)
+        repo[[instance_name]][['CoreData']]$teams = compile_teams(repo, path, instance_name)
+        repo[[instance_name]][['CoreData']]$probteams = compile_probteams(repo, path, instance_name)
+        repo[[instance_name]][['CoreData']]$rates = compile_rates(repo, path, instance_name)
     }
     repo = compile_probparts(repo, nClusters = 10)
+    
+    # Reorder folders.
+    for (instance_name in instances) {
+        repo[[instance_name]] = list(
+            CoreData = repo[[instance_name]][['CoreData']],
+            PlatformData = repo[[instance_name]][['PlatformData']]
+        )
+    }
     
     # Save compiled data to package, tidy environment, and reload the package.
     save(repo,

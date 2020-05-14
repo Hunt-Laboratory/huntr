@@ -1,270 +1,256 @@
 ---
-title: "SWARM Platform Data Dictionary"
-author: "Richard de Rozario & Luke Thorburn"
-date: "2020-03-17"
+title: 'PlatformData Dictionary'
+author: 'Richard de Rozario & Luke Thorburn'
+date: '2020-05-14'
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Vignette Title}
-  %\VignetteEngine{knitr::rmarkdown}
-  \usepackage[utf8]{inputenc}
+    %\VignetteIndexEntry{PlatformData Dictionary}
+    %\VignetteEngine{knitr::rmarkdown}
+    \usepackage[utf8]{inputenc}
 ---
 
 ## Introduction
 
-This document describes a set of datatables that provide a basic, relatively complete dataset of a SWARM test.  The idea is that most quantitative and qualitative analysis of user interaction with SWARM and its outcomes is captured with these tables. The data tables are structured in (mostly) normalised relational form, so that it is easy to process with most analytical tools.  The only data that is missing is the very finegrained on-platform behaviour by users such as click patterns, including edits made to content (only the final text is captured here).
+This document describes a set of datatables that provide a basic, relatively complete dataset of a SWARM test. The idea is that most quantitative and qualitative analysis of user interaction with SWARM and its outcomes is captured with these tables. The data tables are structured in (mostly) normalised relational form, so that it is easy to process with most analytical tools. The only data relating to user interaction with the SWARM platform that is missing is the very finegrained on-platform behaviour by users such as click patterns, including edits made to content (only the final text is captured here).
+        
+We emphasise that the data collected here is _only_ that data captured by the SWARM platform. There is data from external sources, such as the complete lists of all participants and teams, external ratings for quality of reasoning, and the responses of individual users to the entry and exit surveys, that is often required to perform analyses of interest. Such data that, for the most part, doesn't originate on the platform, can be found in the 'CoreData' folder.
 
-The remainder of this document is a list of data tables, each of which captures key elements of the overall data that is captured when SWARM is used in a test or experiment. Note: only data that is generated on the SWARM platform is included here.  Other data, like surveys is not included.
+The remainder of this document is a list of data tables, each of which captures key elements of the overall data that is captured when SWARM is used in a test or experiment.
 
-All tables are to be stored in a file folder with the following naming convention:  SWARM-UniqueTestName-YYYY-MM-DD
+If interacting with this data via the `huntr` R package, you will find the tables described in this document under `repo$<platform_instance>$PlatformData`. If interacting with the data via CSV files, you will presumably have already found them in the relevant folder of the Hunt Lab GitHub repository for our experimental data.
 
 The folder has subfolders for each major component of the data model: authors, chat, comments, media, problems, ratings, reports and responses.
 
-In the subfolders, tables are provided in CSV format, where each row is a record of data, with columns for fields. If a column contains free-form text, then the content is delimited with double-quotes (note that use of double quotes inside a text field needs to be 'escaped' with paired double quotes).  Where the data includes "rich text" content, there will be a file reference field in the table, which points to a unique filename in a subfolder.  For example, the "problem" table may contain a field called "problem_file", where the value in that field may be "319e76a.html", which refers to a file in the html subfolder. The file itself may contain further links to other files (e.g. images), which may be stored in further subfolders, if the HTML file is not self-contained.
+In the subfolders, tables are provided in CSV format, where each row is a record of data, with columns for fields. If a column contains free-form text, then the content is delimited with double-quotes (note that use of double quotes inside a text field needs to be 'escaped' with paired double quotes).  Where the data includes 'rich text' content, there will be a file reference field in the table, which points to a unique filename in a subfolder.  For example, the 'problems' table may contain a field called 'problem_file', where the value in that field may be '319e76a.html', which refers to a file in the html subfolder. The file itself may contain further links to other files (e.g. images), which may be stored in further subfolders, if the HTML file is not self-contained.
 
-Note-1: "Unique identifier" means unique to an instance of the SWARM platform unless otherwise specified.  The identifiers may be unique more broadly (e.g. uuid) but the minimum level is unique within the instance of SWARM.
+Note-1: 'Unique identifier' means unique to an instance of the SWARM platform unless otherwise specified.  The identifiers may be unique more broadly (e.g. uuid) but the minimum level is unique within the instance of SWARM.
 
 Note-2: Timestamps are in UTC with a format of YYYY-MM-DD HH:MM:SS
 
+## Table Name: analytics
 
-## The problem
+In this table we capture how many reports, resources, comments, resource_votes, comment_votes, single, partial or full ratings and chat messages each user makes for a specific problem in a specific group in one handy analytics file. We also calculate an engagement level. Engagement is measured by assigning 7 points for a report, 4 points for a resource, 3 points for a complete rating, 2 points for a comment, on point for a chat message, a single or partial rating or a comment vote.
 
-The problem table uniquely identifies and describes the problem that SWARM users were working on.
-
-Table File Name:    Problem.csv
-
-ColumnName          Description
---------------      ----------------------------------------
-problem_id           Unique identifier of the problem
-problem              Short title of the problem
-problem_text         A unique filename of the problem content in markdown text format
-problem_file         A unique filename in the "Problems" subfolder that contains the HTML file of the problem
-
-
-## Top Reports
-
-Top Reports are the reports that have the highest quality (readiness) rating at the time of the data dump. Of particular interest are "final reports" at the end of a test, but it is possible that an interim data dump is made, in which case the top report is the highest rated report at the time of the data set. Internally, it is also possible that such reports are identifiable through other data in the SWARM platform (such as a report submission event log), but only the basic information is captured in the table below.
-
-Table File Name:    top_reports.csv
-
-ColumnName          Description
---------------      --------------------------------------------------------
-problem_id           Unique identifier of the problem
-problem              Short title of the problem
-team_id              Unique identifier for the team that produced the report
-team                 Screen name for the team_id
-report_id            Unique identifier for the report (response of type "report")
-team_rating          The aggregate rating of the report from the (internal) team at time of submission
-rating_count         Number of received ratings
-origin_author_id      Unique identifier of the user that first created the response that ultimately resulted in this top report
-origin_author_name    Name of the author that first created the response
-
-
-## Responses
-
-Responses are text contributed by users in response to the problem.  Currently, responses can be "reports" or "resources", but more types are possible in future.
-
-Table File Name:    Responses.csv
-
-ColumnName           Description
---------------       --------------------------------------------------------
-problem_id           Unique identifier of the problem
-problem 			 Short title of the problem
-team_id              Unique identifier for the team that produced the response
-team                 The name of the team that produced the response
-response_id          Unique identifier for the a response
-time_created         Timestamp when the response was first created
-time_last_changed    Timestamp when the response was last updated
-response_title		 The beginning of the response  in plain text format
-response_type        Type of response, currently "report" or "resource". More types may be added in future
-response_text        A unique filename of the response content in markdown text format
-response_file        A unique filename in the "Responses" subfolder that contains the HTML file of the response
+ColumnName                      Description
+--------------------------      ------------------------------
+team                            Name of team the user is in
+team_id                         Unique identifier of the team the user is in
+problem_id                      Unique identifier of the problem the team is working on
+user                            Name of user
+user_id                         Unique identifier of user
+report_count                    Number of reports user contributed to problem
+resource_count                  Number of resources user contributed to problem
+comment_count                   Number of comments user contributed in a problem
+chat_count                      Number of chat messages user contributed in a problem
+comment_vote_count              Number of comment upvotes user contributed in a problem
+resource_vote_count             Number of resource upvotes user contributed in a problem
+simple_rating                   Number of times a user contributed a simple (single number) rating
+partial_rating                  Number of times a user contributed a partial (some of the rubrics) rating
+complete_rating                 Number of times a user contributed a complete (all rubrics) rating
+problem                         Title of the problem
+engagement                      Calculated number of overall engagement of one user to a problem
+report_count_scaled             Number of reports user contributed to problem, scaled (within this platform instance) to range between 0 and 1
+resource_count_scaled           Number of resources user contributed to problem, scaled (within this platform instance) to range between 0 and 1
+comment_count_scaled            Number of comments user contributed in a problem, scaled (within this platform instance) to range between 0 and 1
+chat_count_scaled               Number of chat messages user contributed in a problem, scaled (within this platform instance) to range between 0 and 1
+comment_vote_count_scaled       Number of comment upvotes user contributed in a problem, scaled (within this platform instance) to range between 0 and 1
+resource_vote_count_scaled      Number of resource upvotes user contributed in a problem, scaled (within this platform instance) to range between 0 and 1
+simple_rating_scaled            Number of times a user contributed a simple (single number) rating, scaled (within this platform instance) to range between 0 and 1
+partial_rating_scaled           Number of times a user contributed a partial (some of the rubrics) rating, scaled (within this platform instance) to range between 0 and 1
+complete_rating_scaled          Number of times a user contributed a complete (all rubrics) rating, scaled (within this platform instance) to range between 0 and 1
+engagement_scaled               Calculated number of overall engagement of one user to a problem, using scaled engagement scores as inputs
+vote_count                      comment_vote_count + resource_vote_count
+quick_rating                    simple_rating + partial_rating
 
 
-## Authors
+## Table Name: authors
 
-Responses (i.e. reports or "resources") can have multiple authors.  This table captures the authors of responses.
+Responses (i.e. reports or ""resources"") can have multiple authors.  This table captures the authors of responses.
 
-Table File Name:    Authors.csv
-
-ColumnName           Description
---------------       --------------------------------------------------------
-problem_id           Unique identifier of the problem
-problem              Short title of the problem
-team_id              Unique identifier for the team that produced the report
-team                 Name of the team that produced the report
-response_id          Unique identifier for the a response
-author_id            Unique identifier of a user who (co-)authored the response
-originator           1 if the author was the originator of the response, otherwise 0
-author_name          The screen name of the (co-)author (at the time of response or comment creation)
-
-\newpage
-
-## Comments
-
-Users can comment on responses.  The following table captures these comments.
-
-Table File Name:    Comments.csv
-
-ColumnName           Description
---------------       --------------------------------------------------------
-problem_id           Unique identifier of the problem
-problem              Short title of the problem
-team_id              Unique identifier for the team that produced the report
-team                 Name of the team that produced the report
-response_id          Unique identifier for the a response
-author_id            Unique identifier of the original author of the response
-author_name          Name of the orginal author of the response
-comment_id           Unique identifier for the comment
-commenter_id         Unique identifier of a user who created the comment
-commenter_name       Name of the commenter
-time_created         Timestamp when the comment was first created
-time_last_changed    Timestamp when the comment was last updated
-comment_text         A unique filename of the comment content in markdown text format
-comment_file         A unique filename in the "Comments" subfolder that contains the HTML file of the comment
+ColumnName       Description
+-----------      ------------------------------
+problem_id       Unique identifier of the problem
+team_id          Unique identifier for the team that produced the report
+team             Name of the team that produced the report
+response_id      Unique identifier for the a response
+user_id          Unique identifier of a user who (co-)authored the response
+user             The screen name of the (co-)author (at the time of response or comment creation)
+problem          Short title of the problem
 
 
-## Ratings
-
-Users can rate the responses and comments of other users.  The following table captures these ratings.  Note that users can rate as many times as they like (each of which is captured in the table), but only the last ratings are used in calculating the aggregate rating.  In other words, the "rating_total" with the latest timestamp in the *Ratings* table should match the "team_rating" in the *TopReport* table.
-
-Table File Name:    Ratings.csv
-
-ColumnName             Description
---------------         --------------------------------------------------------
-problem_id             Unique identifier of the problem
-problem              Short title of the problem
-team_id                Unique identifier for the team that produced the report
-content_type           "report", "resource", or "comment".  Types may be added in future.
-content_id             Unique identifier for the content (content can be response or comment)
-author_id              Unique identifier of the original author of the response
-rater_id               Unique identifier of a user who rated the response
-last_edited            Timestamp when the rating was last updated
-rating_type            "thumbs", "simple", "detailed"
-rating_total           1 or 0 for thumbs, number (0-100) for simple, aggregated number for detailed rating
-rating_sub_01_title    The title of the ratings subfield
-rating_sub_01_tip      The description or tooltip for the ratings subfield
-rating_sub_01          Number for detailed rating field 1
-rating_sub_02_title    The title of the ratings subfield
-rating_sub_02_tip      The description or tooltip for the ratings subfield
-rating_sub_02          Number for detailed rating field 2
-rating_sub_03_title    The title of the ratings subfield
-rating_sub_03_tip      The description or tooltip for the ratings subfield
-rating_sub_03          Number for detailed rating field 3
-rating_sub_04_title    The title of the ratings subfield
-rating_sub_04_tip      The description or tooltip for the ratings subfield
-rating_sub_04          Number for detailed rating field 4
-rating_sub_05_title    The title of the ratings subfield
-rating_sub_05_tip      The description or tooltip for the ratings subfield
-rating_sub_05          Number for detailed rating field 5
-rating_sub_06_title    The title of the ratings subfield
-rating_sub_06_tip      The description or tooltip for the ratings subfield
-rating_sub_06          Number for detailed rating field 6
-rating_sub_07_title    The title of the ratings subfield
-rating_sub_07_tip      The description or tooltip for the ratings subfield
-rating_sub_07          Number for detailed rating field 7
-rating_sub_08_title    The title of the ratings subfield
-rating_sub_08_tip      The description or tooltip for the ratings subfield
-rating_sub_08          Number for detailed rating field 8
-rating_sub_09_title    The title of the ratings subfield
-rating_sub_09_tip      The description or tooltip for the ratings subfield
-rating_sub_09          Number for detailed rating field 9
-rating_sub_10_title    The title of the ratings subfield
-rating_sub_10_tip      The description or tooltip for the ratings subfield
-rating_sub_10          Number for detailed rating field 10
-
-
-## Chat
+## Table Name: chat
 
 Users can chat freely within each problem.  The following table captures the chat data.
 
-Table File Name:    Chat.csv
+ColumnName      Description
+----------      ------------------------------
+id              Unique identifier of the chat message
+problem_id      Unique identifier of the problem
+created_at      Timestamp when the comment was first created
+user            Name of the author of the chat message
+chat_id         Another unique (within this platform instance) identifier of the chat message
+chat_text       The comment content in plain text format
+user_id         Unique identifier of the author of the chat message
+team_id         Unique identifier for the team that produced the report
+team            Name of the team the author of the chat message was in
+problem         Short title of the problem
 
-ColumnName           Description
---------------       --------------------------------------------------------
-problem_id           Unique identifier of the problem
-problem              Short title of the problem
-created_at           Timestamp when the comment was first created
-author_id            Unique identifier of the author of the chat message
-author_name          Name of the author of the chat message
-team_id              Unique identifier for the team that produced the report
-chat_text            The comment content in plain text format
+
+## Table Name: comments
+
+Users can comment on responses.  The following table captures these comments.
+
+ColumnName             Description
+-----------------      ------------------------------
+problem_id             Unique identifier of the problem
+team_id                Unique identifier for the team that produced the report
+team                   Name of the team that produced the report
+response_id            Unique identifier for the a response
+author_id              Unique identifier of the original author of the response
+author                 Name of the orginal author of the response
+comment_id             Unique identifier for the comment
+commenter_id           Unique identifier of a user who created the comment
+commenter_name         Name of the commenter
+time_created           Timestamp when the comment was first created
+time_last_changed      Timestamp when the comment was last updated
+comment_text           A unique filename of the comment content in markdown text format
+comment_file           A unique filename in the ""Comments"" subfolder that contains the HTML file of the comment
+problem                Short title of the problem
 
 
-## Login
+## Table Name: login
 
 We capture when users log in and out of the platform. A few caveats here: Since many users do not expressly logout but rather just close the browser window we can track far less logouts than logins (rougly a third). We have not attempted to estimate how long a user stays on platform. Also, we do not track which problem a user is looking at. This data can only be supplied on platform level. It includes all login/logouts to this environment, not scaled down to specific tests or exercises.  
 
-ColumnName          Description
----------------         -----------------------------------------------------------
-user_id                 Unique identifier of the user who logs in/out
-user                    Name of user who logs in/out
-event                   Can either be login or logout
-time_stamp              Timestamp when login/logout occurred 
+ColumnName      Description
+----------      ------------------------------
+user_id         Unique identifier of the user who logs in/out
+user            Name of user who logs in/out
+event_type      Can either be login or logout
+timestamp       Timestamp when login/logout occurred
 
 
-## Analytics
+## Table Name: problems
 
-In this file we capture how many reports, resources, comments, resource_votes, comment_votes, single, partial or full ratings and chat messages each user makes for a specific problem in a specific group in one handy analytics file. We also calculate an engagement level. Engagement is measured by assigning 7 points for a report, 4 points for a resource, 3 points for a complete rating, 2 points for a comment, on point for a chat message, a single or partial rating or a comment vote.
+The problems table uniquely identifies and describes the problem that SWARM users were working on.
 
-
-ColumnName                  Description
----------------             -----------------------------------------------------------
-team                        Name of team the user is in
-team_id                     Unique identifier of the team the user is in
-problem_id                  Unique identifier of the problem the team is working on
-user                        Name of user
-user_id                     Unique identifier of user
-report_count                Number of reports user contributed to problem
-resource_count              Number of resources user contributed to problem 
-comment_count               Number of comments user contributed in a problem
-chat_count                  Number of chat messages user contributed in a problem
-comment_vote_count          Number of comment upvotes user contributed in a problem
-resource_vote_count         Number of resource upvotes user contributed in a problem
-simple_rating               Number of times a user contributed a simple (single number) rating
-partial_rating              Number of times a user contributed a partial (some of the rubrics) rating
-complete_rating             Number of times a user contributed a complete (all rubrics) rating
-report_count_normed         Number of reports user contributed to problem, normed within this platform instance
-resource_count_normed       Number of resources user contributed to problem, normed within this platform instance 
-comment_count_normed        Number of comments user contributed in a problem, normed within this platform instance
-chat_count_normed           Number of chat messages user contributed in a problem, normed within this platform instance
-comment_vote_count_normed   Number of comment upvotes user contributed in a problem, normed within this platform instance
-resource_vote_count_normed  Number of resource upvotes user contributed in a problem, normed within this platform instance
-simple_rating_normed        Number of times a user contributed a simple (single number) rating, normed within this platform instance
-partial_rating_normed       Number of times a user contributed a partial (some of the rubrics) rating, normed within this platform instance
-complete_rating_normed      Number of times a user contributed a complete (all rubrics) rating, normed within this platform instance
-problem                     Title of the problem
-engagement              	Calculated number of overall engagement of one user to a problem
-engagement_normed           Calculated number of overall engagement of one user to a problem, using normed engagement scores as inputs
+ColumnName            Description
+----------------      ------------------------------
+problem_id            Unique identifier of the problem
+problem               Short title of the problem
+description           
+start_date            
+due_date              
+problem_text          A unique filename of the problem content in markdown text format
+problem_file          A unique filename in the ""Problems"" subfolder that contains the HTML file of the problem
+problem_template      
+exercise              
 
 
-## Relations
+## Table Name: ratings
 
-A file collecting interaction between users. As an interaction counts if a user commented on another users' response, if a user is named as a contributor for a report or if a user mentions another user in the chat. The interactions are stored summed up per problem and per action.
+Users can rate the responses and comments of other users.  The following table captures these ratings.  Note that users can rate as many times as they like (each of which is captured in the table), but only the last ratings are used in calculating the aggregate rating.  In other words, the ""rating_total"" with the latest timestamp in the *Ratings* table should match the ""team_rating"" in the *TopReport* table.
 
-ColumnName          Description
----------------         -----------------------------------------------------------
-addressant              User addressed by the other user (e.g. mentioned in chat)
-problem_id              Unique identifier of problem
-team                    Name of team both users are in
-user                    User who addresses another user ( e.g. writes a chat message that contains a name tag)
-problem                 Name of problem 
-interaction             Describes the interaction: 'comment', 'contributor' or 'chat'
-count                   Number of times this interaction happened
+ColumnName               Description
+-------------------      ------------------------------
+problem_id               Unique identifier of the problem
+team_id                  Unique identifier for the team that produced the report
+content_type             ""report"", ""resource"", or ""comment"". Other types may be added in future.
+content_id               Unique identifier for the content (content can be response or comment)
+author_id                Unique identifier of the original author of the response
+author                   Name of the user who originally authored the response
+rater_id                 Unique identifier of a user who rated the response
+rater                    Name of the user who rated the response
+last_edited              Timestamp when the rating was last updated
+rating_type              ""thumbs"", ""simple"", ""detailed""
+rating_total             1 or 0 for thumbs, number (0-100) for simple, aggregated number for detailed rating
+rating_sub_01_title      The title of the ratings subfield
+rating_sub_01            Number for detailed rating field 1
+rating_sub_02_title      The title of the ratings subfield
+rating_sub_02            Number for detailed rating field 2
+rating_sub_03_title      The title of the ratings subfield
+rating_sub_03            Number for detailed rating field 3
+rating_sub_04_title      The title of the ratings subfield
+rating_sub_04            Number for detailed rating field 4
+rating_sub_05_title      The title of the ratings subfield
+rating_sub_05            Number for detailed rating field 5
+rating_sub_06_title      The title of the ratings subfield
+rating_sub_06            Number for detailed rating field 6
+rating_sub_07_title      The title of the ratings subfield
+rating_sub_07            Number for detailed rating field 7
+rating_sub_08_title      The title of the ratings subfield
+rating_sub_08            Number for detailed rating field 8
+rating_sub_09_title      The title of the ratings subfield
+rating_sub_09            Number for detailed rating field 9
+problem                  Short title of the problem
 
 
-## Timeline
+## Table Name: relations
 
-Another handy file that stores actions on the platform. Collects timestamps for all resources and reports posted on the platform, timestamps for all comments made on the platform including on which report/resource, timestamp for ratings made including on which report and updates made to resources and reports. Caveat: updates are stored as single edits and have to be mangled to become useful (e.g. only count edits made at least 5 minutes apart as an actual update).
+A table collecting interaction between users. As an interaction counts if a user commented on another users' response, if a user is named as a contributor for a report or if a user mentions another user in the chat. The interactions are stored summed up per problem and per action.
 
-ColumnName          Description
----------------         -----------------------------------------------------------
-chunk_id                Unique identifier for the artefact contributed (can be a report, resource, comment, rating, update)
-parent_id               Unique identifier for the source the artefact was contributed to (a report or resource in case of a comment or update, a problem_id in case of a report or resource, a report in case of a rating)
-problem_id              Unique identifier for the problem (e.g. in case the artefact is a report or resource parent and problem id are identical)
-team_id                 Unique identifier for team
-team                    Name of team
-timestamp               Timestamp when artefact was contributed, for resources, reports and comments this is their first post, for ratings only the last update is stored
-type                    The artefact type, can be report, resource, comment, rating, update
-problem                 The problem title
-user_id                 Unique indentifier of the user contributing the artefact
-user                    Name of user
+ColumnName       Description
+-----------      ------------------------------
+addressant       User addressed by the other user (e.g. mentioned in chat)
+problem_id       Unique identifier of problem
+team             Name of team both users are in
+user             User who addresses another user ( e.g. writes a chat message that contains a name tag)
+problem          Name of problem
+interaction      Describes the interaction: 'comment', 'contributor' or 'chat'
+count            Number of times this interaction happened
+
+
+## Table Name: responses
+
+Responses are text contributed by users in response to the problem.  Currently, responses can be ""reports"" or ""resources"", but more types are possible in future.
+
+ColumnName             Description
+-----------------      ------------------------------
+problem_id             Unique identifier of the problem
+team_id                Unique identifier for the team that produced the response
+team                   The name of the team that produced the response
+response_id            Unique identifier for the a response
+time_created           Timestamp when the response was first created
+time_last_changed      Timestamp when the response was last updated
+response_title         The beginning of the response in plain text format
+response_type          Type of response, currently ""report"" or ""resource"". More types may be added in future
+response_text          A unique filename of the response content in markdown text format
+response_file          A unique filename in the ""Responses"" subfolder that contains the HTML file of the response
+problem                Short title of the problem
+
+
+## Table Name: timeline
+
+Another handy table that stores actions on the platform. Collects timestamps for all resources and reports posted on the platform, timestamps for all comments made on the platform including on which report/resource, timestamp for ratings made including on which report and updates made to resources and reports. Caveat: updates are stored as single edits and have to be mangled to become useful (e.g. only count edits made at least 5 minutes apart as an actual update).
+
+ColumnName      Description
+----------      ------------------------------
+chunk_id        Unique identifier for the artefact contributed (can be a report, resource, comment, rating, update)
+parent_id       Unique identifier for the source the artefact was contributed to (a report or resource in case of a comment or update, a problem_id in case of a report or resource, a report in case of a rating)
+problem_id      Unique identifier for the problem (e.g. in case the artefact is a report or resource parent and problem id are identical)
+team_id         Unique identifier for team
+team            Name of team
+timestamp       Timestamp when artefact was contributed, for resources, reports and comments this is their first post, for ratings only the last update is stored
+type            The artefact type, can be report, resource, comment, rating, update
+problem         The problem title
+user_id         Unique indentifier of the user contributing the artefact
+user            Name of user
+
+
+## Table Name: top_reports
+
+Top Reports are the reports that have the highest quality (readiness) rating at the time of the data dump. Of particular interest are ""final reports"" at the end of a test, but it is possible that an interim data dump is made, in which case the top report is the highest rated report at the time of the data set. Internally, it is also possible that such reports are identifiable through other data in the SWARM platform (such as a report submission event log), but only the basic information is captured in the table below.
+
+ColumnName              Description
+------------------      ------------------------------
+problem_id              Unique identifier of the problem
+problem                 Short title of the problem
+team_id                 Unique identifier for the team that produced the report
+team                    Screen name for the team_id
+report_id               Unique identifier for the report (response of type ""report"")
+team_rating             The aggregate rating of the report from the (internal) team at time of submission
+rating_count            Number of received ratings
+origin_author_id        Unique identifier of the user that first created the response that ultimately resulted in this top report
+origin_author_name      Name of the author that first created the response
+
+

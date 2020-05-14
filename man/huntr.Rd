@@ -3,7 +3,6 @@
 \docType{package}
 \name{huntr}
 \alias{huntr}
-\alias{huntr-package}
 \title{huntr}
 \description{
 This package contains data and analysis functions for The Hunt

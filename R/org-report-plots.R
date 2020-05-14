@@ -23,8 +23,8 @@
 #' }
 generate_feedback_plots = function(instance_name) {
     
-  teams = repo[[instance_name]]$OtherData$teams
-  teams = as.character(teams[teams$isOrg,]$team)
+  teams = as.data.frame(repo[[instance_name]]$CoreData$teams)
+  teams = as.character(teams[teams$type == 'OT',]$team)
   
   for (team_name in teams) {
     message(team_name)
@@ -127,7 +127,7 @@ export_plot = function(plot_object, file_name, instance_name, team_name, export_
 
 plot_demographic_old = function (instance_name, team_name, dem) {
     
-    parts = as.data.frame(repo[[instance_name]]$OtherData$parts)
+    parts = as.data.frame(repo[[instance_name]]$CoreData$parts)
     key = dem[["key"]]
     options = dem[["options"]]
     
@@ -214,9 +214,9 @@ plot_demographic_old = function (instance_name, team_name, dem) {
 
 plot_demographic = function (instance_name, team_name, dem) {
   
-  parts = repo[[instance_name]]$OtherData$parts
-  teamparts = repo[[instance_name]]$OtherData$teamparts
-  teams = repo[[instance_name]]$OtherData$teams
+  parts = as.data.frame(repo[[instance_name]]$CoreData$parts)
+  teamparts = as.data.frame(repo[[instance_name]]$CoreData$teamparts)
+  teams = as.data.frame(repo[[instance_name]]$CoreData$teams)
   
   teamparts = setDT(merge(teamparts, teams, by = c('team'), all.x = T))
   teamparts = teamparts[,.(team, user, type)]
@@ -415,11 +415,11 @@ plots_demographic = function(instance_name, team_name, export = F) {
 
 plot_slopegraph = function(instance_name, team_name, export = F) {
     
-    probteams = repo[[instance_name]]$OtherData$probteams
+    probteams = as.data.frame(repo[[instance_name]]$CoreData$probteams)
     probteams[probteams$team == team_name,]$type = "Your Team"
-    probteams = probteams[probteams$avgODNI > 0,]
+    probteams = probteams[probteams$avgIC > 0,]
     
-    p = ggplot(probteams, aes(probNum, avgODNI, group = team, colour = type, alpha = type, size = type, label = rankODNI)) +
+    p = ggplot(probteams, aes(probNum, avgIC, group = team, colour = type, alpha = type, size = type, label = rankIC)) +
         geom_line() +
         scale_x_continuous(breaks = 1:4) + 
         scale_colour_manual(breaks = c("PT","ST","OT","Your Team"),
@@ -538,8 +538,8 @@ plot_network = function(instance_name, team_name, export = F) {
                                from = user,
                                to = addressant
                         )]
-  parts = repo[[instance_name]]$OtherData$parts
-  teamparts = repo[[instance_name]]$OtherData$teamparts
+  parts = as.data.frame(repo[[instance_name]]$CoreData$parts)
+  teamparts = as.data.frame(repo[[instance_name]]$CoreData$teamparts)
   parts = merge(parts,teamparts,by = c('user'), all.y = T)
   parts = parts[parts$team == team_name,]
   
@@ -700,8 +700,8 @@ plot_network_reference = function(instance_name, team_name, export = F) {
                                from = user,
                                to = addressant
                         )]
-  parts = repo[[instance_name]]$OtherData$parts
-  teamparts = repo[[instance_name]]$OtherData$teamparts
+  parts = as.data.frame(repo[[instance_name]]$CoreData$parts)
+  teamparts = as.data.frame(repo[[instance_name]]$CoreData$teamparts)
   parts = merge(parts,teamparts,by = c('user'), all.y = T)
   parts = parts[parts$team %in% c('tongariro00311', 'bogong00219'),]
   
@@ -814,7 +814,7 @@ plot_network_reference = function(instance_name, team_name, export = F) {
 plot_timeline = function(instance_name, team_name, export = F) {
     
   timeline = repo[[instance_name]]$PlatformData$timeline
-  timeline = timeline[,.(timeStamp, user, team, problem, type)]
+  timeline = timeline[,.(timestamp, user, team, problem, type)]
   colnames(timeline)[1] = 'timestamp'
   chat = repo[[instance_name]]$PlatformData$chat
   chat = chat[,.(created_at, author_name, team_name, problem_title)]
@@ -936,7 +936,7 @@ plot_timeline = function(instance_name, team_name, export = F) {
 plot_timeline_reference = function(instance_name, team_name, export = F) {
   
   timeline = repo[[instance_name]]$PlatformData$timeline
-  timeline = timeline[,.(timeStamp, user, team, problem, type)]
+  timeline = timeline[,.(timestamp, user, team, problem, type)]
   colnames(timeline)[1] = 'timestamp'
   chat = repo[[instance_name]]$PlatformData$chat
   chat = chat[,.(created_at, author_name, team_name, problem_title)]
@@ -1101,12 +1101,12 @@ plot_timeline_reference = function(instance_name, team_name, export = F) {
 
 plot_qor_teamsize = function(instance_name, team_name, export = F) {
   
-  probteams = repo[[instance_name]]$OtherData$probteams
-  probteams = probteams[!is.na(probteams$avgODNI) & probteams$avgODNI > 0,]
+  probteams = as.data.frame(repo[[instance_name]]$CoreData$probteams)
+  probteams = probteams[!is.na(probteams$avgIC) & probteams$avgIC > 0,]
   probteams[probteams$team == team_name,]$type = "Your Team"
   probteams$activeUsers = sqrt(probteams$activeUsersSq)
   
-  p = ggplot(probteams, aes(x = activeUsers, y = avgODNI)) +
+  p = ggplot(probteams, aes(x = activeUsers, y = avgIC)) +
     stat_smooth(data = probteams, method = "lm", formula = y ~ x + I(x^2), size = 0.5,
                 colour = "#000000", fill = "#fedb4a", alpha = 0.2) +
     geom_point(aes(size = type, colour = type)) +
@@ -1147,15 +1147,15 @@ plot_qor_teamsize = function(instance_name, team_name, export = F) {
 
 plot_qor_education = function(instance_name, team_name, export = F) {
   
-  probteams = repo[[instance_name]]$OtherData$probteams
-  probteams = probteams[!is.na(probteams$avgODNI) & probteams$avgODNI > 0,]
+  probteams = as.data.frame(repo[[instance_name]]$CoreData$probteams)
+  probteams = probteams[!is.na(probteams$avgIC) & probteams$avgIC > 0,]
   
-  teams = repo[[instance_name]]$OtherData$teams
+  teams = as.data.frame(repo[[instance_name]]$CoreData$teams)
   probteams = merge(probteams, teams, by = c('team', 'type'), all.x = T)
 
   probteams[probteams$team == team_name,]$type = "Your Team"
   
-  p = ggplot(probteams, aes(x = medianEdu, y = avgODNI)) +
+  p = ggplot(probteams, aes(x = medianEdu, y = avgIC)) +
     stat_smooth(data = probteams, method = "lm", formula = y ~ x + I(x^2), size = 0.5,
                 colour = "#000000", fill = "#fedb4a", alpha = 0.2) +
     geom_point(aes(size = type, colour = type)) +
@@ -1199,10 +1199,10 @@ plot_qor_education = function(instance_name, team_name, export = F) {
 
 plot_qor_AOMT = function(instance_name, team_name, export = F) {
   
-  probteams = repo[[instance_name]]$OtherData$probteams
+  probteams = as.data.frame(repo[[instance_name]]$CoreData$probteams)
   probteams$team = as.character(probteams$team)
-  teams = repo[[instance_name]]$OtherData$teams
-  probteams = probteams[!is.na(probteams$avgODNI) & probteams$avgODNI > 0,]
+  teams = as.data.frame(repo[[instance_name]]$CoreData$teams)
+  probteams = probteams[!is.na(probteams$avgIC) & probteams$avgIC > 0,]
   probteams[probteams$team == team_name,]$type = "Your Team"
   probteams$AOMT = NA
   for (k in 1:nrow(probteams)) {
@@ -1210,7 +1210,7 @@ plot_qor_AOMT = function(instance_name, team_name, export = F) {
   }
   
   
-  p = ggplot(probteams, aes(x = AOMT, y = avgODNI)) +
+  p = ggplot(probteams, aes(x = AOMT, y = avgIC)) +
     stat_smooth(data = probteams, method = "lm", formula = y ~ x + I(x^2), size = 0.5,
                 colour = "#000000", fill = "#fedb4a", alpha = 0.2) +
     geom_point(aes(size = type, colour = type)) +
@@ -1252,10 +1252,10 @@ plot_qor_AOMT = function(instance_name, team_name, export = F) {
 
 plot_qor_divAOMT = function(instance_name, team_name, export = F) {
   
-  probteams = repo[[instance_name]]$OtherData$probteams
+  probteams = as.data.frame(repo[[instance_name]]$CoreData$probteams)
   probteams$team = as.character(probteams$team)
-  teams = repo[[instance_name]]$OtherData$teams
-  probteams = probteams[!is.na(probteams$avgODNI) & probteams$avgODNI > 0,]
+  teams = as.data.frame(repo[[instance_name]]$CoreData$teams)
+  probteams = probteams[!is.na(probteams$avgIC) & probteams$avgIC > 0,]
   probteams[probteams$team == team_name,]$type = "Your Team"
   probteams$divAOMT = NA
   for (k in 1:nrow(probteams)) {
@@ -1263,7 +1263,7 @@ plot_qor_divAOMT = function(instance_name, team_name, export = F) {
   }
   
   
-  p = ggplot(probteams, aes(x = divAOMT, y = avgODNI)) +
+  p = ggplot(probteams, aes(x = divAOMT, y = avgIC)) +
     stat_smooth(data = probteams, method = "lm", formula = y ~ x + I(x^2), size = 0.5,
                 colour = "#000000", fill = "#fedb4a", alpha = 0.2) +
     geom_point(aes(size = type, colour = type)) +
@@ -1305,11 +1305,11 @@ plot_qor_divAOMT = function(instance_name, team_name, export = F) {
 
 plot_qor_textSim = function(instance_name, team_name, export = F) {
   
-  probteams = repo[[instance_name]]$OtherData$probteams
-  probteams = probteams[!is.na(probteams$avgODNI) & probteams$avgODNI > 0,]
+  probteams = as.data.frame(repo[[instance_name]]$CoreData$probteams)
+  probteams = probteams[!is.na(probteams$avgIC) & probteams$avgIC > 0,]
   probteams[probteams$team == team_name,]$type = "Your Team"
   
-  p = ggplot(probteams, aes(x = textSim, y = avgODNI)) +
+  p = ggplot(probteams, aes(x = textSim, y = avgIC)) +
     stat_smooth(data = probteams, method = "lm", formula = y ~ x + I(x^2), size = 0.5,
                 colour = "#000000", fill = "#fedb4a", alpha = 0.2) +
     geom_point(aes(size = type, colour = type)) +
@@ -1350,11 +1350,11 @@ plot_qor_textSim = function(instance_name, team_name, export = F) {
 
 plot_qor_activity = function(instance_name, team_name, export = F) {
   
-  probteams = repo[[instance_name]]$OtherData$probteams
-  probteams = probteams[!is.na(probteams$avgODNI) & probteams$avgODNI > 0,]
+  probteams = as.data.frame(repo[[instance_name]]$CoreData$probteams)
+  probteams = probteams[!is.na(probteams$avgIC) & probteams$avgIC > 0,]
   probteams = setDT(probteams)
-  probteams = probteams[,.(team, type, problem, avgODNI)]
-  probparts = repo[[instance_name]]$OtherData$probparts
+  probteams = probteams[,.(team, type, problem, avgIC)]
+  probparts = repo[[instance_name]]$CoreData$probparts
   probparts = probparts[,sum(engagement), by = c('team', 'problem')]
   probparts = probparts[!(problem %in% c('Test Problem',
                                          "'Sandpit' Problem",
@@ -1365,7 +1365,7 @@ plot_qor_activity = function(instance_name, team_name, export = F) {
   probteams[probteams$team == team_name,]$type = "Your Team"
   probteams = as.data.frame(probteams)
   
-  p = ggplot(probteams, aes(x = engagement, y = avgODNI)) +
+  p = ggplot(probteams, aes(x = engagement, y = avgIC)) +
     stat_smooth(data = probteams, method = "lm", formula = y ~ x + I(x^2), size = 0.5,
                 colour = "#000000", fill = "#fedb4a", alpha = 0.2) +
     geom_point(aes(size = type, colour = type)) +
@@ -1406,11 +1406,11 @@ plot_qor_activity = function(instance_name, team_name, export = F) {
 
 plot_qor_nGeoCorrect = function(instance_name, team_name, export = F) {
   
-  probteams = repo[[instance_name]]$OtherData$probteams
-  probteams = probteams[!is.na(probteams$avgODNI) & probteams$avgODNI > 0 & !is.na(probteams$nGeoCorrect),]
+  probteams = as.data.frame(repo[[instance_name]]$CoreData$probteams)
+  probteams = probteams[!is.na(probteams$avgIC) & probteams$avgIC > 0 & !is.na(probteams$nGeoCorrect),]
   probteams[probteams$team == team_name,]$type = "Your Team"
   
-  p = ggplot(probteams, aes(x = avgODNI, y = nGeoCorrect)) +
+  p = ggplot(probteams, aes(x = avgIC, y = nGeoCorrect)) +
     # stat_smooth(data = probteams, method = "lm", formula = y ~ x + I(x^2), size = 0.5,
     #             colour = "#000000", fill = "#fedb4a", alpha = 0.2) +
     geom_point(aes(size = type, colour = type)) +
@@ -1452,13 +1452,13 @@ plot_qor_nGeoCorrect = function(instance_name, team_name, export = F) {
 
 plot_qor_forecasting = function(instance_name, team_name, export = F) {
   
-  probteams = repo[[instance_name]]$OtherData$probteams
-  probteams = probteams[!is.na(probteams$avgODNI) & probteams$avgODNI > 0 & !is.na(probteams$probabilityEstimate),]
+  probteams = as.data.frame(repo[[instance_name]]$CoreData$probteams)
+  probteams = probteams[!is.na(probteams$avgIC) & probteams$avgIC > 0 & !is.na(probteams$probabilityEstimate),]
   probteams[probteams$team == team_name,]$type = "Your Team"
   
   probteams$brier = probteams$probabilityEstimate^2
   
-  p = ggplot(probteams, aes(x = avgODNI, y = brier)) +
+  p = ggplot(probteams, aes(x = avgIC, y = brier)) +
     # stat_smooth(data = probteams, method = "lm", formula = y ~ x + I(x^2), size = 0.5,
     #             colour = "#000000", fill = "#fedb4a", alpha = 0.2) +
     geom_point(aes(size = type, colour = type)) +
@@ -1500,11 +1500,11 @@ plot_qor_forecasting = function(instance_name, team_name, export = F) {
 
 plot_qor_tightness = function(instance_name, team_name, export = F) {
   
-  probteams = repo[[instance_name]]$OtherData$probteams
-  probteams = probteams[!is.na(probteams$avgODNI) & probteams$avgODNI > 0 & !is.na(probteams$tightness),]
+  probteams = as.data.frame(repo[[instance_name]]$CoreData$probteams)
+  probteams = probteams[!is.na(probteams$avgIC) & probteams$avgIC > 0 & !is.na(probteams$tightness),]
   probteams[probteams$team == team_name,]$type = "Your Team"
   
-  p = ggplot(probteams, aes(x = avgODNI, y = tightness)) +
+  p = ggplot(probteams, aes(x = avgIC, y = tightness)) +
     # stat_smooth(data = probteams, method = "lm", formula = y ~ x + I(x^2), size = 0.5,
     #             colour = "#000000", fill = "#fedb4a", alpha = 0.2) +
     geom_point(aes(size = type, colour = type)) +
@@ -1546,13 +1546,13 @@ plot_qor_tightness = function(instance_name, team_name, export = F) {
 
 plot_qor_nBayesCorrect = function(instance_name, team_name, export = F) {
   
-  probteams = repo[[instance_name]]$OtherData$probteams
-  probteams = probteams[!is.na(probteams$avgODNI) & probteams$avgODNI > 0 & !is.na(probteams$nBayesCorrect),]
+  probteams = as.data.frame(repo[[instance_name]]$CoreData$probteams)
+  probteams = probteams[!is.na(probteams$avgIC) & probteams$avgIC > 0 & !is.na(probteams$nBayesCorrect),]
   if (team_name %in% probteams$team) {
     probteams[probteams$team == team_name,]$type = "Your Team"
   }
   
-  p = ggplot(probteams, aes(x = avgODNI, y = nBayesCorrect)) +
+  p = ggplot(probteams, aes(x = avgIC, y = nBayesCorrect)) +
     # stat_smooth(data = probteams, method = "lm", formula = y ~ x + I(x^2), size = 0.5,
     #             colour = "#000000", fill = "#fedb4a", alpha = 0.2) +
     geom_point(aes(size = type, colour = type)) +
@@ -1594,13 +1594,13 @@ plot_qor_nBayesCorrect = function(instance_name, team_name, export = F) {
 
 plot_qor_nFlawsDetected = function(instance_name, team_name, export = F) {
   
-  probteams = repo[[instance_name]]$OtherData$probteams
-  probteams = probteams[!is.na(probteams$avgODNI) & probteams$avgODNI > 0 & !is.na(probteams$nFlawsDetected),]
+  probteams = as.data.frame(repo[[instance_name]]$CoreData$probteams)
+  probteams = probteams[!is.na(probteams$avgIC) & probteams$avgIC > 0 & !is.na(probteams$nFlawsDetected),]
   if (team_name %in% probteams$team) {
     probteams[probteams$team == team_name,]$type = "Your Team"
   }
   
-  p = ggplot(probteams, aes(x = avgODNI, y = nFlawsDetected)) +
+  p = ggplot(probteams, aes(x = avgIC, y = nFlawsDetected)) +
     # stat_smooth(data = probteams, method = "lm", formula = y ~ x + I(x^2), size = 0.5,
     #             colour = "#000000", fill = "#fedb4a", alpha = 0.2) +
     geom_point(aes(size = type, colour = type)) +
@@ -1642,8 +1642,8 @@ plot_qor_nFlawsDetected = function(instance_name, team_name, export = F) {
 
 plot_dot_engagement = function(instance_name, team_name, export = F) {
   
-  probteams = repo[[instance_name]]$OtherData$probteams
-  probteams = probteams[!is.na(probteams$avgODNI),]
+  probteams = as.data.frame(repo[[instance_name]]$CoreData$probteams)
+  probteams = probteams[!is.na(probteams$avgIC),]
   probteams[probteams$team == team_name,]$type = "Your Team"
   probteams$type = factor(probteams$type, levels = c('PT','ST','OT','Your Team'))
   
@@ -1711,8 +1711,8 @@ plot_dot_engagement = function(instance_name, team_name, export = F) {
 
 plot_dot_engagement_user = function(instance_name, team_name, export = F) {
   
-  probteams = repo[[instance_name]]$OtherData$probteams
-  probteams = probteams[!is.na(probteams$avgODNI),]
+  probteams = as.data.frame(repo[[instance_name]]$CoreData$probteams)
+  probteams = probteams[!is.na(probteams$avgIC),]
   probteams[probteams$team == team_name,]$type = "Your Team"
   probteams$type = factor(probteams$type, levels = c('PT','ST','OT','Your Team'))
   
@@ -1781,15 +1781,15 @@ plot_dot_engagement_user = function(instance_name, team_name, export = F) {
 
 plot_dot_qor = function(instance_name, team_name, export = F) {
   
-  probteams = repo[[instance_name]]$OtherData$probteams
-  probteams = probteams[!is.na(probteams$avgODNI),]
+  probteams = as.data.frame(repo[[instance_name]]$CoreData$probteams)
+  probteams = probteams[!is.na(probteams$avgIC),]
   probteams[probteams$team == team_name,]$type = "Your Team"
   probteams$type = factor(probteams$type, levels = c('PT','ST','OT','Your Team'))
   
   ps = list()
   pcs = list()
   for (pb in 1:4) {
-    ps[[pb]] = ggplot(probteams[probteams$probNum == pb,], aes(avgODNI)) +
+    ps[[pb]] = ggplot(probteams[probteams$probNum == pb,], aes(avgIC)) +
       geom_dotplot(aes(fill = type), 
                    binwidth = .5, 
                    # stroke = 0,
@@ -1813,7 +1813,7 @@ plot_dot_qor = function(instance_name, team_name, export = F) {
             legend.position = "right"
       )
     
-    teamVal = probteams[probteams$probNum == pb & probteams$type == "Your Team",]$avgODNI[1]
+    teamVal = probteams[probteams$probNum == pb & probteams$type == "Your Team",]$avgIC[1]
     
     # PT, ST, OT
     # "#00a087", "#f9a825", "#3c5488"
@@ -1839,7 +1839,7 @@ plot_dot_qor = function(instance_name, team_name, export = F) {
                  label = paste0("Your teams' QoR score of ", teamVal, " was as good or better than that of:")) +
         annotate("text",
                  x = 1.8, y = 40, size = 6, fontface = 2, vjust = 0,
-                 label = paste0(round(100*mean(probteams[probteams$probNum == pb,]$avgODNI <= teamVal)),'%'),
+                 label = paste0(round(100*mean(probteams[probteams$probNum == pb,]$avgIC <= teamVal)),'%'),
                  colour = "#000000") +
         annotate("text",
                  x = 1.8, y = 33, vjust = 1,
@@ -1847,7 +1847,7 @@ plot_dot_qor = function(instance_name, team_name, export = F) {
                  colour = "#000000") +
         annotate("text",
                  x = 2.8, y = 40, size = 6, fontface = 2, vjust = 0,
-                 label = paste0(round(100*mean(probteams[probteams$probNum == pb & probteams$type == pubtype,]$avgODNI <= teamVal)),'%'),
+                 label = paste0(round(100*mean(probteams[probteams$probNum == pb & probteams$type == pubtype,]$avgIC <= teamVal)),'%'),
                  colour = pubcolour) +
         annotate("text",
                  x = 2.8, y = 33, vjust = 1,
@@ -1855,7 +1855,7 @@ plot_dot_qor = function(instance_name, team_name, export = F) {
                  colour = pubcolour) +
         annotate("text",
                  x = 4, y = 40, size = 6, fontface = 2, vjust = 0,
-                 label = paste0(round(100*mean(probteams[probteams$probNum == pb & probteams$type == "OT",]$avgODNI <= teamVal)),'%'),
+                 label = paste0(round(100*mean(probteams[probteams$probNum == pb & probteams$type == "OT",]$avgIC <= teamVal)),'%'),
                  colour = "#3c5488") +
         annotate("text",
                  x = 4, y = 33, vjust = 1,
@@ -1895,7 +1895,7 @@ plot_dot_qor = function(instance_name, team_name, export = F) {
 
 plot_dot_qor_subscales_old = function(instance_name, team_name, export = F) {
   
-  rates = repo[[instance_name]]$OtherData$rates
+  rates = repo[[instance_name]]$CoreData$rates
   rates = rates[!is.na(c1) & team != 'Calibration_team', .(problem, team,
                               c1, c2, c3, c4, c5, c6, c7, c8)]
   rates = rates[team != 'tongariro00311*']
@@ -1910,7 +1910,7 @@ plot_dot_qor_subscales_old = function(instance_name, team_name, export = F) {
   
   rates = rates[, lapply(.SD, mean), by = 'team', .SDcols = paste0('c',1:8)]
   
-  teams = setDT(repo[[instance_name]]$OtherData$teams[,c('team', 'type')])
+  teams = repo[[instance_name]]$CoreData$teams[,.(team, type)]
   teams = merge(teams, rates, by = c('team'), all = T)
   teams = as.data.frame(teams)
   
@@ -2048,7 +2048,7 @@ plot_dot_qor_subscales_old = function(instance_name, team_name, export = F) {
 
 plot_qor_subscales = function(instance_name, team_name, export = F) {
   
-  rates = repo[[instance_name]]$OtherData$rates
+  rates = repo[[instance_name]]$CoreData$rates
   rates = rates[!is.na(c1) & team != 'Calibration_team', .(problem, team,
                                                            c1, c2, c3, c4, c5, c6, c7, c8)]
   rates = rates[team != 'tongariro00311*']
@@ -2063,7 +2063,7 @@ plot_qor_subscales = function(instance_name, team_name, export = F) {
   
   rates = rates[, lapply(.SD, mean), by = c('team', 'problem'), .SDcols = paste0('c',1:8)]
   
-  teams = setDT(repo[[instance_name]]$OtherData$teams[,c('team', 'type')])
+  teams = repo[[instance_name]]$CoreData$teams[,.(team, type)]
   teams = merge(teams, rates, by = c('team'), all = T)
   teams = melt(teams, id.vars = c('team', 'type', 'problem'))
   teams = as.data.frame(teams)
@@ -2146,8 +2146,8 @@ plot_qor_subscales = function(instance_name, team_name, export = F) {
 
 plot_dot_geolocation = function(instance_name, team_name, export = F) {
   
-  probteams = repo[[instance_name]]$OtherData$probteams
-  probteams = probteams[!is.na(probteams$avgODNI) & !is.na(probteams$nGeoCorrect),]
+  probteams = as.data.frame(repo[[instance_name]]$CoreData$probteams)
+  probteams = probteams[!is.na(probteams$avgIC) & !is.na(probteams$nGeoCorrect),]
   probteams[probteams$team == team_name,]$type = "Your Team"
   
   p = ggplot(probteams, aes(nGeoCorrect)) +
@@ -2233,8 +2233,8 @@ plot_dot_geolocation = function(instance_name, team_name, export = F) {
 
 plot_dot_probability = function(instance_name, team_name, export = F) {
   
-  probteams = repo[[instance_name]]$OtherData$probteams
-  probteams = probteams[!is.na(probteams$avgODNI) & !is.na(probteams$probabilityEstimate),]
+  probteams = as.data.frame(repo[[instance_name]]$CoreData$probteams)
+  probteams = probteams[!is.na(probteams$avgIC) & !is.na(probteams$probabilityEstimate),]
   probteams[probteams$team == team_name,]$type = "Your Team"
   
   p = ggplot(probteams, aes(probabilityEstimate)) +
@@ -2320,8 +2320,8 @@ plot_dot_probability = function(instance_name, team_name, export = F) {
 
 plot_dot_brier = function(instance_name, team_name, export = F) {
   
-  probteams = repo[[instance_name]]$OtherData$probteams
-  probteams = probteams[!is.na(probteams$avgODNI) & !is.na(probteams$probabilityEstimate),]
+  probteams = as.data.frame(repo[[instance_name]]$CoreData$probteams)
+  probteams = probteams[!is.na(probteams$avgIC) & !is.na(probteams$probabilityEstimate),]
   probteams[probteams$team == team_name,]$type = "Your Team"
   
   probteams$brier = probteams$probabilityEstimate^2
@@ -2410,8 +2410,8 @@ plot_dot_brier = function(instance_name, team_name, export = F) {
 
 plot_dot_tightness = function(instance_name, team_name, export = F) {
   
-  probteams = repo[[instance_name]]$OtherData$probteams
-  probteams = probteams[!is.na(probteams$avgODNI) & !is.na(probteams$tightness),]
+  probteams = as.data.frame(repo[[instance_name]]$CoreData$probteams)
+  probteams = probteams[!is.na(probteams$avgIC) & !is.na(probteams$tightness),]
   probteams[probteams$team == team_name,]$type = "Your Team"
   
   p = ggplot(probteams, aes(tightness)) +
@@ -2497,16 +2497,16 @@ plot_dot_tightness = function(instance_name, team_name, export = F) {
 
 plot_dot_aggregated_performance_old = function(instance_name, team_name, export = F) {
   
-  probteams = repo[[instance_name]]$OtherData$probteams
-  probteams = probteams[!is.na(probteams$avgODNI),]
+  probteams = as.data.frame(repo[[instance_name]]$CoreData$probteams)
+  probteams = probteams[!is.na(probteams$avgIC),]
   
   tmqor = data.frame(
     team = unique(probteams$team),
     type = NA,
-    avgODNIp1 = NA,
-    avgODNIp2 = NA,
-    avgODNIp3 = NA,
-    avgODNIp4 = NA,
+    avgICp1 = NA,
+    avgICp2 = NA,
+    avgICp3 = NA,
+    avgICp4 = NA,
     brier = NA,
     tightness = NA,
     nGeoCorrect = NA,
@@ -2516,10 +2516,10 @@ plot_dot_aggregated_performance_old = function(instance_name, team_name, export 
   for (k in 1:nrow(tmqor)) {
     tm = tmqor$team[k]
     tmqor$type[k] = probteams[probteams$team == tm,]$type[1]
-    tmqor$avgODNIp1[k] = probteams[probteams$team == tm & probteams$problem == 'Foreign Fighters',]$avgODNI[1]
-    tmqor$avgODNIp2[k] = probteams[probteams$team == tm & probteams$problem == 'Forecasting Piracy',]$avgODNI[1]
-    tmqor$avgODNIp3[k] = probteams[probteams$team == tm & probteams$problem == 'Corporate Espionage',]$avgODNI[1]
-    tmqor$avgODNIp4[k] = probteams[probteams$team == tm & probteams$problem == 'The Park Young-min Case',]$avgODNI[1]
+    tmqor$avgICp1[k] = probteams[probteams$team == tm & probteams$problem == 'Foreign Fighters',]$avgIC[1]
+    tmqor$avgICp2[k] = probteams[probteams$team == tm & probteams$problem == 'Forecasting Piracy',]$avgIC[1]
+    tmqor$avgICp3[k] = probteams[probteams$team == tm & probteams$problem == 'Corporate Espionage',]$avgIC[1]
+    tmqor$avgICp4[k] = probteams[probteams$team == tm & probteams$problem == 'The Park Young-min Case',]$avgIC[1]
     tmqor$brier[k] = (probteams[probteams$team == tm & probteams$problem == 'Forecasting Piracy',]$probabilityEstimate[1])^2
     tmqor$tightness[k] = probteams[probteams$team == tm & probteams$problem == 'Forecasting Piracy',]$tightness[1]
     tmqor$nGeoCorrect[k] = probteams[probteams$team == tm & probteams$problem == 'Foreign Fighters',]$nGeoCorrect[1]
@@ -2631,7 +2631,7 @@ plot_dot_aggregated_performance_old = function(instance_name, team_name, export 
   p = (p/pc) + plot_layout(guides = "keep") +
     plot_annotation(
       title = 'AGGREGATED CHALLENGE PERFORMANCE',
-      subtitle = 'Dot plot of aggregated performance scores for each team across the whole challenge. For each team,\nthe score is calculated by averaging the rescaled reversed rank of that team in each of the applicable\nperformance measures: ODNI rating scale for each of the problems, number of correct geolocation\nchallenges, forecast Brier score, tightness, number of correct Bayesian problems and number of\nreasoning flaws correctly detected. Your teams\' score is indicated in red.',
+      subtitle = 'Dot plot of aggregated performance scores for each team across the whole challenge. For each team,\nthe score is calculated by averaging the rescaled reversed rank of that team in each of the applicable\nperformance measures: IC rating scale for each of the problems, number of correct geolocation\nchallenges, forecast Brier score, tightness, number of correct Bayesian problems and number of\nreasoning flaws correctly detected. Your teams\' score is indicated in red.',
       theme = theme(plot.margin = margin(11, 10, 10, 10, "pt"),
                     plot.background = element_rect(fill = "#f6f6f6"),
                     plot.title = element_text(face = "bold",
@@ -2650,16 +2650,16 @@ plot_dot_aggregated_performance_old = function(instance_name, team_name, export 
 
 plot_dot_aggregated_performance = function(instance_name, team_name, export = F) {
   
-  probteams = repo[[instance_name]]$OtherData$probteams
-  probteams = probteams[!is.na(probteams$avgODNI),]
+  probteams = as.data.frame(repo[[instance_name]]$CoreData$probteams)
+  probteams = probteams[!is.na(probteams$avgIC),]
   
   tmqor = data.frame(
     team = unique(probteams$team),
     type = NA,
-    avgODNIp1 = NA,
-    avgODNIp2 = NA,
-    avgODNIp3 = NA,
-    avgODNIp4 = NA,
+    avgICp1 = NA,
+    avgICp2 = NA,
+    avgICp3 = NA,
+    avgICp4 = NA,
     brier = NA,
     tightness = NA,
     nGeoCorrect = NA,
@@ -2669,10 +2669,10 @@ plot_dot_aggregated_performance = function(instance_name, team_name, export = F)
   for (k in 1:nrow(tmqor)) {
     tm = tmqor$team[k]
     tmqor$type[k] = probteams[probteams$team == tm,]$type[1]
-    tmqor$avgODNIp1[k] = probteams[probteams$team == tm & probteams$problem == 'Foreign Fighters',]$avgODNI[1]
-    tmqor$avgODNIp2[k] = probteams[probteams$team == tm & probteams$problem == 'Forecasting Piracy',]$avgODNI[1]
-    tmqor$avgODNIp3[k] = probteams[probteams$team == tm & probteams$problem == 'Corporate Espionage',]$avgODNI[1]
-    tmqor$avgODNIp4[k] = probteams[probteams$team == tm & probteams$problem == 'The Park Young-min Case',]$avgODNI[1]
+    tmqor$avgICp1[k] = probteams[probteams$team == tm & probteams$problem == 'Foreign Fighters',]$avgIC[1]
+    tmqor$avgICp2[k] = probteams[probteams$team == tm & probteams$problem == 'Forecasting Piracy',]$avgIC[1]
+    tmqor$avgICp3[k] = probteams[probteams$team == tm & probteams$problem == 'Corporate Espionage',]$avgIC[1]
+    tmqor$avgICp4[k] = probteams[probteams$team == tm & probteams$problem == 'The Park Young-min Case',]$avgIC[1]
     tmqor$brier[k] = (probteams[probteams$team == tm & probteams$problem == 'Forecasting Piracy',]$probabilityEstimate[1])^2
     tmqor$tightness[k] = probteams[probteams$team == tm & probteams$problem == 'Forecasting Piracy',]$tightness[1]
     tmqor$nGeoCorrect[k] = probteams[probteams$team == tm & probteams$problem == 'Foreign Fighters',]$nGeoCorrect[1]
@@ -2804,9 +2804,9 @@ plot_dot_aggregated_performance = function(instance_name, team_name, export = F)
 
 plot_redaction_estimates = function(instance_name, team_name, export = F) {
 
-  probteams = repo[[instance_name]]$OtherData$probteams
-  teams = repo[[instance_name]]$OtherData$teams
-  ratings = repo[[instance_name]]$OtherData$rates
+  probteams = as.data.frame(repo[[instance_name]]$CoreData$probteams)
+  teams = as.data.frame(repo[[instance_name]]$CoreData$teams)
+  ratings = repo[[instance_name]]$CoreData$rates
   
   R = ratings[isRedactionTestRating == "Yes",
                 .(problem,
@@ -2906,8 +2906,8 @@ plot_redaction_estimates = function(instance_name, team_name, export = F) {
 
 plot_dot_bayes = function(instance_name, team_name, export = F) {
   
-  probteams = repo[[instance_name]]$OtherData$probteams
-  probteams = probteams[!is.na(probteams$avgODNI) & !is.na(probteams$nBayesCorrect),]
+  probteams = as.data.frame(repo[[instance_name]]$CoreData$probteams)
+  probteams = probteams[!is.na(probteams$avgIC) & !is.na(probteams$nBayesCorrect),]
   if (team_name %in% probteams$team) {
     probteams[probteams$team == team_name,]$type = "Your Team"
   }
@@ -3001,8 +3001,8 @@ plot_dot_bayes = function(instance_name, team_name, export = F) {
 
 plot_dot_flawdetection = function(instance_name, team_name, export = F) {
   
-  probteams = repo[[instance_name]]$OtherData$probteams
-  probteams = probteams[!is.na(probteams$avgODNI) & !is.na(probteams$nFlawsDetected),]
+  probteams = as.data.frame(repo[[instance_name]]$CoreData$probteams)
+  probteams = probteams[!is.na(probteams$avgIC) & !is.na(probteams$nFlawsDetected),]
   if (team_name %in% probteams$team) {
     probteams[probteams$team == team_name,]$type = "Your Team"
   }
@@ -3153,7 +3153,7 @@ plot_user_engagement = function(instance_name, team_name, export = F) {
                           simple_rating,
                           partial_rating,
                           complete_rating,
-                          engagement_normed
+                          engagement_scaled
                           )]
   
   analytics = analytics[,`:=`(
@@ -3188,7 +3188,7 @@ plot_user_engagement = function(instance_name, team_name, export = F) {
     complete_rating,
     quick_rating,
     vote,
-    engagement_normed
+    engagement_scaled
   )]
   
   prbs = c(
@@ -3197,12 +3197,12 @@ plot_user_engagement = function(instance_name, team_name, export = F) {
     'Corporate Espionage',
     'The Park Young-min Case'
   )
-  A = analytics[, engagement:=sum(engagement_normed), by = c('user')]
+  A = analytics[, engagement:=sum(engagement_scaled), by = c('user')]
   usrs = unique(A[order(-engagement)]$user)
   
   analytics = melt(analytics,
                    id.vars = c('user','problem'))
-  analytics = analytics[variable != 'engagement_normed']
+  analytics = analytics[variable != 'engagement_scaled']
   analytics = analytics[variable != 'engagement']
   
   analytics$raw = NA
@@ -3217,7 +3217,7 @@ plot_user_engagement = function(instance_name, team_name, export = F) {
   
   analytics$nonZero = (analytics$raw > 0)
   
-  probparts = repo[[instance_name]]$OtherData$probparts
+  probparts = repo[[instance_name]]$CoreData$probparts
   probparts = probparts[team == team_name & problem %in% prbs,
                         .(user,
                           problem,
@@ -3340,7 +3340,7 @@ plot_cluster_stripchart = function(instance_name, team_name, export = F) {
   
   for (nm in names(repo)) {
     analytics = repo[[nm]]$PlatformData$analytics
-    probteams = repo[[nm]]$OtherData$probteams
+    probteams = as.data.frame(repo[[nm]]$CoreData$probteams)
     
     analytics$probteam = paste0(analytics$team, analytics$problem)
     probteams$probteam = paste0(probteams$team, probteams$problem)
@@ -3503,8 +3503,8 @@ plot_cluster_stripchart = function(instance_name, team_name, export = F) {
 
 plot_bar_expectations = function(instance_name, team_name, export = F) {
   
-  parts = repo[[instance_name]]$OtherData$parts
-  # teamparts = repo[[instance_name]]$OtherData$teamparts
+  parts = as.data.frame(repo[[instance_name]]$CoreData$parts)
+  # teamparts = as.data.frame(repo[[instance_name]]$CoreData$teamparts)
   # parts = merge(parts, teamparts, by = c('user'), all.y = T)
   parts = parts[!is.na(parts$exExpct1), c('user','isOrg',paste0('exExpct',1:10))]
   
@@ -3635,8 +3635,8 @@ plot_bar_expectations = function(instance_name, team_name, export = F) {
 
 plot_bar_capabilities = function(instance_name, team_name, export = F) {
   
-  parts = repo[[instance_name]]$OtherData$parts
-  # teamparts = repo[[instance_name]]$OtherData$teamparts
+  parts = as.data.frame(repo[[instance_name]]$CoreData$parts)
+  # teamparts = as.data.frame(repo[[instance_name]]$CoreData$teamparts)
   # parts = merge(parts, teamparts, by = c('user'), all.y = T)
   parts = parts[!is.na(parts$exExpct1), c('user','isOrg',paste0('exCap',1:7))]
   
@@ -3700,8 +3700,8 @@ plot_bar_capabilities = function(instance_name, team_name, export = F) {
 
 plot_bar_platform = function(instance_name, team_name, export = F) {
   
-  parts = repo[[instance_name]]$OtherData$parts
-  # teamparts = repo[[instance_name]]$OtherData$teamparts
+  parts = as.data.frame(repo[[instance_name]]$CoreData$parts)
+  # teamparts = as.data.frame(repo[[instance_name]]$CoreData$teamparts)
   # parts = merge(parts, teamparts, by = c('user'), all.y = T)
   parts = parts[!is.na(parts$exExpct1), c('user','isOrg',paste0('pf',1:14))]
   
@@ -3774,8 +3774,8 @@ plot_bar_challenge = function(instance_name, team_name, export = F) {
   
   qs = paste0('cha',1:3)
   
-  parts = repo[[instance_name]]$OtherData$parts
-  # teamparts = repo[[instance_name]]$OtherData$teamparts
+  parts = as.data.frame(repo[[instance_name]]$CoreData$parts)
+  # teamparts = as.data.frame(repo[[instance_name]]$CoreData$teamparts)
   # parts = merge(parts, teamparts, by = c('user'), all.y = T)
   parts = parts[!is.na(parts$exExpct1), c('user','isOrg',qs)]
   
@@ -3838,8 +3838,8 @@ plot_bar_CA = function(instance_name, team_name, export = F) {
   
   qs = paste0('ca',1:4)
   
-  parts = repo[[instance_name]]$OtherData$parts
-  # teamparts = repo[[instance_name]]$OtherData$teamparts
+  parts = as.data.frame(repo[[instance_name]]$CoreData$parts)
+  # teamparts = as.data.frame(repo[[instance_name]]$CoreData$teamparts)
   # parts = merge(parts, teamparts, by = c('user'), all.y = T)
   parts = parts[!is.na(parts$exExpct1), c('user','isOrg',qs)]
   
@@ -3902,8 +3902,8 @@ plot_bar_swarm = function(instance_name, team_name, export = F) {
   
   qs = paste0('swarm',1:4)
   
-  parts = repo[[instance_name]]$OtherData$parts
-  # teamparts = repo[[instance_name]]$OtherData$teamparts
+  parts = as.data.frame(repo[[instance_name]]$CoreData$parts)
+  # teamparts = as.data.frame(repo[[instance_name]]$CoreData$teamparts)
   # parts = merge(parts, teamparts, by = c('user'), all.y = T)
   parts = parts[!is.na(parts$exExpct1), c('user','isOrg',qs)]
   
@@ -3967,12 +3967,12 @@ plot_bar_swarm = function(instance_name, team_name, export = F) {
 
 plot_qor_boxplot = function(instance_name, team_name, export = F) {
   
-  probteams = repo[[instance_name]]$OtherData$probteams
-  probteams = probteams[!is.na(probteams$avgODNI),]
+  probteams = as.data.frame(repo[[instance_name]]$CoreData$probteams)
+  probteams = probteams[!is.na(probteams$avgIC),]
   probteams$phase = 'Problems 1 & 2'
   probteams[probteams$probNum > 2,]$phase = 'Problems 3 & 4'
   
-  p = ggplot(probteams, aes(x = type, y = avgODNI, col = type)) +
+  p = ggplot(probteams, aes(x = type, y = avgIC, col = type)) +
     geom_boxplot(alpha = .8) + ylim(8,32) +
     facet_wrap(vars(phase),
                scales = 'free_x') +

@@ -3,16 +3,24 @@
 \name{probteams}
 \alias{probteams}
 \title{probteams}
-\format{A data frame with 53940 rows and 10 variables:
+\format{
 \describe{
-  \item{price}{price, in US dollars}
-  \item{carat}{weight of the diamond, in carats}
-  ...
-}}
-\source{
-\url{http://www.diamondse.info/}
+  \item{team}{Team name.}
+  \item{problem}{Problem title.}
+  \item{probNum}{Position of the problem in the sequence of problems attempted by this team in this exercise.}
+  \item{type}{Team type. PT = Public Team; ST = Superteam; OT = Organisational Team;}
+  \item{avgIC}{Quality of reasoning score on the IC Rating Scale for the team’s top report. This is usually the average of independent ratings by at least 3 external raters.}
+  \item{nIC}{Number of external raters who independently rated the report on the IC Rating Scale.}
+  \item{rankIC}{The teams rank on this problem, when all teams who submitted a report for the problem are ranked from best to worst by avgIC. If there are ties, all tied teams receive the best (lowest integer) rank applicable.}
+  \item{nGeoCorrect}{Number of geolocation challenges successfully solved (if applicable to the problem).}
+  \item{probabilityEstimate}{The team’s probability estimate as stated in their top-rated report (if applicable to the problem).}
+  \item{tightness}{The score on a tightness redaction test for the team’s top-rated report (if applicable to the problem).}
+  \item{nBayesCorrect}{Number of Bayesian probability puzzles correctly solved (if applicable to the problem).}
+  \item{nFlawsDetected}{Number or reasoning flaws correctly detected (if applicable to the problem).}
+  \item{activeUsersSq}{Square of the number of users who had a (strictly) positive engagement score (according to the probparts table).}
+  \item{textSim}{Average pairwise cosine test similarity between all responses of type ‘report’ created by the team on the platform for this problem. Higher values indicate more similar reports. If there were no reports or only 1 report, textSim = 1.}
+}
 }
 \description{
-A dataset containing the prices and other attributes of almost 54,000
-diamonds.
+One row per team-problem pairing (instance of a team attempting a problem), with related attributes.
 }
