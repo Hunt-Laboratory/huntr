@@ -1,15 +1,28 @@
 # huntr
 
-R package for all data wrangling and graphs required by the Hunt Laboratory for Intelligence Research at The University of Melbourne.
+This repository is an R package that contains:
 
-To install this package, use the following line of code in R.
+- tidy data from Hunt Lab experiments
+- documentation for the included datasets
+- functions and scripts used to maintain the more comprehensive [experiment-data](https://github.com/Hunt-Laboratory/experiment-data) repository
+
+The huntr package is the quickest and easiest way to get most experiment data into R.
+
+## How to use this package
+
+To install the huntr package, use the following line of code in R.
 
 ```R
 devtools::install_github("Hunt-Laboratory/huntr")
 ```
 
-Most useful data from the 2018 and 2020 challenges are stored in the `repo` object, with many statistics pre-computed. Documentation is on its way.
+Tidy data from each experiment is stored in a list called `repo`. The `repo` list follows the following heirarchical structure.
 
-The easiest way to extract a particular table from the `repo` object is illustrated in the following GIF.
+- repo
+	- <experiment_label>
+		- <folder_name>
+			- <table_name>
+
+The easiest way to extract a particular table from the `repo` object is to use RStudio's suggested autocomplete functionality, as illustrated in the following GIF.
 
 ![Example for repo object](/static/repo-example.gif)
