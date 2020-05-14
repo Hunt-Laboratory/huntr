@@ -1,3 +1,5 @@
+![Facade of arts building on Parkville Campus](/static/arts.jpg)
+
 # huntr
 
 This repository is an R package that contains:
