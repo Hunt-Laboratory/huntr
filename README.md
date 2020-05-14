@@ -8,6 +8,8 @@ This repository is an R package that contains:
 
 The huntr package is the quickest and easiest way to get most experiment data into R.
 
+**None of the data in this package contains personally identifiable information (PII).**
+
 ## How to use this package
 
 To install the huntr package, use the following line of code in R (you will need to have the `devtools` package already installed).
