@@ -113,26 +113,26 @@ Note-2: Timestamps are in UTC with a format of YYYY-MM-DD HH:MM:SS",
 
 
 #' @export
-export_repo_to_CSV = function(path = 'experiment-data') {
+export_repo_to_CSV = function(repo, data_version, path = 'experiment-data') {
     
     instances = names(repo)
     
     for (inst in instances) {
         
         dir.create(file.path(path, inst), showWarnings = F)
-        dir.create(file.path(path, inst, 'tidy'), showWarnings = F)
+        dir.create(file.path(path, inst, data_version), showWarnings = F)
         folders = names(repo[[inst]])
         
         for (fldr in folders) {
             
-            dir.create(file.path(path, inst, 'tidy', fldr), showWarnings = F)
+            dir.create(file.path(path, inst, data_version, fldr), showWarnings = F)
             tables = names(repo[[inst]][[fldr]])
             
             for (tbl in tables) {
                 
-                dir.create(file.path(path, inst, 'tidy', fldr, tbl), showWarnings = F)
+                dir.create(file.path(path, inst, data_version, fldr, tbl), showWarnings = F)
                 write.csv(repo[[inst]][[fldr]][[tbl]],
-                          file = paste0(file.path(path, inst, 'tidy', fldr, tbl), '/', tbl, '.csv'),
+                          file = paste0(file.path(path, inst, data_version, fldr, tbl), '/', tbl, '.csv'),
                           row.names = F)
                 
             }

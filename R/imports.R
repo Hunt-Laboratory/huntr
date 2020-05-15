@@ -2543,6 +2543,57 @@ compile_data = function(path = "data/") {
         )
     }
     
+    # Save copy of 'tidy' repo version to experiment-data repository.
+    export_repo_to_CSV(repo, 'tidy')
+    
+    # Remove columns that contain free-text user input.
+    user_input_cols = c(
+        "interestsOtherInput",
+        "priOtherInput",
+        "multidisciplinaryExperienceInput",
+        "describeAnalyticalExperience",
+        "bestThing",
+        "worstThing",
+        "pfComments",
+        "mostValuable",
+        "lkSuggestions",
+        "ratingToolWhyNot",
+        "featureRequests",
+        "externalToolsComments",
+        "bestQuestionNotAsked",
+        "testimonial",
+        "otherComments",
+        "chat_text",
+        "response_title"
+    )
+    for (instance_name in instances) {
+        fldrs = names(repo[[instance_name]])
+        for (fldr in fldrs) {
+            tbls = names(repo[[instance_name]][[fldr]])
+            for (tbl in tbls) {
+                cols = names(repo[[instance_name]][[fldr]][[tbl]])
+                for (user_input_col in user_input_cols) {
+                    if (user_input_col %in% cols) {
+                        repo[[instance_name]][[fldr]][[tbl]][[user_input_col]] = NULL
+                    }
+                }
+            }
+        }
+    }
+    
+    # Anonymise real names of raters.
+    for (instance_name in instances) {
+        if ('rates' %in% names(repo[[instance_name]]$CoreData)) {
+            rates = repo[[instance_name]]$CoreData$rates
+            rates$rater = as.integer(factor(rates$rater))
+            repo[[instance_name]]$CoreData$rates$rater = rates$rater
+        }
+    }
+    
+    
+    # Save 'noPII' repo version to experiment-data repository.
+    export_repo_to_CSV(repo, 'noPII')
+    
     # Save compiled data to package, tidy environment, and reload the package.
     save(repo,
          file="huntr/data/repo.RData")
