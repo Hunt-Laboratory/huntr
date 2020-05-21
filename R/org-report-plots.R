@@ -48,12 +48,12 @@ generate_feedback_plots = function(instance_name) {
     # plot_qor_nBayesCorrect(instance_name, team_name, export = T)
     # plot_qor_nFlawsDetected(instance_name, team_name, export = T)
     # plot_dot_qor(instance_name, team_name, export = T)
-    plot_qor_subscales(instance_name, team_name, export = T)
+    # plot_qor_subscales(instance_name, team_name, export = T)
     # plot_dot_aggregated_performance(instance_name, team_name, export = T)
     # plot_dot_engagement(instance_name, team_name, export = T)
     # plot_dot_engagement_user(instance_name, team_name, export = T)
     # plot_dot_geolocation(instance_name, team_name, export = T)
-    # plot_dot_probability(instance_name, team_name, export = T)
+    plot_dot_probability(instance_name, team_name, export = T)
     # plot_dot_brier(instance_name, team_name, export = T)
     # plot_redaction_estimates(instance_name, team_name, export = T)
     # plot_dot_tightness(instance_name, team_name, export = T)
@@ -2258,8 +2258,12 @@ plot_dot_probability = function(instance_name, team_name, export = F) {
     scale_y_continuous(NULL, breaks = NULL, limits = c(0, 0.25)) +
     scale_x_continuous(breaks = c(0,.2,.4,.6,.8,1),
                        limits = c(0,1)) +
-    scale_fill_manual(breaks = c("PT","ST","OT","Your Team"),
-                        values = c("#00a087", "#f9a825", "#3c5488", "#e64b35")) +
+    # scale_fill_manual(breaks = c("PT","ST","OT","Your Team"),
+    #                     values = c("#00a087", "#f9a825", "#3c5488", "#e64b35")) +
+    scale_fill_manual(breaks = c("OT","PT","ST"),
+                      values = c("#3c5488", "#e64b35", "#4caf50"),
+                      labels = c("Org Team", "Public Team", "Super Team"),
+                      drop = T) +
     labs(x = NULL,
          y = NULL,
          fill = "Type") +
@@ -2313,7 +2317,7 @@ plot_dot_probability = function(instance_name, team_name, export = F) {
   p = p + plot_layout(guides = "keep") +
     plot_annotation(
       title = 'DISTRIBUTION OF REPORT PROBABILITIES',
-      subtitle = 'Dot plot of estimated probabilities in team reports. Your teams\' estimate is indicated in red.',
+      subtitle = 'Dot plot of estimated probabilities in team reports. You teams\' estimate is in red',
       theme = theme(plot.margin = margin(11, 10, 10, 10, "pt"),
                     plot.background = element_rect(fill = "#f6f6f6"),
                     plot.title = element_text(face = "bold",

@@ -684,6 +684,8 @@ compile_parts_2020_HuntChallenge = function(path_to_data, instance_name) {
     exitSurveyPub = exitSurveyPub[3:nrow(exitSurveyPub)]
     exitSurveyOrg = exitSurveyOrg[3:nrow(exitSurveyOrg)]
     
+    exitSurveyPub = exitSurveyPub[,1:101]
+    
     colnames(entrySurveyPub) <- c("startDate",
                                   "endDate",
                                   "status",
