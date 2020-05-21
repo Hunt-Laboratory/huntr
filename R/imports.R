@@ -2503,7 +2503,9 @@ compile_rates = function(repo, path_to_data, instance_name) {
 #' # (re-)compile data
 #' compile_data()
 #' }
-compile_data = function(path = "data/") {
+compile_data = function(path = "data/",
+                        use_previous_redactions = TRUE,
+                        redaction_patterns = c()) {
     
     require(dplyr)
     require(data.table)
@@ -2543,6 +2545,36 @@ compile_data = function(path = "data/") {
         )
     }
     
+    if (use_previous_redactions) {
+        repo = apply_previous_redactions(
+            repo,
+            instances = c('2020_HuntChallenge'),
+            path = 'experiment-data'
+        )
+    } else {
+        patterns = c(redaction_patterns,
+                 'phone number', 'my number is',
+                 "[[:alnum:]._-]+@[[:alnum:].-]+", # basic regex for email addresses
+                 "(^| |\\+)[0-9]{3,}( |-)[0-9]{3}( |-)[0-9]{3}( |$)"    # basic regex for phone numbers
+                 )
+        repo = run_PII_redaction_session(
+            repo,
+            patterns,
+            c('2020_HuntChallenge'),
+            path = 'experiment-data'
+        )
+    }
+    
+    
+    # Anonymise real names of raters.
+    for (instance_name in instances) {
+        if ('rates' %in% names(repo[[instance_name]]$CoreData)) {
+            rates = repo[[instance_name]]$CoreData$rates
+            rates$rater = as.integer(factor(rates$rater))
+            repo[[instance_name]]$CoreData$rates$rater = rates$rater
+        }
+    }
+    
     # Save copy of 'tidy' repo version to experiment-data repository.
     export_repo_to_CSV(repo, 'tidy')
     
@@ -2580,16 +2612,6 @@ compile_data = function(path = "data/") {
             }
         }
     }
-    
-    # Anonymise real names of raters.
-    for (instance_name in instances) {
-        if ('rates' %in% names(repo[[instance_name]]$CoreData)) {
-            rates = repo[[instance_name]]$CoreData$rates
-            rates$rater = as.integer(factor(rates$rater))
-            repo[[instance_name]]$CoreData$rates$rater = rates$rater
-        }
-    }
-    
     
     # Save 'noPII' repo version to experiment-data repository.
     export_repo_to_CSV(repo, 'noPII')

@@ -4,7 +4,7 @@
 
 This repository is an R package that contains:
 
-- tidy data from Hunt Lab experiments
+- tidy data from Hunt Lab experiments (the 'noPII data' from the [experiment-data](https://github.com/Hunt-Laboratory/experiment-data) repository)
 - documentation for the included datasets
 - functions and scripts used to maintain the more comprehensive [experiment-data](https://github.com/Hunt-Laboratory/experiment-data) repository
 

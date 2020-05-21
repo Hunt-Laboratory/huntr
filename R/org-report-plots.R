@@ -22,11 +22,13 @@
 #' generate_feedback_plots('2020_HuntChallenge')
 #' }
 generate_feedback_plots = function(instance_name) {
-    
+  
+  library(ggpubr)
+  
   teams = as.data.frame(repo[[instance_name]]$CoreData$teams)
   teams = as.character(teams[teams$type == 'OT',]$team)
   
-  for (team_name in teams) {
+  for (team_name in teams[1]) {
     message(team_name)
     # plots_demographic(instance_name, team_name, export = T)
     # plot_slopegraph(instance_name, team_name, export = T)
@@ -46,7 +48,7 @@ generate_feedback_plots = function(instance_name) {
     # plot_qor_nBayesCorrect(instance_name, team_name, export = T)
     # plot_qor_nFlawsDetected(instance_name, team_name, export = T)
     # plot_dot_qor(instance_name, team_name, export = T)
-    # plot_qor_subscales(instance_name, team_name, export = T)
+    plot_qor_subscales(instance_name, team_name, export = T)
     # plot_dot_aggregated_performance(instance_name, team_name, export = T)
     # plot_dot_engagement(instance_name, team_name, export = T)
     # plot_dot_engagement_user(instance_name, team_name, export = T)
@@ -56,7 +58,7 @@ generate_feedback_plots = function(instance_name) {
     # plot_redaction_estimates(instance_name, team_name, export = T)
     # plot_dot_tightness(instance_name, team_name, export = T)
     # plot_dot_bayes(instance_name, team_name, export = T)
-    plot_dot_flawdetection(instance_name, team_name, export = T)
+    # plot_dot_flawdetection(instance_name, team_name, export = T)
     # # plot_cluster_stripchart(instance_name, team_name, e xport = T)
     # plot_user_engagement(instance_name, team_name, export = T)
     # plot_bar_expectations(instance_name, team_name, export = T)
@@ -2071,6 +2073,8 @@ plot_qor_subscales = function(instance_name, team_name, export = F) {
   teams$type = factor(teams$type, levels = c('PT','ST','OT','Your Team'))
   teams$variable = factor(teams$variable, levels = paste0('c', 8:1))
   
+  # teams = teams[teams$problem == 'Forcasting Piracy',]
+  
   criteriaDescriptions = c(
     '(1) Describes sources,\ndata, methodologies',
     '(2) Expresses and\nexplains uncertainties',
@@ -2102,10 +2106,18 @@ plot_qor_subscales = function(instance_name, team_name, export = F) {
               height = .5) +
     scale_colour_manual(breaks = c("PT","ST","OT","Your Team"),
                       values = c("#00a087", "#f9a825", "#3c5488", "#e64b35"),
-                      drop = F) +
+                      drop = T) +
     scale_fill_manual(breaks = c("PT","ST","OT","Your Team"),
                         values = c("#00a087", "#f9a825", "#3c5488", "#e64b35"),
-                        drop = F) +
+                        drop = T) +
+    # scale_colour_manual(breaks = c("OT","PT","ST"),
+    #                     values = c("#3c5488", "#e64b35", "#4caf50"),
+    #                     labels = c("Org Team", "Public Team", "Super Team"),
+    #                     drop = T) +
+    # scale_fill_manual(breaks = c("OT","PT","ST"),
+    #                   values = c("#3c5488", "#e64b35", "#4caf50"),
+    #                   labels = c("Org Team", "Public Team", "Super Team"),
+    #                   drop = T) +
     scale_y_discrete(breaks = paste0('c', 1:8),
                      labels = criteriaDescriptions) +
     scale_x_continuous(breaks = 1:4,
