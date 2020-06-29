@@ -1606,6 +1606,7 @@ compile_teamparts_2018_SwarmChallengeExp1 = function(repo, path_to_data, instanc
 
     # Populate team.
     lookup = fread(paste0(path_to_data, instance_name, '/AdminData/match_ind_diffs_response_to_swarm_username.csv'))
+    lookup$username = tolower(lookup$username)
     for (k in 1:nrow(tmprt)) {
         if (tmprt$user[k] %in% lookup$username) {
             i = which(lookup$username == tmprt$user[k])
@@ -1641,6 +1642,10 @@ compile_teamparts_2020_HuntChallenge = function(repo, path_to_data, instance_nam
         team = group_code
     )]
     orgLookup = orgLookup[,user:team]
+    
+    orgLookup$user = tolower(orgLookup$user)
+    pubLookup$user = tolower(pubLookup$user)
+    supLookup$user = tolower(supLookup$user)
     
     pubLookup = pubLookup[user %in% parts$user]
     supLookup = supLookup[user %in% parts$user]
