@@ -158,12 +158,12 @@ score_likert_scale = function(my_df, scale_col_names, scale_maxes, scale_reverse
     mask = mapply(reverse_score_column, 
                   my_df[, scale_col_names], 
                   scale_maxes, scale_reverses)
-    final_score = rowSums(mask, na.rm = TRUE)
+    final_score = rowSums(mask)
     return(final_score)
 }
 
 computeAOMT = function(dt) {
-    aomt_colnames = grep("aomt", names(dt), value=T, fixed=T)
+    aomt_colnames = paste0('aomt', 1:11)
     aomt_max_vec = rep(7, length(aomt_colnames))
     aomt_reverse_vec <- c(FALSE, FALSE, FALSE, TRUE, TRUE, TRUE, TRUE, FALSE, TRUE, FALSE, FALSE)
     dt$aomt = score_likert_scale(dt,
