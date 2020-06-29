@@ -53,13 +53,13 @@ generate_feedback_plots = function(instance_name) {
     # plot_dot_engagement(instance_name, team_name, export = T)
     # plot_dot_engagement_user(instance_name, team_name, export = T)
     # plot_dot_geolocation(instance_name, team_name, export = T)
-    plot_dot_probability(instance_name, team_name, export = T)
+    # plot_dot_probability(instance_name, team_name, export = T)
     # plot_dot_brier(instance_name, team_name, export = T)
     # plot_redaction_estimates(instance_name, team_name, export = T)
     # plot_dot_tightness(instance_name, team_name, export = T)
     # plot_dot_bayes(instance_name, team_name, export = T)
     # plot_dot_flawdetection(instance_name, team_name, export = T)
-    # # plot_cluster_stripchart(instance_name, team_name, e xport = T)
+    plot_cluster_stripchart(instance_name, team_name, export = T)
     # plot_user_engagement(instance_name, team_name, export = T)
     # plot_bar_expectations(instance_name, team_name, export = T)
     # plot_bar_capabilities(instance_name, team_name, export = T)
@@ -3372,7 +3372,7 @@ plot_cluster_stripchart = function(instance_name, team_name, export = F) {
   
   # Select contributions for each user instance.
   anal = anal %>%
-    select(team, problem, user, report_count, resource_count, comment_count, vote_count,
+    dplyr::select(team, problem, user, report_count, resource_count, comment_count, vote_count,
            quick_rating, complete_rating, chat_count)
   
   # Remove outliers: artificially capping chat counts to 100 so they don't cause outliers.
@@ -3399,18 +3399,18 @@ plot_cluster_stripchart = function(instance_name, team_name, export = F) {
   fit.km = kmeans(scanal[,4:10], centers = centers[, 2:8], nstart = 1)
   
   # Silhouette width now increased to 0.3
-  sil = silhouette(fit.km$cluster, d)
+  sil = cluster::silhouette(fit.km$cluster, d)
   
   # Stripcharts for k-means: 
   anal[['cluster']] = factor(fit.km$cluster)
   anal[['clusterLabel']] = character(nrow(anal))
   anal[anal$cluster == 1,]$clusterLabel = 'Talkative Multi-talent (Tier 2)'
   anal[anal$cluster == 2,]$clusterLabel = 'Talkative Multi-talent (Tier 1)' # 'Slow-rating Multi-talent (Tier 1)'
-  anal[anal$cluster == 3,]$clusterLabel = 'Resource Guru' # 'Speed-rating Multi-talent (Tier 1)'
+  anal[anal$cluster == 3,]$clusterLabel = 'Report Guru' # 'Speed-rating Multi-talent (Tier 1)'
   anal[anal$cluster == 4,]$clusterLabel = 'Speed-rating Multi-talent (Tier 1)' # 'Allrounder (Tier 1)'
-  anal[anal$cluster == 5,]$clusterLabel = 'Report Guru' # 'Slow-rating Multi-talent (Tier 2)'
-  anal[anal$cluster == 6,]$clusterLabel = 'Allrounder' # 'Report Guru'
-  anal[anal$cluster == 7,]$clusterLabel = 'Slow-rating Multi-talent (Tier 1)' # 'Allrounder (Tier 2)'
+  anal[anal$cluster == 5,]$clusterLabel = 'Resource Guru' # 'Slow-rating Multi-talent (Tier 2)'
+  anal[anal$cluster == 6,]$clusterLabel = 'Slow-rating Multi-talent (Tier 1)' # 'Report Guru'
+  anal[anal$cluster == 7,]$clusterLabel = 'Allrounder' # 'Allrounder (Tier 2)'
   anal[anal$cluster == 8,]$clusterLabel = 'Drop In' # 'Speed-rating Multi-talent (Tier 2)'
   anal[anal$cluster == 9,]$clusterLabel = 'Speed-rating Multi-talent (Tier 2)' # 'Single-minded Raters'
   anal[anal$cluster == 10,]$clusterLabel = 'Slow-rating Multi-talent (Tier 2)' # 'Drop In'
@@ -3472,7 +3472,7 @@ plot_cluster_stripchart = function(instance_name, team_name, export = F) {
     guides(color = FALSE) +
     theme_linedraw() +
     labs(x = "",
-         y = "Percentile",
+         y = "Rescaled Activity Counts",
          title = NULL) +
     facet_wrap(vars(clusterLabel), ncol = 3, nrow = 4) +
     theme_huntlab() +

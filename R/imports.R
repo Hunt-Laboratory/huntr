@@ -1876,7 +1876,10 @@ compile_probteams_2018_SwarmChallengeExp1 = function(repo, path_to_data, instanc
                           nIC = NA,
                           rankIC = NA,
                           activeUsersSq = NA,
-                          textSim = NA)
+                          textSim = NA,
+                          AOMT = NA,
+                          divAOMT = NA,
+                          medianEdu = NA)
     
     getActiveUsersSq = function(tm, pr) {
         team_members = analytics[team == tm & problem == pr]
@@ -1907,6 +1910,32 @@ compile_probteams_2018_SwarmChallengeExp1 = function(repo, path_to_data, instanc
         mean(Distances)
     }
     
+    getAOMT = function(tm, pr) {
+        active_team_members = analytics[team == tm & problem == pr & engagement_scaled > 0]$user
+        return( median(parts[parts$user %in% active_team_members,]$aomt, na.rm = T) )
+    }
+    
+    getDivAOMT = function(tm, pr) {
+        active_team_members = analytics[team == tm & problem == pr & engagement_scaled > 0]$user
+        scores = parts[parts$user %in% active_team_members,]$aomt
+        scores = scores[!is.na(scores)]
+        return(mean(c(dist(scores))))
+    }
+    
+    getMedianEdu = function(tm, pr) {
+        active_team_members = analytics[team == tm & problem == pr & engagement_scaled > 0]$user
+        eds = parts[parts$user %in% active_team_members,]$education
+        eds[eds == "High School or GED Equivalency"] = 1
+        eds[eds == "Some College"] = 2
+        eds[eds == "Bachelor's Degree"] = 3
+        eds[eds == "Associate's Degree"] = 4
+        eds[eds == "Master's Degree"] = 5
+        eds[eds == "Professional or Doctoral Degree (e.g. MD, JD, PhD)"] = 6
+        eds = as.numeric(eds)
+        
+        return(median(eds, na.rm = T))
+    }
+    
     for (k in 1:nrow(probteam)) {
         i = intersect( which(K$team == probteam$team[k]), which(K$problem == probteam$problem[k]))
         l = which(K[K$problem == probteam$problem[k] & nchar(K$team) > 0,]$team == probteam$team[k])
@@ -1921,6 +1950,9 @@ compile_probteams_2018_SwarmChallengeExp1 = function(repo, path_to_data, instanc
         probteam$rankIC[k] = rank(-K[K$problem == probteam$problem[k] & nchar(K$team) > 0,]$avgIC, ties.method = "min")[l]
         probteam$activeUsersSq[k] = getActiveUsersSq(probteam$team[k], probteam$problem[k])
         probteam$textSim[k] = getTextSim(probteam$team[k], probteam$problem[k])
+        probteam$AOMT[k] = getAOMT(probteam$team[k], probteam$problem[k])
+        probteam$divAOMT[k] = getDivAOMT(probteam$team[k], probteam$problem[k])
+        probteam$medianEdu[k] = getMedianEdu(probteam$team[k], probteam$problem[k])
     }
     
     probteam = probteam[!is.na(probteam$avgIC),]
