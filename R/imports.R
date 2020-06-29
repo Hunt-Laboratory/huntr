@@ -1927,8 +1927,9 @@ compile_probteams_2018_SwarmChallengeExp1 = function(repo, path_to_data, instanc
     getDivAOMT = function(tm, pr) {
         active_team_members = analytics[team == tm & problem == pr & engagement_scaled > 0]$user
         scores = parts[parts$user %in% active_team_members,]$aomt
-        scores = scores[!is.na(scores)]
-        rval = mean(c(dist(scores)))
+        # scores = scores[!is.na(scores)]
+        # rval = mean(c(dist(scores)))
+        rval = sum(dist(scores), na.rm = T) / length(scores)
         if (is.na(rval)) {
             rval = NA
         }
@@ -2179,8 +2180,9 @@ compile_probteams_2020_HuntChallenge = function(repo, path_to_data, instance_nam
     getDivAOMT = function(tm, pr) {
         active_team_members = analytics[team == tm & problem == pr & engagement_scaled > 0]$user
         scores = parts[parts$user %in% active_team_members,]$aomt
-        scores = scores[!is.na(scores)]
-        rval = mean(c(dist(scores)))
+        # scores = scores[!is.na(scores)]
+        # rval = mean(c(dist(scores)))
+        rval = sum(dist(scores), na.rm = T) / length(scores)
         if (is.na(rval)) {
             rval = NA
         }
@@ -2314,7 +2316,7 @@ compile_probparts = function(repo, nClusters, generatePlots = F) {
     
     # Select contributions for each user instance.
     anal = anal %>%
-        select(team, problem, user, report_count, resource_count, comment_count, vote_count,
+        dplyr::select(team, problem, user, report_count, resource_count, comment_count, vote_count,
                quick_rating, complete_rating, chat_count)
     
     # Remove outliers: artificially capping chat counts to 100 so they don't cause outliers.
@@ -2396,7 +2398,7 @@ compile_probparts = function(repo, nClusters, generatePlots = F) {
             labs(x = "",
                  y = "Percentile",
                  title = paste("Cluster", p),
-                 subtitle = D[cluster == p]$clusterLabel[1]) +
+                 subtitle = D[D$cluster == p,]$clusterLabel[1]) +
             theme(panel.grid.major = element_blank(), panel.grid.minor.y = element_line(colour="grey", size=0.2))
     }
     pw = P[[1]] + P[[2]] + P[[3]] + P[[4]] + P[[5]] + P[[6]] + P[[7]] + P[[8]] + P[[9]] + P[[10]]
