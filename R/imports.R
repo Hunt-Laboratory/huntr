@@ -661,6 +661,8 @@ compile_parts_2018_SwarmChallengeExp1 = function(path_to_data, instance_name) {
         }
     }
     
+    ES$user = tolower(ES$user)
+    
     ES <- ES[ES$finished]
     ES = ES[!is.na(ES$user)]
     ES = as.data.frame(ES)
@@ -1560,6 +1562,8 @@ compile_parts_2020_HuntChallenge = function(path_to_data, instance_name) {
     
     ES = merge(ES, ExS, by = c("user", "isOrg"), all = T)
     ES = as.data.frame(ES)
+    
+    ES$user = tolower(ES$user)
     
     colsToRemove = c('finished.x', 'progress.x',
                      'finished.y', 'progress.y')
