@@ -4,7 +4,11 @@
 \alias{compile_data}
 \title{Compile data from 'raw' SWARM, Qualtrics & Knack CSVs}
 \usage{
-compile_data(path = "data/")
+compile_data(
+  path = "data/",
+  use_previous_redactions = TRUE,
+  redaction_patterns = c()
+)
 }
 \description{
 \code{compile_data} Compiles data from 'raw' CSVs exported from the various

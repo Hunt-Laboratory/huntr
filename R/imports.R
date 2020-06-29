@@ -1923,7 +1923,11 @@ compile_probteams_2018_SwarmChallengeExp1 = function(repo, path_to_data, instanc
         active_team_members = analytics[team == tm & problem == pr & engagement_scaled > 0]$user
         scores = parts[parts$user %in% active_team_members,]$aomt
         scores = scores[!is.na(scores)]
-        return(mean(c(dist(scores))))
+        rval = mean(c(dist(scores)))
+        if (is.na(rval)) {
+            rval = NA
+        }
+        return(rval)
     }
     
     getMedianEdu = function(tm, pr) {
@@ -2128,7 +2132,10 @@ compile_probteams_2020_HuntChallenge = function(repo, path_to_data, instance_nam
                           nBayesCorrect = NA,
                           nFlawsDetected = NA,
                           activeUsersSq = NA,
-                          textSim = NA)
+                          textSim = NA,
+                          AOMT = NA,
+                          divAOMT = NA,
+                          medianEdu = NA)
     
     getActiveUsersSq = function(tm, pr) {
         team_members = analytics[team == tm & problem == pr]
@@ -2157,6 +2164,37 @@ compile_probteams_2020_HuntChallenge = function(repo, path_to_data, instance_nam
         }
         
         mean(Distances)
+    }
+    
+    getAOMT = function(tm, pr) {
+        active_team_members = analytics[team == tm & problem == pr & engagement_scaled > 0]$user
+        return( median(parts[parts$user %in% active_team_members,]$aomt, na.rm = T) )
+    }
+    
+    getDivAOMT = function(tm, pr) {
+        active_team_members = analytics[team == tm & problem == pr & engagement_scaled > 0]$user
+        scores = parts[parts$user %in% active_team_members,]$aomt
+        scores = scores[!is.na(scores)]
+        rval = mean(c(dist(scores)))
+        if (is.na(rval)) {
+            rval = NA
+        }
+        return(rval)
+    }
+    
+    getMedianEdu = function(tm, pr) {
+        active_team_members = analytics[team == tm & problem == pr & engagement_scaled > 0]$user
+        eds = parts[parts$user %in% active_team_members,]$education
+        eds[eds == "High School"] = 1
+        eds[eds == "Trade or Technical Qualification"] = 2
+        eds[eds == "Bachelors"] = 3
+        eds[eds == "Graduate Certificate, Diploma or equivalent"] = 4
+        eds[eds == "Masters"] = 5
+        eds[eds == "Phd"] = 6
+        eds[eds == "Prefer not to say"] = NA
+        eds = as.numeric(eds)
+        
+        return(median(eds, na.rm = T))
     }
     
     getNumFlawsDetected = function(tm) {
@@ -2215,6 +2253,9 @@ compile_probteams_2020_HuntChallenge = function(repo, path_to_data, instance_nam
         }
         probteam$activeUsersSq[k] = getActiveUsersSq(probteam$team[k], probteam$problem[k])
         probteam$textSim[k] = getTextSim(probteam$team[k], probteam$problem[k])
+        probteam$AOMT[k] = getAOMT(probteam$team[k], probteam$problem[k])
+        probteam$divAOMT[k] = getDivAOMT(probteam$team[k], probteam$problem[k])
+        probteam$medianEdu[k] = getMedianEdu(probteam$team[k], probteam$problem[k])
     }
     
     probteam = probteam[!is.na(probteam$avgIC),]
