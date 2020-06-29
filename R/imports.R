@@ -1929,7 +1929,7 @@ compile_probteams_2018_SwarmChallengeExp1 = function(repo, path_to_data, instanc
         scores = parts[parts$user %in% active_team_members,]$aomt
         # scores = scores[!is.na(scores)]
         # rval = mean(c(dist(scores)))
-        n = length(scores) * (length(scores) + 1) / 2 # Number of unique pairs.
+        n = length(scores) * (length(scores) - 1) / 2 # Number of unique pairs.
         rval = sum(dist(scores), na.rm = T) / n
         if (is.na(rval)) {
             rval = NA
@@ -2183,7 +2183,7 @@ compile_probteams_2020_HuntChallenge = function(repo, path_to_data, instance_nam
         scores = parts[parts$user %in% active_team_members,]$aomt
         # scores = scores[!is.na(scores)]
         # rval = mean(c(dist(scores)))
-        n = length(scores) * (length(scores) + 1) / 2 # Number of unique pairs.
+        n = length(scores) * (length(scores) - 1) / 2 # Number of unique pairs.
         rval = sum(dist(scores), na.rm = T) / n
         if (is.na(rval)) {
             rval = NA
