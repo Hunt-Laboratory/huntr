@@ -1583,8 +1583,8 @@ compile_parts = function(path_to_data, instance_name) {
     # syntactically across different experiements, and so each require custom code to tidy the
     # data into a consistent format.
     compile_parts = list(
-        "2018_SwarmChallengeExp1" = compile_parts_2018_SwarmChallengeExp1,
-        "2020_HuntChallenge" = compile_parts_2020_HuntChallenge
+        "x2018_SwarmChallengeExp1" = compile_parts_2018_SwarmChallengeExp1,
+        "x2020_HuntChallenge" = compile_parts_2020_HuntChallenge
     )
     
     if (instance_name %in% names(compile_parts)) {
@@ -1671,8 +1671,8 @@ compile_teamparts = function(repo, path_to_data, instance_name) {
     # syntactically across different experiements, and so each require custom code to tidy the
     # data into a consistent format.
     compile_teamparts = list(
-        "2018_SwarmChallengeExp1" = compile_teamparts_2018_SwarmChallengeExp1,
-        "2020_HuntChallenge" = compile_teamparts_2020_HuntChallenge
+        "x2018_SwarmChallengeExp1" = compile_teamparts_2018_SwarmChallengeExp1,
+        "x2020_HuntChallenge" = compile_teamparts_2020_HuntChallenge
     )
     
     if (instance_name %in% names(compile_teamparts)) {
@@ -1834,8 +1834,8 @@ compile_teams = function(repo, path_to_data, instance_name) {
     # syntactically across different experiements, and so each require custom code to tidy the
     # data into a consistent format.
     compile_teams = list(
-        "2018_SwarmChallengeExp1" = compile_teams_2018_SwarmChallengeExp1,
-        "2020_HuntChallenge" = compile_teams_2020_HuntChallenge
+        "x2018_SwarmChallengeExp1" = compile_teams_2018_SwarmChallengeExp1,
+        "x2020_HuntChallenge" = compile_teams_2020_HuntChallenge
     )
     
     if (instance_name %in% names(compile_teams)) {
@@ -1884,20 +1884,26 @@ compile_probteams_2018_SwarmChallengeExp1 = function(repo, path_to_data, instanc
                           avgIC = NA,
                           nIC = NA,
                           rankIC = NA,
-                          activeUsersSq = NA,
-                          textSim = NA,
+                          activeUsers = NA,
+                          textSimReports = NA,
+                          textSimResponses = NA,
                           AOMT = NA,
                           divAOMT = NA,
                           medianEdu = NA)
     
-    getActiveUsersSq = function(tm, pr) {
+    getActiveUsers = function(tm, pr) {
         team_members = analytics[team == tm & problem == pr]
         nActive = sum(team_members$engagement_scaled > 0)
-        nActiveSq = nActive ^ 2
     }
     
-    getTextSim = function(tm, pr) {
-        file_names = responses[team == tm & problem == pr & response_type == "report"]$response_text
+    getTextSim = function(tm, pr, scope) {
+        if (scope == "reports") {
+            file_names = responses[team == tm & problem == pr & response_type == "report"]$response_text
+        } else if (scope == "resources") {
+            file_names = responses[team == tm & problem == pr & response_type == "resource"]$response_text
+        } else if (scope == "responses") {
+            file_names = responses[team == tm & problem == pr]$response_text
+        }
         
         if (length(file_names) > 1) {
             reports = suppressWarnings(readtext::readtext(paste0(response_path,file_names[1])))  # surpress "*.md" warnings
@@ -1912,11 +1918,14 @@ compile_probteams_2018_SwarmChallengeExp1 = function(repo, path_to_data, instanc
                                 stem = TRUE, remove_punct = TRUE, remove_numbers = TRUE)
             DistMat = quanteda::textstat_simil(DFM, method="cosine")
             Distances = DistMat[lower.tri(DistMat)]
+            
+            library(quanteda)
+            # message(summary(CORPUS)$tokens)
+            return( (1 - mean(Distances)) / sum(summary(CORPUS)$tokens) )
         } else {
-            Distances = c(1) # If 1 or 0 reports, assign similarity of 1.
+            return( 0 )
         }
         
-        mean(Distances)
     }
     
     getAOMT = function(tm, pr) {
@@ -1932,7 +1941,7 @@ compile_probteams_2018_SwarmChallengeExp1 = function(repo, path_to_data, instanc
         n = length(scores) * (length(scores) - 1) / 2 # Number of unique pairs.
         rval = sum(dist(scores), na.rm = T) / n
         if (is.na(rval)) {
-            rval = NA
+            rval = 0
         }
         return(rval)
     }
@@ -1963,8 +1972,9 @@ compile_probteams_2018_SwarmChallengeExp1 = function(repo, path_to_data, instanc
         probteam$avgIC[k] = K$avgIC[i]
         probteam$nIC[k] = K$nRatings[i]
         probteam$rankIC[k] = rank(-K[K$problem == probteam$problem[k] & nchar(K$team) > 0,]$avgIC, ties.method = "min")[l]
-        probteam$activeUsersSq[k] = getActiveUsersSq(probteam$team[k], probteam$problem[k])
-        probteam$textSim[k] = getTextSim(probteam$team[k], probteam$problem[k])
+        probteam$activeUsers[k] = getActiveUsers(probteam$team[k], probteam$problem[k])
+        probteam$textSimReports[k] = getTextSim(probteam$team[k], probteam$problem[k], 'reports')
+        probteam$textSimResponses[k] = getTextSim(probteam$team[k], probteam$problem[k], 'responses')
         probteam$AOMT[k] = getAOMT(probteam$team[k], probteam$problem[k])
         probteam$divAOMT[k] = getDivAOMT(probteam$team[k], probteam$problem[k])
         probteam$medianEdu[k] = getMedianEdu(probteam$team[k], probteam$problem[k])
@@ -2138,20 +2148,26 @@ compile_probteams_2020_HuntChallenge = function(repo, path_to_data, instance_nam
                           tightness = NA,
                           nBayesCorrect = NA,
                           nFlawsDetected = NA,
-                          activeUsersSq = NA,
-                          textSim = NA,
+                          activeUsers = NA,
+                          textSimReports = NA,
+                          textSimResponses = NA,
                           AOMT = NA,
                           divAOMT = NA,
                           medianEdu = NA)
     
-    getActiveUsersSq = function(tm, pr) {
+    getActiveUsers = function(tm, pr) {
         team_members = analytics[team == tm & problem == pr]
         nActive = sum(team_members$engagement_scaled > 0)
-        nActiveSq = nActive ^ 2
     }
     
-    getTextSim = function(tm, pr) {
-        file_names = responses[team == tm & problem == pr & response_type == "report"]$response_text
+    getTextSim = function(tm, pr, scope) {
+        if (scope == "reports") {
+            file_names = responses[team == tm & problem == pr & response_type == "report"]$response_text
+        } else if (scope == "resources") {
+            file_names = responses[team == tm & problem == pr & response_type == "resource"]$response_text
+        } else if (scope == "responses") {
+            file_names = responses[team == tm & problem == pr]$response_text
+        }
         
         if (length(file_names) > 1) {
             reports = suppressWarnings(readtext::readtext(paste0(response_path,file_names[1])))  # surpress "*.md" warnings
@@ -2162,15 +2178,17 @@ compile_probteams_2020_HuntChallenge = function(repo, path_to_data, instance_nam
             
             CORPUS = quanteda::corpus(reports)
             DFM = quanteda::dfm(CORPUS,
-                      remove = quanteda::stopwords("english"),
-                      stem = TRUE, remove_punct = TRUE, remove_numbers = TRUE)
+                                remove = quanteda::stopwords("english"),
+                                stem = TRUE, remove_punct = TRUE, remove_numbers = TRUE)
             DistMat = quanteda::textstat_simil(DFM, method="cosine")
             Distances = DistMat[lower.tri(DistMat)]
+            
+            library(quanteda)
+            return( (1 - mean(Distances)) / sum(summary(CORPUS)$tokens) )
         } else {
-            Distances = c(1) # If 1 or 0 reports, assign similarity of 1.
+            return( 0 )
         }
         
-        mean(Distances)
     }
     
     getAOMT = function(tm, pr) {
@@ -2186,7 +2204,7 @@ compile_probteams_2020_HuntChallenge = function(repo, path_to_data, instance_nam
         n = length(scores) * (length(scores) - 1) / 2 # Number of unique pairs.
         rval = sum(dist(scores), na.rm = T) / n
         if (is.na(rval)) {
-            rval = NA
+            rval = 0
         }
         return(rval)
     }
@@ -2260,8 +2278,9 @@ compile_probteams_2020_HuntChallenge = function(repo, path_to_data, instance_nam
             probteam$nFlawsDetected[k] = getNumFlawsDetected(probteam$team[k])
             
         }
-        probteam$activeUsersSq[k] = getActiveUsersSq(probteam$team[k], probteam$problem[k])
-        probteam$textSim[k] = getTextSim(probteam$team[k], probteam$problem[k])
+        probteam$activeUsers[k] = getActiveUsers(probteam$team[k], probteam$problem[k])
+        probteam$textSimReports[k] = getTextSim(probteam$team[k], probteam$problem[k], 'reports')
+        probteam$textSimResponses[k] = getTextSim(probteam$team[k], probteam$problem[k], 'responses')
         probteam$AOMT[k] = getAOMT(probteam$team[k], probteam$problem[k])
         probteam$divAOMT[k] = getDivAOMT(probteam$team[k], probteam$problem[k])
         probteam$medianEdu[k] = getMedianEdu(probteam$team[k], probteam$problem[k])
@@ -2280,8 +2299,8 @@ compile_probteams = function(repo, path_to_data, instance_name) {
     # syntactically across different experiements, and so each require custom code to tidy the
     # data into a consistent format.
     compile_probteams = list(
-        "2018_SwarmChallengeExp1" = compile_probteams_2018_SwarmChallengeExp1,
-        "2020_HuntChallenge" = compile_probteams_2020_HuntChallenge
+        "x2018_SwarmChallengeExp1" = compile_probteams_2018_SwarmChallengeExp1,
+        "x2020_HuntChallenge" = compile_probteams_2020_HuntChallenge
     )
     
     if (instance_name %in% names(compile_probteams)) {
@@ -2564,7 +2583,7 @@ compile_rates = function(repo, path_to_data, instance_name) {
     # syntactically across different experiements, and so each require custom code to tidy the
     # data into a consistent format.
     compile_rates = list(
-        "2020_HuntChallenge" = compile_rates_2020_HuntChallenge
+        "x2020_HuntChallenge" = compile_rates_2020_HuntChallenge
     )
     
     if (instance_name %in% names(compile_rates)) {
@@ -2599,8 +2618,8 @@ compile_data = function(path = "data/",
     require(data.table)
     
     instances = c(
-        '2020_HuntChallenge',
-        '2018_SwarmChallengeExp1'
+        'x2020_HuntChallenge',
+        'x2018_SwarmChallengeExp1'
     )
     
     # Initialise repo list.
@@ -2636,7 +2655,7 @@ compile_data = function(path = "data/",
     if (use_previous_redactions) {
         repo = apply_previous_redactions(
             repo,
-            instances = c('2020_HuntChallenge'),
+            instances = c('x2020_HuntChallenge'),
             path = 'experiment-data'
         )
     } else {
@@ -2648,7 +2667,7 @@ compile_data = function(path = "data/",
         repo = run_PII_redaction_session(
             repo,
             patterns,
-            c('2020_HuntChallenge'),
+            c('x2020_HuntChallenge'),
             path = 'experiment-data'
         )
     }

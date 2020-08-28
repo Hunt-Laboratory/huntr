@@ -31,7 +31,7 @@ generate_feedback_plots = function(instance_name) {
   for (team_name in teams[1]) {
     message(team_name)
     # plots_demographic(instance_name, team_name, export = T)
-    # plot_slopegraph(instance_name, team_name, export = T)
+    plot_slopegraph(instance_name, team_name, export = T)
     # plot_network(instance_name, team_name, export = T)
     # plot_network_reference(instance_name, team_name, export = T)
     # plot_timeline(instance_name, team_name, export = T)
@@ -59,7 +59,7 @@ generate_feedback_plots = function(instance_name) {
     # plot_dot_tightness(instance_name, team_name, export = T)
     # plot_dot_bayes(instance_name, team_name, export = T)
     # plot_dot_flawdetection(instance_name, team_name, export = T)
-    plot_cluster_stripchart(instance_name, team_name, export = T)
+    # plot_cluster_stripchart(instance_name, team_name, export = T)
     # plot_user_engagement(instance_name, team_name, export = T)
     # plot_bar_expectations(instance_name, team_name, export = T)
     # plot_bar_capabilities(instance_name, team_name, export = T)
@@ -77,6 +77,7 @@ export_plot = function(plot_object, file_name, instance_name, team_name, export_
   # Define width and height based on requested size.
   widths = list(
       "A4" = 2181,
+      "A4landscape" = 2800,
       "A4-title" = 2181,
       "A4-title-subtitle" = 2181,
       "(A4-title)/2" = 2181,
@@ -89,6 +90,7 @@ export_plot = function(plot_object, file_name, instance_name, team_name, export_
   )
   heights = list(
       "A4" = 2800,
+      "A4landscape" = 2181,
       "A4-title" = 2747,
       "A4-title-subtitle" = 2600,
       "(A4-title)/2" = 1650,
@@ -418,7 +420,7 @@ plots_demographic = function(instance_name, team_name, export = F) {
 plot_slopegraph = function(instance_name, team_name, export = F) {
     
     probteams = as.data.frame(repo[[instance_name]]$CoreData$probteams)
-    probteams[probteams$team == team_name,]$type = "Your Team"
+    # probteams[probteams$team == team_name,]$type = "Your Team"
     probteams = probteams[probteams$avgIC > 0,]
     
     p = ggplot(probteams, aes(probNum, avgIC, group = team, colour = type, alpha = type, size = type, label = rankIC)) +
@@ -2247,7 +2249,7 @@ plot_dot_probability = function(instance_name, team_name, export = F) {
   
   probteams = as.data.frame(repo[[instance_name]]$CoreData$probteams)
   probteams = probteams[!is.na(probteams$avgIC) & !is.na(probteams$probabilityEstimate),]
-  probteams[probteams$team == team_name,]$type = "Your Team"
+  # probteams[probteams$team == team_name,]$type = "Your Team"
   
   p = ggplot(probteams, aes(probabilityEstimate)) +
     geom_dotplot(aes(fill = type), 
@@ -2260,10 +2262,8 @@ plot_dot_probability = function(instance_name, team_name, export = F) {
                        limits = c(0,1)) +
     # scale_fill_manual(breaks = c("PT","ST","OT","Your Team"),
     #                     values = c("#00a087", "#f9a825", "#3c5488", "#e64b35")) +
-    scale_fill_manual(breaks = c("OT","PT","ST"),
-                      values = c("#3c5488", "#e64b35", "#4caf50"),
-                      labels = c("Org Team", "Public Team", "Super Team"),
-                      drop = T) +
+    scale_fill_manual(breaks = c("PT","ST","OT","Your Team"),
+                      values = c("#00a087", "#f9a825", "#3c5488", "#e64b35")) +
     labs(x = NULL,
          y = NULL,
          fill = "Type") +
@@ -2274,50 +2274,10 @@ plot_dot_probability = function(instance_name, team_name, export = F) {
           legend.position = "top"
     )
   
-  # PT, ST, OT
-  # "#00a087", "#f9a825", "#3c5488"
-  
-  # teamVal = probteams[probteams$type == "Your Team",]$probabilityEstimate[1]
-  # 
-  # pc = ggplot() +
-  #   scale_x_continuous(expand = c(0,0), limits = c(1,5)) + 
-  #   scale_y_continuous(expand = c(0,0), limits = c(0,100)) + 
-  #   annotate("text",
-  #            x = 1, y = 80,
-  #            hjust = 0, vjust = 1,
-  #            label = paste0("Your teams' forecast of ", teamVal, " was as good or better than that of:")) +
-  #   annotate("text",
-  #            x = 1.8, y = 25, size = 10, fontface = 2, vjust = 0,
-  #            label = paste0(round(100*mean(probteams$probabilityEstimate >= teamVal)),'%'),
-  #            colour = "#000000") +
-  #   annotate("text",
-  #            x = 1.8, y = 18, vjust = 1,
-  #            label = "of all teams",
-  #            colour = "#000000") +
-  #   annotate("text",
-  #            x = 2.8, y = 25, size = 10, fontface = 2, vjust = 0,
-  #            label = paste0(round(100*mean(probteams[probteams$type == "PT",]$probabilityEstimate >= teamVal)),'%'),
-  #            colour = "#00a087") +
-  #   annotate("text",
-  #            x = 2.8, y = 18, vjust = 1,
-  #            label = "of public teams",
-  #            colour = "#00a087") +
-  #   annotate("text",
-  #            x = 4, y = 25, size = 10, fontface = 2, vjust = 0,
-  #            label = paste0(round(100*mean(probteams[probteams$type == "OT",]$probabilityEstimate >= teamVal)),'%'),
-  #            colour = "#3c5488") +
-  #   annotate("text",
-  #            x = 4, y = 18, vjust = 1,
-  #            label = "of organisational teams",
-  #            colour = "#3c5488") +
-  #   theme_void() +
-  #   theme(panel.background = element_rect(fill = "#f6f6f6",
-  #                                        linetype = 0))
-  
   p = p + plot_layout(guides = "keep") +
     plot_annotation(
       title = 'DISTRIBUTION OF REPORT PROBABILITIES',
-      subtitle = 'Dot plot of estimated probabilities in team reports. You teams\' estimate is in red',
+      subtitle = 'Dot plot of estimated probabilities in team reports.',
       theme = theme(plot.margin = margin(11, 10, 10, 10, "pt"),
                     plot.background = element_rect(fill = "#f6f6f6"),
                     plot.title = element_text(face = "bold",
@@ -3474,7 +3434,7 @@ plot_cluster_stripchart = function(instance_name, team_name, export = F) {
     labs(x = "",
          y = "Rescaled Activity Counts",
          title = NULL) +
-    facet_wrap(vars(clusterLabel), ncol = 3, nrow = 4) +
+    facet_wrap(vars(clusterLabel), ncol = 4, nrow = 3) +
     theme_huntlab() +
   theme(panel.grid.major = element_blank(),
         panel.grid.minor.y = element_line(colour="grey", size=0.2),
