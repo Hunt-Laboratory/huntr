@@ -8,7 +8,7 @@
   \item{team}{Team name.}
   \item{problem}{Problem title.}
   \item{probNum}{Position of the problem in the sequence of problems attempted by this team in this exercise.}
-  \item{type}{Team type. PT = Public Team; ST = Superteam; OT = Organisational Team;}
+  \item{type}{Team type. PT = Public Team; ST = Superteam; OT = Organisational Team; AA = Agency Analyst (2018 SWARM Challenge); PA = Public Analyst (2018 SWARM Challenge); GP = General Public (2018 SWARM Challenge).}
   \item{avgIC}{Quality of reasoning score on the IC Rating Scale for the team’s top report. This is usually the average of independent ratings by at least 3 external raters.}
   \item{nIC}{Number of external raters who independently rated the report on the IC Rating Scale.}
   \item{rankIC}{The teams rank on this problem, when all teams who submitted a report for the problem are ranked from best to worst by avgIC. If there are ties, all tied teams receive the best (lowest integer) rank applicable.}
@@ -17,8 +17,12 @@
   \item{tightness}{The score on a tightness redaction test for the team’s top-rated report (if applicable to the problem).}
   \item{nBayesCorrect}{Number of Bayesian probability puzzles correctly solved (if applicable to the problem).}
   \item{nFlawsDetected}{Number or reasoning flaws correctly detected (if applicable to the problem).}
-  \item{activeUsersSq}{Square of the number of users who had a (strictly) positive engagement score (according to the probparts table).}
-  \item{textSim}{Average pairwise cosine test similarity between all responses of type ‘report’ created by the team on the platform for this problem. Higher values indicate more similar reports. If there were no reports or only 1 report, textSim = 1.}
+  \item{activeUsers}{The number of users who had a (strictly) positive engagement score (according to the probparts table).}
+  \item{textSimReports}{Average pairwise cosine test similarity between all responses of type ‘report’ created by the team on the platform for this problem. Higher values indicate more similar reports. If there were no reports or only 1 report, textSimReports = 1.}
+  \item{textSimResponses}{Average pairwise cosine test similarity between all responses (both ‘reports’ and ‘resources’) created by the team on the platform for this problem. Higher values indicate more similar reports. If there were no responses or only 1 response, textSimResponses = 1.}
+  \item{AOMT}{Median Actively Open-Minded Thinking score for team members who were active on this problem. Missing values are excluded from the calculation.}
+  \item{divAOMT}{Average pairwise difference in AOMT scores across all team members who were active on this problem, and for whom the AOMT score is available.}
+  \item{medianEdu}{Median education level for the team members who were active on this problem, where education levels are encoded as follows. 1 = ‘High School’; 2 = ‘Trade or Technical Qualification’; 3 = ‘Bachelors’; 4 = ‘Graduate Certificate, Diploma or equivalent’; 5 = ‘Masters’; 6 = ‘Phd’. Missing values excluded from calculation.}
 }
 }
 \description{

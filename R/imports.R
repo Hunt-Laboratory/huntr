@@ -2,10 +2,10 @@
 # Compile Data ------------------------------------------------------------
 
 tidyProblemNames = function(dt) {
-    dt[dt == "Problem #1 - Foreign Fighters"] = "Foreign Fighters"
-    dt[dt == "Problem #2 - Forecasting Piracy"] = "Forecasting Piracy"
-    dt[dt == "Problem #3 - Corporate Espionage"] = "Corporate Espionage"
-    dt[dt == "Problem #4 - The Park Young-min Case"] = "The Park Young-min Case"
+    dt[dt$problem == "Problem #1 - Foreign Fighters"]$problem = "Foreign Fighters"
+    dt[dt$problem == "Problem #2 - Forecasting Piracy"]$problem = "Forecasting Piracy"
+    dt[dt$problem == "Problem #3 - Corporate Espionage"]$problem = "Corporate Espionage"
+    dt[dt$problem == "Problem #4 - The Park Young-min Case"]$problem = "The Park Young-min Case"
     return(dt)
 }
 
@@ -1920,10 +1920,10 @@ compile_probteams_2018_SwarmChallengeExp1 = function(repo, path_to_data, instanc
             Distances = DistMat[lower.tri(DistMat)]
             
             library(quanteda)
-            # message(summary(CORPUS)$tokens)
-            return( (1 - mean(Distances)) / sum(summary(CORPUS)$tokens) )
+            # return( (1 - mean(Distances)) / sum(summary(CORPUS)$Tokens) )
+            return( mean(Distances) )
         } else {
-            return( 0 )
+            return( 1 )
         }
         
     }
@@ -2184,9 +2184,10 @@ compile_probteams_2020_HuntChallenge = function(repo, path_to_data, instance_nam
             Distances = DistMat[lower.tri(DistMat)]
             
             library(quanteda)
-            return( (1 - mean(Distances)) / sum(summary(CORPUS)$tokens) )
+            # return( (1 - mean(Distances)) / sum(summary(CORPUS)$Tokens) )
+            return( mean(Distances) )
         } else {
-            return( 0 )
+            return( 1 )
         }
         
     }

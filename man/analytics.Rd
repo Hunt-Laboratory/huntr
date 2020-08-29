@@ -20,7 +20,7 @@
   \item{partial_rating}{Number of times a user contributed a partial (some of the rubrics) rating}
   \item{complete_rating}{Number of times a user contributed a complete (all rubrics) rating}
   \item{problem}{Title of the problem}
-  \item{engagement}{Calculated number of overall engagement of one user to a problem}
+  \item{engagement}{Engagement score calculated as a weighted sum of the various activity counts for the user on this problem. Reports have weight 7; resources and complete ratings have weight 3; comments have weight 2; chat messages, simple ratings, partial ratings, comment votes and resource votes have weight 1.}
   \item{report_count_scaled}{Number of reports user contributed to problem, scaled (within this platform instance) to range between 0 and 1}
   \item{resource_count_scaled}{Number of resources user contributed to problem, scaled (within this platform instance) to range between 0 and 1}
   \item{comment_count_scaled}{Number of comments user contributed in a problem, scaled (within this platform instance) to range between 0 and 1}
@@ -30,7 +30,7 @@
   \item{simple_rating_scaled}{Number of times a user contributed a simple (single number) rating, scaled (within this platform instance) to range between 0 and 1}
   \item{partial_rating_scaled}{Number of times a user contributed a partial (some of the rubrics) rating, scaled (within this platform instance) to range between 0 and 1}
   \item{complete_rating_scaled}{Number of times a user contributed a complete (all rubrics) rating, scaled (within this platform instance) to range between 0 and 1}
-  \item{engagement_scaled}{Calculated number of overall engagement of one user to a problem, using scaled engagement scores as inputs}
+  \item{engagement_scaled}{Engagement score calculated as a weighted sum of the various scaled activity counts for the user on this problem. Reports have weight 7; resources and complete ratings have weight 3; comments have weight 2; chat messages, simple ratings, partial ratings, comment votes and resource votes have weight 1.}
   \item{vote_count}{comment_vote_count + resource_vote_count}
   \item{quick_rating}{simple_rating + partial_rating}
 }

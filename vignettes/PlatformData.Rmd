@@ -1,7 +1,7 @@
 ---
 title: 'PlatformData Dictionary'
 author: 'Richard de Rozario & Luke Thorburn'
-date: '2020-05-14'
+date: '2020-08-29'
 output: rmarkdown::html_vignette
 vignette: >
     %\VignetteIndexEntry{PlatformData Dictionary}
@@ -48,7 +48,7 @@ simple_rating                   Number of times a user contributed a simple (sin
 partial_rating                  Number of times a user contributed a partial (some of the rubrics) rating
 complete_rating                 Number of times a user contributed a complete (all rubrics) rating
 problem                         Title of the problem
-engagement                      Calculated number of overall engagement of one user to a problem
+engagement                      Engagement score calculated as a weighted sum of the various activity counts for the user on this problem. Reports have weight 7; resources and complete ratings have weight 3; comments have weight 2; chat messages, simple ratings, partial ratings, comment votes and resource votes have weight 1.
 report_count_scaled             Number of reports user contributed to problem, scaled (within this platform instance) to range between 0 and 1
 resource_count_scaled           Number of resources user contributed to problem, scaled (within this platform instance) to range between 0 and 1
 comment_count_scaled            Number of comments user contributed in a problem, scaled (within this platform instance) to range between 0 and 1
@@ -58,7 +58,7 @@ resource_vote_count_scaled      Number of resource upvotes user contributed in a
 simple_rating_scaled            Number of times a user contributed a simple (single number) rating, scaled (within this platform instance) to range between 0 and 1
 partial_rating_scaled           Number of times a user contributed a partial (some of the rubrics) rating, scaled (within this platform instance) to range between 0 and 1
 complete_rating_scaled          Number of times a user contributed a complete (all rubrics) rating, scaled (within this platform instance) to range between 0 and 1
-engagement_scaled               Calculated number of overall engagement of one user to a problem, using scaled engagement scores as inputs
+engagement_scaled               Engagement score calculated as a weighted sum of the various scaled activity counts for the user on this problem. Reports have weight 7; resources and complete ratings have weight 3; comments have weight 2; chat messages, simple ratings, partial ratings, comment votes and resource votes have weight 1.
 vote_count                      comment_vote_count + resource_vote_count
 quick_rating                    simple_rating + partial_rating
 
