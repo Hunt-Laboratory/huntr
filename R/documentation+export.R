@@ -133,7 +133,7 @@ export_repo_to_CSV = function(repo, data_version, path = 'experiment-data') {
                 dir.create(file.path(path, inst, data_version, fldr, tbl), showWarnings = F)
                 write.csv(repo[[inst]][[fldr]][[tbl]],
                           file = paste0(file.path(path, inst, data_version, fldr, tbl), '/', tbl, '.csv'),
-                          row.names = F)
+                          row.names = F, na = "")
                 
             }
         }
