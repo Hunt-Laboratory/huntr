@@ -5,7 +5,7 @@ PlatformData,problems,description,
 PlatformData,problems,start_date,
 PlatformData,problems,due_date,
 PlatformData,problems,problem_text,A unique filename of the problem content in markdown text format
-PlatformData,problems,problem_file,"A unique filename in the ""Problems"" subfolder that contains the HTML file of the problem"
+PlatformData,problems,problem_file,A unique filename in the 'Problems' subfolder that contains the HTML file of the problem
 PlatformData,problems,problem_template,
 PlatformData,problems,exercise,
 PlatformData,analytics,team,Name of team the user is in
@@ -65,7 +65,7 @@ PlatformData,comments,commenter_name,Name of the commenter
 PlatformData,comments,time_created,Timestamp when the comment was first created
 PlatformData,comments,time_last_changed,Timestamp when the comment was last updated
 PlatformData,comments,comment_text,A unique filename of the comment content in markdown text format
-PlatformData,comments,comment_file,"A unique filename in the ""Comments"" subfolder that contains the HTML file of the comment"
+PlatformData,comments,comment_file,A unique filename in the 'Comments' subfolder that contains the HTML file of the comment
 PlatformData,comments,problem,Short title of the problem
 PlatformData,login,user_id,Unique identifier of the user who logs in/out
 PlatformData,login,user,Name of user who logs in/out
@@ -73,14 +73,14 @@ PlatformData,login,event_type,Can either be login or logout
 PlatformData,login,timestamp,Timestamp when login/logout occurred 
 PlatformData,ratings,problem_id,Unique identifier of the problem
 PlatformData,ratings,team_id,Unique identifier for the team that produced the report
-PlatformData,ratings,content_type,"""report"", ""resource"", or ""comment"". Other types may be added in future."
+PlatformData,ratings,content_type,"'report', 'resource', or 'comment'. Other types may be added in future."
 PlatformData,ratings,content_id,Unique identifier for the content (content can be response or comment)
 PlatformData,ratings,author_id,Unique identifier of the original author of the response
 PlatformData,ratings,author,Name of the user who originally authored the response
 PlatformData,ratings,rater_id,Unique identifier of a user who rated the response
 PlatformData,ratings,rater,Name of the user who rated the response
 PlatformData,ratings,last_edited,Timestamp when the rating was last updated
-PlatformData,ratings,rating_type,"""thumbs"", ""simple"", ""detailed"""
+PlatformData,ratings,rating_type,"'thumbs', 'simple', 'detailed'"
 PlatformData,ratings,rating_total,"1 or 0 for thumbs, number (0-100) for simple, aggregated number for detailed rating"
 PlatformData,ratings,rating_sub_01_title,The title of the ratings subfield
 PlatformData,ratings,rating_sub_01,Number for detailed rating field 1
@@ -112,7 +112,7 @@ PlatformData,top_reports,problem_id,Unique identifier of the problem
 PlatformData,top_reports,problem,Short title of the problem
 PlatformData,top_reports,team_id,Unique identifier for the team that produced the report
 PlatformData,top_reports,team,Screen name for the team_id
-PlatformData,top_reports,report_id,"Unique identifier for the report (response of type ""report"")"
+PlatformData,top_reports,report_id,Unique identifier for the report (response of type 'report')
 PlatformData,top_reports,team_rating,The aggregate rating of the report from the (internal) team at time of submission
 PlatformData,top_reports,rating_count,Number of received ratings
 PlatformData,top_reports,origin_author_id,Unique identifier of the user that first created the response that ultimately resulted in this top report
@@ -124,9 +124,9 @@ PlatformData,responses,response_id,Unique identifier for the a response
 PlatformData,responses,time_created,Timestamp when the response was first created
 PlatformData,responses,time_last_changed,Timestamp when the response was last updated
 PlatformData,responses,response_title,The beginning of the response in plain text format
-PlatformData,responses,response_type,"Type of response, currently ""report"" or ""resource"". More types may be added in future"
+PlatformData,responses,response_type,"Type of response, currently 'report' or 'resource'. More types may be added in future"
 PlatformData,responses,response_text,A unique filename of the response content in markdown text format
-PlatformData,responses,response_file,"A unique filename in the ""Responses"" subfolder that contains the HTML file of the response"
+PlatformData,responses,response_file,A unique filename in the 'Responses' subfolder that contains the HTML file of the response
 PlatformData,responses,problem,Short title of the problem
 PlatformData,timeline,chunk_id,"Unique identifier for the artefact contributed (can be a report, resource, comment, rating, update)"
 PlatformData,timeline,parent_id,"Unique identifier for the source the artefact was contributed to (a report or resource in case of a comment or update, a problem_id in case of a report or resource, a report in case of a rating)"
@@ -238,13 +238,112 @@ CoreData,parts,user,Username.
 CoreData,parts,isOrg,Logical. Equals TRUE if user participated as part of an organisational team.
 CoreData,parts,gaveConsent2,Gave consent to participate in the ‘Problem Solving In Online Groups’ experiment.
 CoreData,parts,gaveConsent3,Gave consent to participate in the ‘Identifying and Rating Quality of Reasoning’ experiment.
+CoreData,parts,gaveConsent4,Gave consent to proceed with the Entry Survey in the Psychology Capstone exercise.
 CoreData,parts,agreedToTerms,
 CoreData,parts,agegroup,Age group.
 CoreData,parts,gender,Gender.
 CoreData,parts,occupation,Occupation status.
 CoreData,parts,education,Highest education level.
+CoreData,parts,"major1, major2",Subjects majored in.
+CoreData,parts,"minor1, minor2",Subjects minored in.
 CoreData,parts,studyarea,Study area.
 CoreData,parts,studyareaOtherInput,"Free text input for ‘Other’ study area, if selected."
+CoreData,parts,englishProficiency,"Proficiency in English. Response options are: ‘No proficiency’, ‘Elementary proficiency’, ‘Limited working proficiency’, ‘Professional working proficiency’, ‘Full professional proficiency’, ‘Native or bilingual proficiency’"
+CoreData,parts,loteProficiency1-6,Specified proficiency levels in up to 6 languages other than English.
+CoreData,parts,loteProficiencyText1-6,The languages for which the proficiency is specified in loteProficiency.
+CoreData,parts,enjoyLogicProbs,"Response to the prompt: ‘How enjoyable do you find logic problems?’ Response options are: ‘Note at all enjoyable’, ‘A little bit enjoyable’, ‘Slightly enjoyable’, ‘Somewhat enjoyable’, ‘Quite enjoyable’, ‘Very enjoyable’, ‘Extremely enjoyable’"
+CoreData,parts,enjoyNumProbs,"Response to the prompt: ‘How enjoyable do you find number problems?’ Response options are: ‘Note at all enjoyable’, ‘A little bit enjoyable’, ‘Slightly enjoyable’, ‘Somewhat enjoyable’, ‘Quite enjoyable’, ‘Very enjoyable’, ‘Extremely enjoyable’"
+CoreData,parts,exp1,"Numerical encoding of the participant’s response to the prompt: ‘Please rate your level of technical expertise in the following areas: Mathematics (generally)’. 1 = ‘Not familiar with this domain’, 2 = ‘Studied in school, but don’t use it’, 3 = ‘Use this knowledge occasionally’, 4 = ‘Use this knowledge regularly’, 5 = ‘I am a recognized expert’, 6 = ‘I am an international authority’."
+CoreData,parts,exp2,"Numerical encoding of the participant’s response to the prompt: ‘Please rate your level of technical expertise in the following areas: Quantitative  Modeling, Simulation’. 1 = ‘Not familiar with this domain’, 2 = ‘Studied in school, but don’t use it’, 3 = ‘Use this knowledge occasionally’, 4 = ‘Use this knowledge regularly’, 5 = ‘I am a recognized expert’, 6 = ‘I am an international authority’."
+CoreData,parts,exp3,"Numerical encoding of the participant’s response to the prompt: ‘Please rate your level of technical expertise in the following areas: Statistics’. 1 = ‘Not familiar with this domain’, 2 = ‘Studied in school, but don’t use it’, 3 = ‘Use this knowledge occasionally’, 4 = ‘Use this knowledge regularly’, 5 = ‘I am a recognized expert’, 6 = ‘I am an international authority’."
+CoreData,parts,exp4,"Numerical encoding of the participant’s response to the prompt: ‘Please rate your level of technical expertise in the following areas: Probability’. 1 = ‘Not familiar with this domain’, 2 = ‘Studied in school, but don’t use it’, 3 = ‘Use this knowledge occasionally’, 4 = ‘Use this knowledge regularly’, 5 = ‘I am a recognized expert’, 6 = ‘I am an international authority’."
+CoreData,parts,exp5,"Numerical encoding of the participant’s response to the prompt: ‘Please rate your level of technical expertise in the following areas: Bayes Nets’. 1 = ‘Not familiar with this domain’, 2 = ‘Studied in school, but don’t use it’, 3 = ‘Use this knowledge occasionally’, 4 = ‘Use this knowledge regularly’, 5 = ‘I am a recognized expert’, 6 = ‘I am an international authority’."
+CoreData,parts,exp6,"Numerical encoding of the participant’s response to the prompt: ‘Please rate your level of technical expertise in the following areas: Programming’. 1 = ‘Not familiar with this domain’, 2 = ‘Studied in school, but don’t use it’, 3 = ‘Use this knowledge occasionally’, 4 = ‘Use this knowledge regularly’, 5 = ‘I am a recognized expert’, 6 = ‘I am an international authority’."
+CoreData,parts,exp7,"Numerical encoding of the participant’s response to the prompt: ‘Please rate your level of technical expertise in the following areas: Experimental Design’. 1 = ‘Not familiar with this domain’, 2 = ‘Studied in school, but don’t use it’, 3 = ‘Use this knowledge occasionally’, 4 = ‘Use this knowledge regularly’, 5 = ‘I am a recognized expert’, 6 = ‘I am an international authority’."
+CoreData,parts,exp8,"Numerical encoding of the participant’s response to the prompt: ‘Please rate your level of technical expertise in the following areas: Risk Analysis’. 1 = ‘Not familiar with this domain’, 2 = ‘Studied in school, but don’t use it’, 3 = ‘Use this knowledge occasionally’, 4 = ‘Use this knowledge regularly’, 5 = ‘I am a recognized expert’, 6 = ‘I am an international authority’."
+CoreData,parts,exp9,"Numerical encoding of the participant’s response to the prompt: ‘Please rate your level of technical expertise in the following areas: Forecasting’. 1 = ‘Not familiar with this domain’, 2 = ‘Studied in school, but don’t use it’, 3 = ‘Use this knowledge occasionally’, 4 = ‘Use this knowledge regularly’, 5 = ‘I am a recognized expert’, 6 = ‘I am an international authority’."
+CoreData,parts,exp10,"Numerical encoding of the participant’s response to the prompt: ‘Please rate your level of technical expertise in the following areas: Decision Thoery (e.g. multi-attribute utility theory)’. 1 = ‘Not familiar with this domain’, 2 = ‘Studied in school, but don’t use it’, 3 = ‘Use this knowledge occasionally’, 4 = ‘Use this knowledge regularly’, 5 = ‘I am a recognized expert’, 6 = ‘I am an international authority’."
+CoreData,parts,exp11,"Numerical encoding of the participant’s response to the prompt: ‘Please rate your level of technical expertise in the following areas: Game Theory’. 1 = ‘Not familiar with this domain’, 2 = ‘Studied in school, but don’t use it’, 3 = ‘Use this knowledge occasionally’, 4 = ‘Use this knowledge regularly’, 5 = ‘I am a recognized expert’, 6 = ‘I am an international authority’."
+CoreData,parts,exp12,"Numerical encoding of the participant’s response to the prompt: ‘Please rate your level of technical expertise in the following areas: Structured Analytic Techniques’. 1 = ‘Not familiar with this domain’, 2 = ‘Studied in school, but don’t use it’, 3 = ‘Use this knowledge occasionally’, 4 = ‘Use this knowledge regularly’, 5 = ‘I am a recognized expert’, 6 = ‘I am an international authority’."
+CoreData,parts,exp13,"Numerical encoding of the participant’s response to the prompt: ‘Please rate your level of technical expertise in the following areas: Argument Mapping’. 1 = ‘Not familiar with this domain’, 2 = ‘Studied in school, but don’t use it’, 3 = ‘Use this knowledge occasionally’, 4 = ‘Use this knowledge regularly’, 5 = ‘I am a recognized expert’, 6 = ‘I am an international authority’."
+CoreData,parts,exp14,"Numerical encoding of the participant’s response to the prompt: ‘Please rate your level of technical expertise in the following areas: Informal Logic’. 1 = ‘Not familiar with this domain’, 2 = ‘Studied in school, but don’t use it’, 3 = ‘Use this knowledge occasionally’, 4 = ‘Use this knowledge regularly’, 5 = ‘I am a recognized expert’, 6 = ‘I am an international authority’."
+CoreData,parts,exp15,"Numerical encoding of the participant’s response to the prompt: ‘Please rate your level of technical expertise in the following areas: Systems Thinking or Cognitive Mapping’. 1 = ‘Not familiar with this domain’, 2 = ‘Studied in school, but don’t use it’, 3 = ‘Use this knowledge occasionally’, 4 = ‘Use this knowledge regularly’, 5 = ‘I am a recognized expert’, 6 = ‘I am an international authority’."
+CoreData,parts,exp16,"Numerical encoding of the participant’s response to the prompt: ‘Please rate your level of technical expertise in the following areas: Image Analysis’. 1 = ‘Not familiar with this domain’, 2 = ‘Studied in school, but don’t use it’, 3 = ‘Use this knowledge occasionally’, 4 = ‘Use this knowledge regularly’, 5 = ‘I am a recognized expert’, 6 = ‘I am an international authority’."
+CoreData,parts,exp17,"Numerical encoding of the participant’s response to the prompt: ‘Please rate your level of technical expertise in the following areas: Link Analysis’. 1 = ‘Not familiar with this domain’, 2 = ‘Studied in school, but don’t use it’, 3 = ‘Use this knowledge occasionally’, 4 = ‘Use this knowledge regularly’, 5 = ‘I am a recognized expert’, 6 = ‘I am an international authority’."
+CoreData,parts,exp18,"Numerical encoding of the participant’s response to the prompt: ‘Please rate your level of technical expertise in the following areas: Graphic Design’. 1 = ‘Not familiar with this domain’, 2 = ‘Studied in school, but don’t use it’, 3 = ‘Use this knowledge occasionally’, 4 = ‘Use this knowledge regularly’, 5 = ‘I am a recognized expert’, 6 = ‘I am an international authority’."
+CoreData,parts,exp19,"Numerical encoding of the participant’s response to the prompt: ‘Please rate your level of technical expertise in the following areas: Technical Writing’. 1 = ‘Not familiar with this domain’, 2 = ‘Studied in school, but don’t use it’, 3 = ‘Use this knowledge occasionally’, 4 = ‘Use this knowledge regularly’, 5 = ‘I am a recognized expert’, 6 = ‘I am an international authority’."
+CoreData,parts,pc…,"Probability coherence questions. The prompt is: ‘What is the probability that each of the following statements are true? If you are absolutely certain that the statement is true, you should enter 100. Likewise, if you are absolutely certain that the statement is false, you should enter 0. If you are uncertain, you should enter the probability that corresponds with what you think are the chances that the statement is true. When answering these questions, we ask that you do NOT consult with any outside sources.’ Respondents then select a probability as a percentage."
+CoreData,parts,pc5A,'HA is the postal abbreviation for Hawaii.'
+CoreData,parts,pc5B,'HI is the postal abbreviation for Hawaii.'
+CoreData,parts,pc5Acomp,'HA is NOT the postal abbreviation for Hawaii.'
+CoreData,parts,pc5AUB,'Either HA or HI is the postal abbreviation for Hawaii.'
+CoreData,parts,pc14A,'Michaelangelo painted the Sistine Chapel.'
+CoreData,parts,pc14B,'Raphael painted the Sistine Chapel.'
+CoreData,parts,pc14Acomp,'Michaelangelo did NOT paint the Sistine Chapel.'
+CoreData,parts,pc14AUB,'Either Michaelangelo or Raphael painted the Sistine Chapel.'
+CoreData,parts,pc35A,'The Pacific Ocean is the largest of Earth’s oceans.'
+CoreData,parts,pc35B,'The Indian Ocean is the largest of Earth’s oceans.'
+CoreData,parts,pc35Acomp,'The Pacific Ocean is NOT the largest of the Earth’s oceans.'
+CoreData,parts,pc35AUB,'Either the Pacific Ocean or the Indian Ocean is the largest of Earth’s oceans.'
+CoreData,parts,pc57A,'The term 'bounded rationality' was coined by Herbert Simon.'
+CoreData,parts,pc57B,'The term 'bounded rationality' was coined by Alan Turing.'
+CoreData,parts,pc57Acomp,'The term 'bounded rationality' was NOT coined by Herbert Simon.'
+CoreData,parts,pc57AUB,'The term 'bounded rationality' was coined either by Herbert Simon or Alan Turing.'
+CoreData,parts,pc60A,'The oldest brother of famous philosopher William James was famous politician Walter James.'
+CoreData,parts,pc60B,'The oldest brother of famous philosopher William James was famous writer Henry James.'
+CoreData,parts,pc60Acomp,'The oldest brother of famous philosopher William James was NOT the famous politician Walter James.'
+CoreData,parts,pc60AUB,'The oldest brother of famous philosopher William James was either famous politician Walter James or famous writer Henry James.'
+CoreData,parts,pr1,"Probabilistic reasoning item. Prompt: 'A ball was drawn from a bag ontaning 10 red, 30 white, 20 blue, and 15 yellow balls. What is the probability that it is neither red nor blue?' Response options: '30/75', '10/75', '45.75'."
+CoreData,parts,pr2,"Probabilistic reasoning item. Prompt: 'The proportion of left-handed people is 4 out of 100. In a school there are 300 students. How many left-handed students are there?' Response options: 20, 12, 25."
+CoreData,parts,pr3,"Probabilistic reasoning item. Prompt: 'Smokers are about 35\% of the population. At the airport in the waiting room there are 200 passengers. How many smokers are there?' Response options: 70, 35, 20."
+CoreData,parts,pr4,"Probabilistic reasoning item. Prompt: 'A fair coin is tossed nine times. Which of the following sequences of outcomes is a more likely result of nine flips of the fair coin? (H: Heads, T: Tails)'. Response options: 'THHTHTTHH', 'HTHTHTHTH', 'Both sequences are equally likely'"
+CoreData,parts,pr5,"Probabilistic reasoning item. Prompt: 'Two containers, labelled A and B, are filled with red and yellow tokens in the following quantities. Container A contains 100 tokens, 65 red and 35 yellow. Container B contains 10 tokens, 6 red and 4 yellow. Each container is shaken vigorously. After choosing one of the containers, you must draw a token (without peeking, of course). Which container gives you a better chance of drawing a yellow token?' Response options: 'Container A (with 65 red and 35 yellow)', 'Container B (with 6 red and 4 yellow)', 'Equal chances from each container'."
+CoreData,parts,pr6,"Probabilistic reasoning item. Prompt: 'A marble bag contains 15 blue and 15 green marbles. After you drew 5 marbles (the marble draw was always put back into the bag), a sequence of five green marbles was obtained. What is the most likely outcome if a marble is drawn a sixth time?' Response options: 'A green marble', 'A blue marble', 'Blue and green are equally likely'."
+CoreData,parts,pr7,"Probabilistic reasoning item. Prompt: 'A bingo game is played with 25 numbers (from 1 to 25). At the first draw, which of the following results is the most likely?' Response options: 'It is more likely to be an even number', 'It is more likely to be an odd number', 'It is just as likely to be an even or an odd number'."
+CoreData,parts,pr8,"Probabilistic reasoning item. Prompt: 'Two decks, labelled A and B, are composed of cards with a star (star cards) and cards without any figure (white cards) on the reverse side. Deck A contains 100 cards, 80 white and 20 with a star. Deck B contains 10 cards, 8 white and 2 with a star. After choosing one of the decks, you must draw a card (without peeking, of course). Which deck gives you a better chance of drawing a star card?' Response options: 'Deck A (with 80 white and 20 star cards)', 'Deck B (with 8 white and 2 star cards', 'Equal chances from each deck'."
+CoreData,parts,pr9,"Probabilistic reasoning item. Prompt: 'A marble bag contains 10 blue and 20 green marbles. After you drew 5 marbles (the marble draw was always put back into the bag), a sequence of five green marbles was obtained. What is the most likely outcome if a marble is drawn a sixth time?' Response options: 'A green marble', 'A blue marble', 'Blue and green are equally likely'."
+CoreData,parts,pr10,"Probabilistic reasoning item. Prompt: '60\% of the population in a city are men and 40\% are women. 50\% of the men and 30\% of the women smoke. We select a person from the city at random. What is the probability that this person is a smoker?' Response options: 42\%, 50\%, 85\%."
+CoreData,parts,pr11,"Probabilistic reasoning item. Prompt: 'According to a recent survey, 90\% of the population in a city usually lie and 30\% of those usually lie about important matters. If we pick a person at random from this city, what is the probability that the person usually lies about important matters?' Response options: 60\%, 30\%, 27\%."
+CoreData,parts,pr12,"Probabilistic reasoning item. Prompt: 'In a choir there are 100 children: 30 boys and 70 girls. Half of the boys and 1 in 10 girls learn to play the piano. We select a child from the choir at random. What is the probability that he/she plays the piano?' Response options: '22 out of 100', '30 out of 100', '50 out of 100'."
+CoreData,parts,pr13,"Probabilistic reasoning item. Prompt: 'A village has 1000 inhabitants. 600 people own a pet, and amongst pet owners 1 in 3 owns more than one pet. If we select one person from this village at random, what is the probability that they own more than one pet' Response options: '333 out of 1000', '500 out of 1000', '200 out of 1000'."
+CoreData,parts,pr14,"Probabilistic reasoning item. Prompt: 'In a medical center a group of people were interviewed with the following results: (a table: ((,55 years old or younger,Over 55 years old, Total),(Previous heart attack, 29, 75, 104),(No previous heart attack, 401, 275, 676),(Total, 430, 350, 780))). Suppose we select a person from this group at random. Based on the table: What is the probability that the person has had a heart attack?' Response options: '104 out of 780', '104 out of 676', '390 out fo 780'."
+CoreData,parts,pr15,"Probabilistic reasoning item. Prompt: 'What is the probability that the person has had a heart attack and, at the same time is older than 55?' Response options: '104 out of 350', '75 out of 350', '75 out of 780'."
+CoreData,parts,pr16,"Probabilistic reasoning item. Prompt: 'When the person had a heart attack, what is the probability that they are over 55?' Response options: '75 out of 780', '75 out of 104', '104 out of 350'."
+CoreData,parts,mat1-mat11,Responses to ICAR matrix reasoning questions.
+CoreData,parts,crt1,"Cognitive reflection task item. Prompt: 'A bat and a ball cost $1.10 in total. The bat costs a dollar more than the ball. How much does the ball cost? (Please enter a number in dollars, excluding the dollar sign.' "
+CoreData,parts,crt2,"Cognitive reflection task item. Prompt: 'If it takes 5 machines 5 minutes to make 5 widgets, how long would it take for 100 machines to make 100 widgets? (Please enter a number in minutes)'"
+CoreData,parts,crt3,"Cognitive reflection task item. Prompt: 'In a lake, there is a patch of lily pads. Every day, the patch doubles in size. If it takes 48 days for the patch to cover the entire lake, how long would it take for the patch to cover half the lake? (Please enter a number in days)'"
+CoreData,parts,crt4,"Cognitive reflection task item. Prompt: 'If it takes 2 nurses 2 minutes to measure the blood pressure of 2 patients, how long would it take 200 nurses to measure the blood pressure of 200 patients? (Please enter a number in minutes)'"
+CoreData,parts,crt5,"Cognitive reflection task item. Prompt: 'Soup and salad costs $5.50 in total. The soup costs a dollar more than the salad. How much does the salad cost? (Please enter a number in dollars, excluding the dollar sign)'"
+CoreData,parts,crt6,"Cognitive reflection task item. Prompt: 'Sally is making sun tea. Every hour, the concentration of the tea doubles. If it takes 6 hours for the tea to be ready, how long would it take for the tea to reach half of the final concentration? (Please enter a number in hours)'"
+CoreData,parts,crtSeenBefore,"Cognitive reflection task supplementary-item. 'Have you seen any of these 6 questions before?' Response options: Yes, No."
+CoreData,parts,crtSeenBeforeText,Cognitive reflection task supplementary-item. 'Which ones?'
+CoreData,parts,bfi1,"Big Five Inventory item. Prompt: 'Below are a number of characteristics that may or may not apply to you. For example, do you agree that you are someone who likes to spend time with others? Please rate the extent to which you agree or disagree with each statement. I am someone who is reserved.' 1 = ‘Strongly disagree’, 2 = ‘Disagree’, 3 = ‘Somewhat disagree’, 4 = ‘Neither agree nor disagree’, 5 = ‘Somewhat agree’, 6 = ‘Agree’, 7 = ‘Strongly agree’."
+CoreData,parts,bfi2,"Big Five Inventory item. Prompt: 'I am someone who is generally trusting.' 1 = ‘Strongly disagree’, 2 = ‘Disagree’, 3 = ‘Somewhat disagree’, 4 = ‘Neither agree nor disagree’, 5 = ‘Somewhat agree’, 6 = ‘Agree’, 7 = ‘Strongly agree’."
+CoreData,parts,bfi3,"Big Five Inventory item. Prompt: 'I am someone who tends to be lazy.' 1 = ‘Strongly disagree’, 2 = ‘Disagree’, 3 = ‘Somewhat disagree’, 4 = ‘Neither agree nor disagree’, 5 = ‘Somewhat agree’, 6 = ‘Agree’, 7 = ‘Strongly agree’."
+CoreData,parts,bfi4,"Big Five Inventory item. Prompt: 'I am someone who is relaxed, handles stress well.' 1 = ‘Strongly disagree’, 2 = ‘Disagree’, 3 = ‘Somewhat disagree’, 4 = ‘Neither agree nor disagree’, 5 = ‘Somewhat agree’, 6 = ‘Agree’, 7 = ‘Strongly agree’."
+CoreData,parts,bfi5,"Big Five Inventory item. Prompt: 'I am someone who has few artistic interests.' 1 = ‘Strongly disagree’, 2 = ‘Disagree’, 3 = ‘Somewhat disagree’, 4 = ‘Neither agree nor disagree’, 5 = ‘Somewhat agree’, 6 = ‘Agree’, 7 = ‘Strongly agree’."
+CoreData,parts,bfi6,"Big Five Inventory item. Prompt: 'I am someone who is outgoing, sociable.' 1 = ‘Strongly disagree’, 2 = ‘Disagree’, 3 = ‘Somewhat disagree’, 4 = ‘Neither agree nor disagree’, 5 = ‘Somewhat agree’, 6 = ‘Agree’, 7 = ‘Strongly agree’."
+CoreData,parts,bfi7,"Big Five Inventory item. Prompt: 'I am someone who tends to find faults with others.' 1 = ‘Strongly disagree’, 2 = ‘Disagree’, 3 = ‘Somewhat disagree’, 4 = ‘Neither agree nor disagree’, 5 = ‘Somewhat agree’, 6 = ‘Agree’, 7 = ‘Strongly agree’."
+CoreData,parts,bfi8,"Big Five Inventory item. Prompt: 'I am someone who does a thorough job.' 1 = ‘Strongly disagree’, 2 = ‘Disagree’, 3 = ‘Somewhat disagree’, 4 = ‘Neither agree nor disagree’, 5 = ‘Somewhat agree’, 6 = ‘Agree’, 7 = ‘Strongly agree’."
+CoreData,parts,bfi9,"Big Five Inventory item. Prompt: 'I am someone who gets nervous easily.' 1 = ‘Strongly disagree’, 2 = ‘Disagree’, 3 = ‘Somewhat disagree’, 4 = ‘Neither agree nor disagree’, 5 = ‘Somewhat agree’, 6 = ‘Agree’, 7 = ‘Strongly agree’."
+CoreData,parts,bfi10,"Big Five Inventory item. Prompt: 'I am someone who has an active imagination.' 1 = ‘Strongly disagree’, 2 = ‘Disagree’, 3 = ‘Somewhat disagree’, 4 = ‘Neither agree nor disagree’, 5 = ‘Somewhat agree’, 6 = ‘Agree’, 7 = ‘Strongly agree’."
+CoreData,parts,tp1,"Teamwork Perceptions item. Prompt: 'I have found working as part of a team in my classes to be a valuable experience.' 1 = ‘Strongly disagree’, 2 = ‘Somewhat disagree’, 3 = ‘Neither agree nor disagree’, 4 = ‘Somewhat agree’, 5 = ‘Strongly agree’."
+CoreData,parts,tp2,"Teamwork Perceptions item. Prompt: 'In most of the teams I have been on, the other team members have generally contributed as much as I have.' 1 = ‘Strongly disagree’, 2 = ‘Somewhat disagree’, 3 = ‘Neither agree nor disagree’, 4 = ‘Somewhat agree’, 5 = ‘Strongly agree’."
+CoreData,parts,tp3,"Teamwork Perceptions item. Prompt: 'In most of the teams I have been on, I felt the other team members respected me.' 1 = ‘Strongly disagree’, 2 = ‘Somewhat disagree’, 3 = ‘Neither agree nor disagree’, 4 = ‘Somewhat agree’, 5 = ‘Strongly agree’."
+CoreData,parts,tp4,"Teamwork Perceptions item. Prompt: 'In most of the teams I have been on, the team has worked well together.' 1 = ‘Strongly disagree’, 2 = ‘Somewhat disagree’, 3 = ‘Neither agree nor disagree’, 4 = ‘Somewhat agree’, 5 = ‘Strongly agree’."
+CoreData,parts,tp5,"Teamwork Perceptions item. Prompt: 'I have found teamwork to be a productive use of course time.' 1 = ‘Strongly disagree’, 2 = ‘Somewhat disagree’, 3 = ‘Neither agree nor disagree’, 4 = ‘Somewhat agree’, 5 = ‘Strongly agree’."
+CoreData,parts,tp6,"Teamwork Perceptions item. Prompt: 'I have found that teams help me learn course material more than if I just studied alone.' 1 = ‘Strongly disagree’, 2 = ‘Somewhat disagree’, 3 = ‘Neither agree nor disagree’, 4 = ‘Somewhat agree’, 5 = ‘Strongly agree’."
+CoreData,parts,tp7,"Teamwork Perceptions item. Prompt: 'I have learned more in courses where I have been a member of a team.' 1 = ‘Strongly disagree’, 2 = ‘Somewhat disagree’, 3 = ‘Neither agree nor disagree’, 4 = ‘Somewhat agree’, 5 = ‘Strongly agree’."
+CoreData,parts,tp8,"Teamwork Perceptions item. Prompt: 'I have found being part of a team improved my course grades.' 1 = ‘Strongly disagree’, 2 = ‘Somewhat disagree’, 3 = ‘Neither agree nor disagree’, 4 = ‘Somewhat agree’, 5 = ‘Strongly agree’."
+CoreData,parts,tp9,"Teamwork Perceptions item. Prompt: 'I have found that working with a team helps me develop skills in working with others.' 1 = ‘Strongly disagree’, 2 = ‘Somewhat disagree’, 3 = ‘Neither agree nor disagree’, 4 = ‘Somewhat agree’, 5 = ‘Strongly agree’."
+CoreData,parts,tp10,"Teamwork Perceptions item. Prompt: 'I have found that working with a team has helped me develop cooperative leadership skills.' 1 = ‘Strongly disagree’, 2 = ‘Somewhat disagree’, 3 = ‘Neither agree nor disagree’, 4 = ‘Somewhat agree’, 5 = ‘Strongly agree’."
+CoreData,parts,tp11,"Teamwork Perceptions item. Prompt: 'I have found that working with a team has helped me develop more respect for the opinion of others.' 1 = ‘Strongly disagree’, 2 = ‘Somewhat disagree’, 3 = ‘Neither agree nor disagree’, 4 = ‘Somewhat agree’, 5 = ‘Strongly agree’."
+CoreData,parts,tp12,"Teamwork Perceptions item. Prompt: 'I have found that working with a team has enhanced my sense of who I am.' 1 = ‘Strongly disagree’, 2 = ‘Somewhat disagree’, 3 = ‘Neither agree nor disagree’, 4 = ‘Somewhat agree’, 5 = ‘Strongly agree’."
+CoreData,parts,tp13,"Teamwork Perceptions item. Prompt: 'I have found that teams make good decisions.' 1 = ‘Strongly disagree’, 2 = ‘Somewhat disagree’, 3 = ‘Neither agree nor disagree’, 4 = ‘Somewhat agree’, 5 = ‘Strongly agree’."
+CoreData,parts,tp14,"Teamwork Perceptions item. Prompt: 'I have found that being on a team has helped me become better at problem solving.' 1 = ‘Strongly disagree’, 2 = ‘Somewhat disagree’, 3 = ‘Neither agree nor disagree’, 4 = ‘Somewhat agree’, 5 = ‘Strongly agree’."
+CoreData,parts,tp15,"Teamwork Perceptions item. Prompt: 'Being part of a team discussion has improved my ability to think through a problem.' 1 = ‘Strongly disagree’, 2 = ‘Somewhat disagree’, 3 = ‘Neither agree nor disagree’, 4 = ‘Somewhat agree’, 5 = ‘Strongly agree’."
+CoreData,parts,tp16,"Teamwork Perceptions item. Prompt: 'I feel that team-based learning has improved my reasoning skills.' 1 = ‘Strongly disagree’, 2 = ‘Somewhat disagree’, 3 = ‘Neither agree nor disagree’, 4 = ‘Somewhat agree’, 5 = ‘Strongly agree’."
 CoreData,parts,int1,"Logical. Indicates whether the participant selected ‘What the problems will be like’ among their responses to the prompt: ‘Thinking about the Hunt Challenge, what are you most interested in?’."
 CoreData,parts,int2,"Logical. Indicates whether the participant selected ‘Platform functionality’ among their responses to the prompt: ‘Thinking about the Hunt Challenge, what are you most interested in?’."
 CoreData,parts,int3,"Logical. Indicates whether the participant selected ‘How reports are created’ among their responses to the prompt: ‘Thinking about the Hunt Challenge, what are you most interested in?’."

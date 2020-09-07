@@ -1,7 +1,7 @@
 ---
 title: 'PlatformData Dictionary'
 author: 'Richard de Rozario & Luke Thorburn'
-date: '2020-08-29'
+date: '2020-09-06'
 output: rmarkdown::html_vignette
 vignette: >
     %\VignetteIndexEntry{PlatformData Dictionary}
@@ -114,7 +114,7 @@ commenter_name         Name of the commenter
 time_created           Timestamp when the comment was first created
 time_last_changed      Timestamp when the comment was last updated
 comment_text           A unique filename of the comment content in markdown text format
-comment_file           A unique filename in the ""Comments"" subfolder that contains the HTML file of the comment
+comment_file           A unique filename in the 'Comments' subfolder that contains the HTML file of the comment
 problem                Short title of the problem
 
 
@@ -142,7 +142,7 @@ description
 start_date            
 due_date              
 problem_text          A unique filename of the problem content in markdown text format
-problem_file          A unique filename in the ""Problems"" subfolder that contains the HTML file of the problem
+problem_file          A unique filename in the 'Problems' subfolder that contains the HTML file of the problem
 problem_template      
 exercise              
 
@@ -155,14 +155,14 @@ ColumnName               Description
 -------------------      ------------------------------
 problem_id               Unique identifier of the problem
 team_id                  Unique identifier for the team that produced the report
-content_type             ""report"", ""resource"", or ""comment"". Other types may be added in future.
+content_type             'report', 'resource', or 'comment'. Other types may be added in future.
 content_id               Unique identifier for the content (content can be response or comment)
 author_id                Unique identifier of the original author of the response
 author                   Name of the user who originally authored the response
 rater_id                 Unique identifier of a user who rated the response
 rater                    Name of the user who rated the response
 last_edited              Timestamp when the rating was last updated
-rating_type              ""thumbs"", ""simple"", ""detailed""
+rating_type              'thumbs', 'simple', 'detailed'
 rating_total             1 or 0 for thumbs, number (0-100) for simple, aggregated number for detailed rating
 rating_sub_01_title      The title of the ratings subfield
 rating_sub_01            Number for detailed rating field 1
@@ -213,9 +213,9 @@ response_id            Unique identifier for the a response
 time_created           Timestamp when the response was first created
 time_last_changed      Timestamp when the response was last updated
 response_title         The beginning of the response in plain text format
-response_type          Type of response, currently ""report"" or ""resource"". More types may be added in future
+response_type          Type of response, currently 'report' or 'resource'. More types may be added in future
 response_text          A unique filename of the response content in markdown text format
-response_file          A unique filename in the ""Responses"" subfolder that contains the HTML file of the response
+response_file          A unique filename in the 'Responses' subfolder that contains the HTML file of the response
 problem                Short title of the problem
 
 
@@ -247,7 +247,7 @@ problem_id              Unique identifier of the problem
 problem                 Short title of the problem
 team_id                 Unique identifier for the team that produced the report
 team                    Screen name for the team_id
-report_id               Unique identifier for the report (response of type ""report"")
+report_id               Unique identifier for the report (response of type 'report')
 team_rating             The aggregate rating of the report from the (internal) team at time of submission
 rating_count            Number of received ratings
 origin_author_id        Unique identifier of the user that first created the response that ultimately resulted in this top report

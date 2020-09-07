@@ -12,9 +12,9 @@
   \item{time_created}{Timestamp when the response was first created}
   \item{time_last_changed}{Timestamp when the response was last updated}
   \item{response_title}{The beginning of the response in plain text format}
-  \item{response_type}{Type of response, currently ""report"" or ""resource"". More types may be added in future}
+  \item{response_type}{Type of response, currently 'report' or 'resource'. More types may be added in future}
   \item{response_text}{A unique filename of the response content in markdown text format}
-  \item{response_file}{A unique filename in the ""Responses"" subfolder that contains the HTML file of the response}
+  \item{response_file}{A unique filename in the 'Responses' subfolder that contains the HTML file of the response}
   \item{problem}{Short title of the problem}
 }
 }

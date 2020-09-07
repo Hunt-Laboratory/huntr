@@ -23,7 +23,11 @@ addRescaledEngagementMetrics = function(analytics) {
         ( x - min(x, na.rm = T) ) / ( max(x, na.rm = T) - min(x, na.rm = T ) )
     }
     for (a in as) {
-        analytics[[paste0(a,"_scaled")]] = rescale(analytics[[a]])
+        if (max(analytics[[a]]) - min(analytics[[a]]) == 0) {
+            analytics[[paste0(a,"_scaled")]] = 0
+        } else {
+            analytics[[paste0(a,"_scaled")]] = rescale(analytics[[a]])
+        }
     }
     analytics$engagement_scaled = 7*analytics$report_count_scaled +
         3*analytics$resource_count_scaled +
@@ -1577,6 +1581,753 @@ compile_parts_2020_HuntChallenge = function(path_to_data, instance_name) {
     return(setDT(ES))
 }
 
+compile_parts_2020_PsychologyCapstone = function(path_to_data, instance_name) {
+    path = paste0(path_to_data, instance_name, '/QualtricsData/')
+    
+    entrySurvey = fread(paste0(path, "EntrySurvey-noPII.csv"))
+    entrySurveySupplement = fread(paste0(path, "EntrySurveySupplement-noPII.csv"))
+    
+    # exitSurveyPub = fread(paste0(path, "HC2020_ExitSurvey_Public.csv"))
+    # exitSurveyOrg = fread(paste0(path, "HC2020_ExitSurvey_Organisations.csv"))
+    
+    entrySurvey = entrySurvey[3:nrow(entrySurvey)]
+    entrySurveySupplement = entrySurveySupplement[3:nrow(entrySurveySupplement)]
+    # exitSurveyPub = exitSurveyPub[3:nrow(exitSurveyPub)]
+    # exitSurveyOrg = exitSurveyOrg[3:nrow(exitSurveyOrg)]
+    
+    # exitSurveyPub = exitSurveyPub[,1:101]
+    
+    colnames(entrySurvey) <- c("startDate",
+                                  "endDate",
+                                  "status",
+                                  "IPaddress",
+                                  "progress",
+                                  "duration",
+                                  "finished",
+                                  "recordedDate",
+                                  "responseID",
+                                  "recipientLastName",
+                                  "recipientFirstName",
+                                  "recipientEmail",
+                                  "externalReference",
+                                  "latitude",
+                                  "longitude",
+                                  "distributionChannel",
+                                  "userLanguage",
+                                  
+                                  "gaveConsent4", # Psychology Capstone consent
+                                  "user",
+                                  
+                                  "age",
+                                  "gender",
+                                  "education",
+                                  
+                                  "major1",
+                                  "major2",
+                                  "minor1",
+                                  "minor2",
+                                  
+                                  "englishProficiency",
+                                  "loteProficiency1",
+                                  "loteProficiencyText1",
+                                  "loteProficiency2",
+                                  "loteProficiencyText2",
+                                  "loteProficiency3",
+                                  "loteProficiencyText3",
+                                  "loteProficiency4",
+                                  "loteProficiencyText4",
+                                  "loteProficiency5",
+                                  "loteProficiencyText5",
+                                  "loteProficiency6",
+                                  "loteProficiencyText6",
+                                  
+                                  "enjoyLogicProbs",
+                                  "enjoyNumProbs",
+                                  
+                                  "exp1", # Math
+                                  "exp2", # Quant Model
+                                  "exp3", # Stats
+                                  "exp4", # Prob
+                                  "exp5", # Bayse Nets
+                                  "exp6", # Programming
+                                  "exp7", # Experimental Design
+                                  "exp8", # Risk Analysis
+                                  "exp9", # Forecasting
+                                  "exp10", # Decision Theory
+                                  "exp11", # Game Theory
+                                  "exp12", # SATs
+                                  "exp13", # Argument Mapping
+                                  "exp14", # Informal Logic
+                                  "exp15", # Sys Think
+                                  "exp16", # Image Analysis
+                                  "exp17", # Link Analysis
+                                  "exp18", # Graphic Design
+                                  "exp19", # Technical Writing
+                                  
+                                  "pc35Acomp",
+                                  "pc57A",
+                                  "pc14Acomp",
+                                  "pc60AUB",
+                                  "pc5AUB",
+                                  
+                                  "pr1",
+                                  "pr2",
+                                  "pr3",
+                                  "pr4",
+                                  "pr5",
+                                  "pr6",
+                                  "pr7",
+                                  "pr8",
+                                  "pr9",
+                                  "pr10",
+                                  "pr11",
+                                  "pr12",
+                                  "pr13",
+                                  "pr14",
+                                  "pr15",
+                                  "pr16",
+                                  
+                                  "mat1",
+                                  "mat2",
+                                  "mat3",
+                                  "mat4",
+                                  "mat5",
+                                  "mat6",
+                                  "mat7",
+                                  "mat8",
+                                  "mat9",
+                                  "mat10",
+                                  "mat11",
+                                  
+                                  "pc60Acomp",
+                                  "pc5Acomp",
+                                  "pc35A",
+                                  "pc57Acomp",
+                                  "pc14B",
+                                  
+                                  "crt1",
+                                  "crt2",
+                                  "crt3",
+                                  "crt4",
+                                  "crt5",
+                                  "crt6",
+                                  "crtSeenBefore",
+                                  "crtSeenBeforeText",
+                                  
+                                  "aomt1",
+                                  "aomt2",
+                                  "aomt3",
+                                  "aomt4",
+                                  "aomt5",
+                                  "aomt6",
+                                  "aomt7",
+                                  "aomt8",
+                                  "aomt9",
+                                  "aomt10",
+                                  "aomt11",
+                                  
+                                  "bfi1",
+                                  "bfi2",
+                                  "bfi3",
+                                  "bfi4",
+                                  "bfi5",
+                                  "bfi6",
+                                  "bfi7",
+                                  "bfi8",
+                                  "bfi9",
+                                  "bfi10",
+                                  
+                                  "pc14A",
+                                  "pc57AUB",
+                                  "pc5B",
+                                  "pc35AUB",
+                                  "pc60A",
+                                  
+                                  "pc60B",
+                                  "pc57B",
+                                  "pc14AUB",
+                                  "pc5A",
+                                  "pc35B",
+                                  
+                                  "tp1",
+                                  "tp2",
+                                  "tp3",
+                                  "tp4",
+                                  "tp5",
+                                  "tp6",
+                                  "tp7",
+                                  "tp8",
+                                  "tp9",
+                                  "tp10",
+                                  "tp11",
+                                  "tp12",
+                                  "tp13",
+                                  "tp14",
+                                  "tp15",
+                                  "tp16"
+    )
+    
+    colnames(entrySurveySupplement) <- c("startDate",
+                               "endDate",
+                               "status",
+                               "IPaddress",
+                               "progress",
+                               "duration",
+                               "finished",
+                               "recordedDate",
+                               "responseID",
+                               "recipientLastName",
+                               "recipientFirstName",
+                               "recipientEmail",
+                               "externalReference",
+                               "latitude",
+                               "longitude",
+                               "distributionChannel",
+                               "userLanguage",
+                               
+                               "user",
+                               
+                               "tp1",
+                               "tp2",
+                               "tp3",
+                               "tp4",
+                               "tp5",
+                               "tp6",
+                               "tp7",
+                               "tp8",
+                               "tp9",
+                               "tp10",
+                               "tp11",
+                               "tp12",
+                               "tp13",
+                               "tp14",
+                               "tp15",
+                               "tp16"
+    )
+    
+    # Remove empty 
+    ES = entrySurvey[,1:(152-16)]
+    
+    
+    
+    # ExS = rbind(exitSurveyPub,
+    #             exitSurveyOrg,
+    #             use.names = TRUE,
+    #             fill = TRUE)
+    
+    # for (k in 1:nrow(ExS)) {
+    #     if (!ExS$isOrg[k]) {
+    #         ExS$user[k] = as.character(ES[recipientEmail == ExS$recipientEmail[k]]$user[1])
+    #     }
+    # }
+    
+    colsToRemove = c("startDate",
+                     "endDate",
+                     "status",
+                     "IPaddress",
+                     "duration",
+                     "recordedDate",
+                     "externalReference",
+                     "latitude",
+                     "longitude",
+                     "distributionChannel",
+                     "userLanguage",
+                     "responseID",
+                     "recipientLastName",
+                     "recipientFirstName",
+                     "recipientEmail"
+    )
+    ES = ES[,!..colsToRemove]
+    
+    # colsToRemove <- c("startDate",
+    #                   "endDate",
+    #                   "status",
+    #                   "IPaddress",
+    #                   "duration",
+    #                   "recordedDate",
+    #                   "responseID",
+    #                   "recipientLastName",
+    #                   "recipientFirstName",
+    #                   "recipientEmail",
+    #                   "externalReference",
+    #                   "latitude",
+    #                   "longitude",
+    #                   "distributionChannel",
+    #                   "userLanguage",
+    #                   "recaptcha",
+    #                   "username",
+    #                   "career2"
+    # )
+    # ExS = ExS[,!..colsToRemove]
+    
+    ES[ES == ""] <- NA
+    
+    # Add in missing team perceptions component.
+    for (k in 1:nrow(entrySurveySupplement)) {
+        ES[user == entrySurveySupplement$user[k],paste0('tp',1:16)] = entrySurveySupplement[k,paste0('tp',1:16)]
+    }
+    
+    ES[age >= 18 & age <= 25, agegroup := "18-25"]
+    ES[age >= 26 & age <= 35, agegroup := "26-35"]
+    ES[age >= 36 & age <= 45, agegroup := "36-45"]
+    ES[age >= 46 & age <= 55, agegroup := "46-55"]
+    ES[age >= 56 & age <= 65, agegroup := "56-65"]
+    ES[age >= 66, agegroup := "over 65"]
+    
+    ES[,`:=`(progress = as.numeric(progress),
+             finished = (finished == "True"),
+             gaveConsent4 = (gaveConsent4 == "I am happy to participate")
+    )]
+    
+    for (cl in paste0('exp', 1:19)) {
+        ES[get(cl) == "Not familiar with this domain", (cl) := 1]
+        ES[get(cl) == "Studied in school, but don't use it", (cl) := 2]
+        ES[get(cl) == "Use this knowledge occasionally", (cl) := 3]
+        ES[get(cl) == "Use this knowledge regularly", (cl) := 4]
+        ES[get(cl) == "I am a recognized expert", (cl) := 5]
+        ES[get(cl) == "I am an international authority", (cl) := 6]
+    }
+    
+    for (cl in paste0('aomt', 1:11)) {
+        ES[get(cl) == "Strongly Disagree", (cl) := 1]
+        ES[get(cl) == "Strongly disagree", (cl) := 1]
+        ES[get(cl) == "Disagree", (cl) := 2]
+        ES[get(cl) == "Somewhat disagree", (cl) := 3]
+        ES[get(cl) == "Neither agree nor disagree", (cl) := 4]
+        ES[get(cl) == "Somewhat agree", (cl) := 5]
+        ES[get(cl) == "Agree", (cl) := 6]
+        ES[get(cl) == "Strongly agree", (cl) := 7]
+        ES[[cl]] = as.numeric(ES[[cl]])
+    }
+
+    for (cl in paste0('bfi', 1:10)) {
+        ES[get(cl) == "Strongly Disagree", (cl) := 1]
+        ES[get(cl) == "Strongly disagree", (cl) := 1]
+        ES[get(cl) == "Disagree", (cl) := 2]
+        ES[get(cl) == "Somewhat disagree", (cl) := 3]
+        ES[get(cl) == "Neither agree nor disagree", (cl) := 4]
+        ES[get(cl) == "Somewhat agree", (cl) := 5]
+        ES[get(cl) == "Agree", (cl) := 6]
+        ES[get(cl) == "Strongly agree", (cl) := 7]
+    }
+    
+    for (cl in paste0('tp', 1:16)) {
+        ES[get(cl) == "Strongly disagree", (cl) := 1]
+        ES[get(cl) == "Somewhat disagree", (cl) := 2]
+        ES[get(cl) == "Neither agree nor disagree", (cl) := 3]
+        ES[get(cl) == "Somewhat agree", (cl) := 4]
+        ES[get(cl) == "Strongly agree", (cl) := 5]
+    }
+    
+    
+    # ExS[ExS == ""] <- NA
+    # ExS[timeWellSpent == "No", timeWellSpent := 1]
+    # ExS[timeWellSpent == "Unsure", timeWellSpent := 2]
+    # ExS[timeWellSpent == "Yes", timeWellSpent := 3]
+    # 
+    # for (cl in paste0('rate', 1:5)) {
+    #     ExS[get(cl) == "Poor", (cl) := 1]
+    #     ExS[get(cl) == "Average", (cl) := 2]
+    #     ExS[get(cl) == "Good", (cl) := 3]
+    # }
+    # 
+    # for (cl in paste0('exExpct', 1:10)) {
+    #     ExS[get(cl) == "Below", (cl) := 1]
+    #     ExS[get(cl) == "Below ", (cl) := 1]
+    #     ExS[get(cl) == "Met", (cl) := 2]
+    #     ExS[get(cl) == "Exceeded", (cl) := 3]
+    #     ExS[get(cl) == "I had no expectations", (cl) := 4]
+    # }
+    # 
+    # for (cl in paste0('tw', 1:7)) {
+    #     ExS[get(cl) == "Disagree", (cl) := 1]
+    #     ExS[get(cl) == "Neutral", (cl) := 2]
+    #     ExS[get(cl) == "Agree", (cl) := 3]
+    # }
+    # 
+    # for (cl in paste0('pf', 1:14)) {
+    #     ExS[get(cl) == "No", (cl) := 1]
+    #     ExS[get(cl) == "Yes", (cl) := 2]
+    #     ExS[get(cl) == "Not sure", (cl) := 3]
+    # }
+    # 
+    # for (cl in paste0('fb', 1:4)) {
+    #     ExS[get(cl) == "Disagree", (cl) := 1]
+    #     ExS[get(cl) == "Neutral", (cl) := 2]
+    #     ExS[get(cl) == "Agree", (cl) := 3]
+    # }
+    # 
+    # for (cl in paste0('exCap', 1:7)) {
+    #     ExS[get(cl) == "No", (cl) := 1]
+    #     ExS[get(cl) == "Somewhat", (cl) := 2]
+    #     ExS[get(cl) == "Significantly", (cl) := 3]
+    # }
+    # 
+    # for (cl in paste0('cha', 1:3)) {
+    #     ExS[get(cl) == "Disagree", (cl) := 1]
+    #     ExS[get(cl) == "Neutral", (cl) := 2]
+    #     ExS[get(cl) == "Agree", (cl) := 3]
+    # }
+    # 
+    # for (cl in paste0('career', 1)) {
+    #     ExS[get(cl) == "No change", (cl) := 1]
+    #     ExS[get(cl) == "Not changed", (cl) := 1]
+    #     ExS[get(cl) == "No change\t", (cl) := 1]
+    #     ExS[get(cl) == "Positively\t", (cl) := 2]
+    #     ExS[get(cl) == "Increased", (cl) := 2]
+    # }
+    # 
+    # for (cl in paste0('ca', 1:4)) {
+    #     ExS[get(cl) == "No", (cl) := 1]
+    #     ExS[get(cl) == "Yes", (cl) := 2]
+    #     ExS[get(cl) == "Not Sure", (cl) := 3]
+    # }
+    # 
+    # for (cl in paste0('swarm', 1:4)) {
+    #     ExS[get(cl) == "Strongly disagree", (cl) := 1]
+    #     ExS[get(cl) == "Disagree", (cl) := 2]
+    #     ExS[get(cl) == "Neutral", (cl) := 3]
+    #     ExS[get(cl) == "Agree", (cl) := 4]
+    #     ExS[get(cl) == "Strongly agree", (cl) := 5]
+    # }
+    # 
+    # for (cl in paste0('lk', 1:6)) {
+    #     ExS[get(cl) == "Disagree", (cl) := 1]
+    #     ExS[get(cl) == "Neutral", (cl) := 2]
+    #     ExS[get(cl) == "Agree", (cl) := 3]
+    # }
+    # 
+    # ExS[ratingTool == "No", ratingTool := 1]
+    # ExS[ratingTool == "Yes", ratingTool := 2]
+    # 
+    # ExS[externalTools == "No", externalTools := 1]
+    # ExS[externalTools == "Yes", externalTools := 2]
+    # 
+    # ExS[enoughTime == "No", enoughTime := 1]
+    # ExS[enoughTime == "Yes", enoughTime := 2]
+    # 
+    # ExS[,`:=`(progress = as.numeric(progress),
+    #           finished = (finished == "True"),
+    #           starRating = as.integer(substr(starRating,1,1)),
+    #           responseStatements = lapply(strsplit(responseStatements, ","), trimws),
+    #           ratingToolPurpose = lapply(strsplit(ratingToolPurpose, ","), trimws)
+    # )]
+    # 
+    # # Separate out responseStatements into own column.
+    # suppressWarnings(ExS[,`:=`(
+    #     res1 = stringr::str_detect(responseStatements, "The resources were an important contribution to problem solving"),
+    #     res2 = stringr::str_detect(responseStatements, "It was easy to keep track of all the resources posted on the Platform"),
+    #     res3 = stringr::str_detect(responseStatements, "My team created a lot of resources"),
+    #     res4 = stringr::str_detect(responseStatements, "It was too time consuming to read through everyone's resources.")
+    # )])
+    # 
+    # # Seperate out analytical experience into own column.
+    # suppressWarnings(ExS[,`:=`(
+    #     whyRate1 = stringr::str_detect(ratingToolPurpose, "I used rating to fairly indicate the readiness or quality of a report"),
+    #     whyRate2 = stringr::str_detect(ratingToolPurpose, "I used rating to give guidance to the author"),
+    #     whyRate3 = stringr::str_detect(ratingToolPurpose, "I used rating to push my prefered report to the top")
+    # )])
+    # 
+    # colsToRemove = c("responseStatements",
+    #                  "ratingToolPurpose")
+    # ExS = ExS[,!..colsToRemove]
+    
+    
+    # REORDER COLUMNS
+    ES = ES[,.(
+        progress,
+        finished,
+        gaveConsent4,
+        user,
+        
+        agegroup,
+        gender,
+        education,
+        
+        major1,
+        major2,
+        minor1,
+        minor2,
+        
+        englishProficiency,
+        loteProficiency1,
+        loteProficiencyText1,
+        loteProficiency2,
+        loteProficiencyText2,
+        loteProficiency3,
+        loteProficiencyText3,
+        loteProficiency4,
+        loteProficiencyText4,
+        loteProficiency5,
+        loteProficiencyText5,
+        loteProficiency6,
+        loteProficiencyText6,
+        
+        enjoyLogicProbs,
+        enjoyNumProbs,
+        
+        exp1,
+        exp2,
+        exp3,
+        exp4,
+        exp5,
+        exp6,
+        exp7,
+        exp8,
+        exp9,
+        exp10,
+        exp11,
+        exp12,
+        exp13,
+        exp14,
+        exp15,
+        exp16,
+        exp17,
+        exp18,
+        exp19,
+        
+        pc5A,
+        pc5B,
+        pc5Acomp,
+        pc5AUB,
+        pc14A,
+        pc14B,
+        pc14Acomp,
+        pc14AUB,
+        pc35A,
+        pc35B,
+        pc35Acomp,
+        pc35AUB,
+        pc57A,
+        pc57B,
+        pc57Acomp,
+        pc57AUB,
+        pc60A,
+        pc60B,
+        pc60Acomp,
+        pc60AUB,
+        
+        pr1,
+        pr2,
+        pr3,
+        pr4,
+        pr5,
+        pr6,
+        pr7,
+        pr8,
+        pr9,
+        pr10,
+        pr11,
+        pr12,
+        pr13,
+        pr14,
+        pr15,
+        pr16,
+        
+        mat1,
+        mat2,
+        mat3,
+        mat4,
+        mat5,
+        mat6,
+        mat7,
+        mat8,
+        mat9,
+        mat10,
+        mat11,
+        
+        crt1,
+        crt2,
+        crt3,
+        crt4,
+        crt5,
+        crt6,
+        crtSeenBefore,
+        crtSeenBeforeText,
+        
+        aomt1,
+        aomt2,
+        aomt3,
+        aomt4,
+        aomt5,
+        aomt6,
+        aomt7,
+        aomt8,
+        aomt9,
+        aomt10,
+        aomt11,
+        
+        bfi1,
+        bfi2,
+        bfi3,
+        bfi4,
+        bfi5,
+        bfi6,
+        bfi7,
+        bfi8,
+        bfi9,
+        bfi10,
+        
+        tp1,
+        tp2,
+        tp3,
+        tp4,
+        tp5,
+        tp6,
+        tp7,
+        tp8,
+        tp9,
+        tp10,
+        tp11,
+        tp12,
+        tp13,
+        tp14,
+        tp15,
+        tp16
+    )]
+    
+    # ExS = ExS[, .(
+    #     progress,
+    #     finished,
+    #     isOrg,
+    #     user,
+    #     starRating,
+    #     timeWellSpent,
+    #     bestThing,
+    #     worstThing,
+    #     
+    #     hoursPerWeek,
+    #     enoughTime,
+    #     proportionOwnTime,
+    #     
+    #     rate1,
+    #     rate2,
+    #     rate3,
+    #     rate4,
+    #     rate5,
+    #     
+    #     exExpct1,
+    #     exExpct2,
+    #     exExpct3,
+    #     exExpct4,
+    #     exExpct5,
+    #     exExpct6,
+    #     exExpct7,
+    #     exExpct8,
+    #     exExpct9,
+    #     exExpct10,
+    #     
+    #     tw1,
+    #     tw2,
+    #     tw3,
+    #     tw4,
+    #     tw5,
+    #     tw6,
+    #     tw7,
+    #     
+    #     pf1,
+    #     pf2,
+    #     pf3,
+    #     pf4,
+    #     pf5,
+    #     pf6,
+    #     pf7,
+    #     pf8,
+    #     pf9,
+    #     pf10,
+    #     pf11,
+    #     pf12,
+    #     pf13,
+    #     pf14,
+    #     pfComments,
+    #     
+    #     fb1,
+    #     fb2,
+    #     fb3,
+    #     fb4,
+    #     
+    #     exCap1,
+    #     exCap2,
+    #     exCap3,
+    #     exCap4,
+    #     exCap5,
+    #     exCap6,
+    #     exCap7,
+    #     
+    #     mostValuable,
+    #     
+    #     cha1,
+    #     cha2,
+    #     cha3,
+    #     
+    #     career1,
+    #     
+    #     ca1,
+    #     ca2,
+    #     ca3,
+    #     ca4,
+    #     
+    #     swarm1,
+    #     swarm2,
+    #     swarm3,
+    #     swarm4,
+    #     
+    #     lk1,
+    #     lk2,
+    #     lk3,
+    #     lk4,
+    #     lk5,
+    #     lk6,
+    #     lkSuggestions,
+    #     
+    #     res1,
+    #     res2,
+    #     res3,
+    #     res4,
+    #     
+    #     whyRate1,
+    #     whyRate2,
+    #     whyRate3,
+    #     
+    #     ratingTool,
+    #     ratingToolWhyNot,
+    #     featureRequests,
+    #     externalTools,
+    #     externalToolsComments,
+    #     bestQuestionNotAsked,
+    #     testimonial,
+    #     otherComments
+    # )]
+    
+    ES <- ES[finished & ((gaveConsent4 == TRUE) | is.na(gaveConsent4))]
+    ES = ES[!is.na(ES$user)]
+    
+    # ExS <- ExS[(finished)]
+    # ExS = ExS[!is.na(ExS$user)]
+    
+    # ES = merge(ES, ExS, by = c("user", "isOrg"), all = T)
+    ES = as.data.frame(ES)
+    
+    ES$user = tolower(ES$user)
+    
+    # colsToRemove = c('finished.x', 'progress.x',
+    #                  'finished.y', 'progress.y')
+    # for (cl in colsToRemove) {
+    #     ES[[cl]] = NULL
+    # }
+    
+    # Compute AOMT construct.
+    ES = computeAOMT(ES)
+    
+    # Add in participants who didn't complete the entry survey.
+    users = c("gecko307","flyingfox753","koala806","fairywren473","thornydevil258","dingo367","pademelon117","goanna424","kookaburra542","galah431","corella928","currawong437","budgerigar571","echidna358","magpie806","kiwi231","emu750","quokka744","tassiedevil533","quoll339","sugarglider399","boobook990","cassowary120","numbat535","bilby505","blackswan808","kangaroo331","blackswan705","possum193","wombat650","bluewhale248","blackcockatoo586","flyingfox651","pobblebonk917","gecko593","crocodile147","wallaby468","frogmouth979","pharlap649","cockatoo319","kangaroo384","platypus604","wallaroo177","galah361","tassiedevil576","flyingfox488","cassowary792","budgerigar439","kiwi471","fairywren318","frogmouth679","kangaroo769")
+    users = users[!(users %in% ES$user)]
+    newES = data.table(user = users)
+    ES = plyr::rbind.fill(ES, newES)
+    
+    return(setDT(ES))
+}
+
 compile_parts = function(path_to_data, instance_name) {
     
     # Lookup table for relevant functions. This is required because demographic surveys differ
@@ -1584,7 +2335,8 @@ compile_parts = function(path_to_data, instance_name) {
     # data into a consistent format.
     compile_parts = list(
         "x2018_SwarmChallengeExp1" = compile_parts_2018_SwarmChallengeExp1,
-        "x2020_HuntChallenge" = compile_parts_2020_HuntChallenge
+        "x2020_HuntChallenge" = compile_parts_2020_HuntChallenge,
+        "x2020_PsychologyCapstone" = compile_parts_2020_PsychologyCapstone
     )
     
     if (instance_name %in% names(compile_parts)) {
@@ -1665,6 +2417,37 @@ compile_teamparts_2020_HuntChallenge = function(repo, path_to_data, instance_nam
     return(setDT(tmprt))
 }
 
+compile_teamparts_2020_PsychologyCapstone = function(repo, path_to_data, instance_name) {
+    
+    usrs = repo[[instance_name]]$CoreData$parts$user
+    
+    teamLookup = fread(paste0(path_to_data, instance_name, '/AdminData/usernames.csv'))
+    teamLookup$Username = tolower(teamLookup$Username)
+    teamLookup = teamLookup[Username %in% usrs]
+    
+    tmprt = data.table(
+        user = character(1000),
+        team = character(1000)
+    )
+    
+    k = 1L
+    for (j in 1:nrow(teamLookup)) {
+        
+        tms = paste(teamLookup[['Challenge Team']][j], sep=',')
+        tms = strsplit(tms, split = ',')[[1]]
+        for (tm in tms) {
+            set(tmprt, k, 'user', teamLookup$Username[j])
+            set(tmprt, k, 'team', tm)
+            k = k + 1L
+        }
+    }
+    
+    tmprt = tmprt[user != ""]
+    
+    tmprt = as.data.frame(tmprt)
+    return(setDT(tmprt))
+}
+
 compile_teamparts = function(repo, path_to_data, instance_name) {
     
     # Lookup table for relevant functions. This is required because demographic surveys differ
@@ -1672,7 +2455,8 @@ compile_teamparts = function(repo, path_to_data, instance_name) {
     # data into a consistent format.
     compile_teamparts = list(
         "x2018_SwarmChallengeExp1" = compile_teamparts_2018_SwarmChallengeExp1,
-        "x2020_HuntChallenge" = compile_teamparts_2020_HuntChallenge
+        "x2020_HuntChallenge" = compile_teamparts_2020_HuntChallenge,
+        "x2020_PsychologyCapstone" = compile_teamparts_2020_PsychologyCapstone
     )
     
     if (instance_name %in% names(compile_teamparts)) {
@@ -1828,6 +2612,49 @@ compile_teams_2020_HuntChallenge = function(repo, path_to_data, instance_name) {
     return(setDT(teams))
 }
 
+compile_teams_2020_PsychologyCapstone = function(repo, path_to_data, instance_name) {
+    
+    parts = repo[[instance_name]]$CoreData$parts
+    teamparts = repo[[instance_name]]$CoreData$teamparts
+    parts = merge(teamparts, parts, by = c("user"))
+    
+    # Create teams table.
+    
+    tms = unique(teamparts$team)
+    teams = data.frame(team = tms,
+                       AOMT = NA,
+                       divAOMT = NA,
+                       medianEdu = NA,
+                       type = rep('UT',length(tms))
+    )
+    getDivAOMT = function(tm) {
+        scores = parts[parts$team == tm,]$aomt
+        scores = scores[!is.na(scores)]
+        return(mean(c(dist(scores))))
+    }
+    
+    getMedianEdu = function(tm) {
+        eds = parts[parts$team == tm,]$education
+        eds[eds == "High School or GED Equivalency"] = 1
+        eds[eds == "Some College"] = 2
+        eds[eds == "Bachelor's Degree"] = 3
+        eds[eds == "Associate's Degree"] = 4
+        eds[eds == "Master's Degree"] = 5
+        eds[eds == "Professional or Doctoral Degree (e.g. MD, JD, PhD)"] = 6
+        eds = as.numeric(eds)
+        
+        return(median(eds, na.rm = T))
+    }
+    
+    for (k in 1:nrow(teams)) {
+        teams$AOMT[k] = median(parts[parts$team == teams$team[k],]$aomt, na.rm = T)
+        teams$divAOMT[k] = getDivAOMT(teams$team[k])
+        teams$medianEdu[k] = getMedianEdu(teams$team[k])
+    }
+    
+    return(setDT(teams))
+}
+
 compile_teams = function(repo, path_to_data, instance_name) {
     
     # Lookup table for relevant functions. This is required because demographic surveys differ
@@ -1835,7 +2662,8 @@ compile_teams = function(repo, path_to_data, instance_name) {
     # data into a consistent format.
     compile_teams = list(
         "x2018_SwarmChallengeExp1" = compile_teams_2018_SwarmChallengeExp1,
-        "x2020_HuntChallenge" = compile_teams_2020_HuntChallenge
+        "x2020_HuntChallenge" = compile_teams_2020_HuntChallenge,
+        "x2020_PsychologyCapstone" = compile_teams_2020_PsychologyCapstone
     )
     
     if (instance_name %in% names(compile_teams)) {
@@ -2292,6 +3120,234 @@ compile_probteams_2020_HuntChallenge = function(repo, path_to_data, instance_nam
     return(setDT(probteam))
 }
 
+compile_probteams_2020_PsychologyCapstone = function(repo, path_to_data, instance_name) {
+    
+    # ratings = fread(paste0(path, "ratings2020challenge.csv"))
+    # colnames(ratings) = c(
+    #     "reportID",
+    #     "password1",
+    #     "password2",
+    #     "password3",
+    #     "problem",
+    #     "team",
+    #     "participant",
+    #     "created",
+    #     "rater",
+    #     "c1", "c1comment", "c1distinction",
+    #     "c2", "c2comment", "c2distinction",
+    #     "c3", "c3distinction", "c3comment",
+    #     "c4", "c4comment",
+    #     "c5", "c5comment",
+    #     "c6", "c6comment",
+    #     "c7", "c7comment",
+    #     "c8",
+    #     "geo1",
+    #     "geo2",
+    #     "geo3",
+    #     "geo4",
+    #     "c8comment",
+    #     "c1score",
+    #     "c2score",
+    #     "c3score",
+    #     "c4score",
+    #     "c5score",
+    #     "c6score",
+    #     "c7score",
+    #     "c8score",
+    #     "IC",
+    #     "c1na",
+    #     "c2na",
+    #     "c3na",
+    #     "c4na",
+    #     "c5na",
+    #     "c6na",
+    #     "c7na",
+    #     "c8na",
+    #     "ruleBased",
+    #     "ruleBasedScore",
+    #     "ruleBaseAlexAns",
+    #     "c4distinction",
+    #     "c5distinction",
+    #     "c6distinction",
+    #     "c7distinction",
+    #     "c8distinction",
+    #     "lensKit",
+    #     "geo1score",
+    #     "geo2score",
+    #     "geo3score",
+    #     "geo4score",
+    #     "geoOverall",
+    #     "isRedactionTestRating",
+    #     "raterProbabilityEstimate",
+    #     "estTimeTaken",
+    #     "estJustification",
+    #     "estComments",
+    #     "bayes1",
+    #     "bayes2",
+    #     "bayes3",
+    #     "bayes1score",
+    #     "bayes2score",
+    #     "bayes3score",
+    #     "flaw1",
+    #     "flaw2",
+    #     "flaw3",
+    #     "flaw4"
+    # )
+    # ratings[ratings == ""] = NA
+    # ratings[IC == 0,"IC"] = NA
+    # ratings = ratings[,.(
+    #     problem,
+    #     team,
+    #     participant,
+    #     rater,
+    #     geo1,
+    #     geo2,
+    #     geo3,
+    #     geo4,
+    #     IC,
+    #     geo1score,
+    #     geo2score,
+    #     geo3score,
+    #     geo4score,
+    #     geoOverall,
+    #     isRedactionTestRating,
+    #     raterProbabilityEstimate,
+    #     estTimeTaken,
+    #     estJustification,
+    #     estComments,
+    #     bayes1,
+    #     bayes2,
+    #     bayes3,
+    #     bayes1score,
+    #     bayes2score,
+    #     bayes3score,
+    #     flaw1,
+    #     flaw2,
+    #     flaw3,
+    #     flaw4
+    # )]
+    # ratings[,bayesScore := bayes1score + bayes2score + bayes3score]
+    
+    parts = repo[[instance_name]]$CoreData$parts
+    teams = repo[[instance_name]]$CoreData$teams
+    tms = unique(teams$team)
+    problems = c("Foreign Fighters", "Corporate Espionage")
+    analytics = repo[[instance_name]]$PlatformData$analytics
+    responses = repo[[instance_name]]$PlatformData$responses
+    
+    response_path = paste0(path_to_data,instance_name,"/PlatformData/responses/text/")
+    
+    probteam = data.frame(team = rep(tms, length(problems)),
+                          problem = rep(problems, each = length(tms)),
+                          probNum = rep(1:length(problems), each = length(tms)),
+                          type = NA,
+                          avgIC = NA,
+                          nIC = NA,
+                          rankIC = NA,
+                          nGeoCorrect = NA,
+                          nBayesCorrect = NA,
+                          activeUsers = NA,
+                          textSimReports = NA,
+                          textSimResponses = NA,
+                          AOMT = NA,
+                          divAOMT = NA,
+                          medianEdu = NA)
+    
+    getActiveUsers = function(tm, pr) {
+        team_members = analytics[team == tm & problem == pr]
+        nActive = sum(team_members$engagement_scaled > 0)
+    }
+    
+    getTextSim = function(tm, pr, scope) {
+        if (scope == "reports") {
+            file_names = responses[team == tm & problem == pr & response_type == "report"]$response_text
+        } else if (scope == "resources") {
+            file_names = responses[team == tm & problem == pr & response_type == "resource"]$response_text
+        } else if (scope == "responses") {
+            file_names = responses[team == tm & problem == pr]$response_text
+        }
+        
+        if (length(file_names) > 1) {
+            reports = suppressWarnings(readtext::readtext(paste0(response_path,file_names[1])))  # surpress "*.md" warnings
+            
+            for (j in 2:length(file_names)) {
+                reports = rbind(reports, suppressWarnings(readtext::readtext(paste0(response_path,file_names[j]))))
+            }
+            
+            CORPUS = quanteda::corpus(reports)
+            DFM = quanteda::dfm(CORPUS,
+                                remove = quanteda::stopwords("english"),
+                                stem = TRUE, remove_punct = TRUE, remove_numbers = TRUE)
+            DistMat = quanteda::textstat_simil(DFM, method="cosine")
+            Distances = DistMat[lower.tri(DistMat)]
+            
+            library(quanteda)
+            # return( (1 - mean(Distances)) / sum(summary(CORPUS)$Tokens) )
+            return( mean(Distances) )
+        } else {
+            return( 1 )
+        }
+        
+    }
+    
+    getAOMT = function(tm, pr) {
+        active_team_members = analytics[team == tm & problem == pr & engagement_scaled > 0]$user
+        return( median(parts[parts$user %in% active_team_members,]$aomt, na.rm = T) )
+    }
+    
+    getDivAOMT = function(tm, pr) {
+        active_team_members = analytics[team == tm & problem == pr & engagement_scaled > 0]$user
+        scores = parts[parts$user %in% active_team_members,]$aomt
+        # scores = scores[!is.na(scores)]
+        # rval = mean(c(dist(scores)))
+        n = length(scores) * (length(scores) - 1) / 2 # Number of unique pairs.
+        rval = sum(dist(scores), na.rm = T) / n
+        if (is.na(rval)) {
+            rval = 0
+        }
+        return(rval)
+    }
+    
+    getMedianEdu = function(tm, pr) {
+        active_team_members = analytics[team == tm & problem == pr & engagement_scaled > 0]$user
+        eds = parts[parts$user %in% active_team_members,]$education
+        eds[eds == "High School or GED Equivalency"] = 1
+        eds[eds == "Some College"] = 2
+        eds[eds == "Bachelor's Degree"] = 3
+        eds[eds == "Associate's Degree"] = 4
+        eds[eds == "Master's Degree"] = 5
+        eds[eds == "Professional or Doctoral Degree (e.g. MD, JD, PhD)"] = 6
+        eds[eds == "Prefer not to say"] = NA
+        eds = as.numeric(eds)
+        
+        return(median(eds, na.rm = T))
+    }
+    
+    for (k in 1:nrow(probteam)) {
+        # i = which(K$team == probteam$team[k])
+        probteam$type[k] = "UT"
+        # probteam$avgIC[k] = K[[paste0("avg", probteam$probNum[k])]][i]
+        # probteam$nIC[k] = K[[paste0("nRatings", probteam$probNum[k])]][i]
+        # probteam$rankIC[k] = rank(-K[[paste0("avg", probteam$probNum[k])]], ties.method = "min")[i]
+        if (probteam$problem[k] == "Foreign Fighters") {
+            # probteam$nGeoCorrect[k] = K$nGeoCorrect[i]
+        }
+        if (probteam$problem[k] == "Corporate Espionage" & !is.na(probteam$avgIC[k])) {
+            # probteam$nBayesCorrect[k] = round(mean(ratings[team == probteam$team[k] & problem == "Corporate Espionage"]$bayesScore))
+        }
+        probteam$activeUsers[k] = getActiveUsers(probteam$team[k], probteam$problem[k])
+        probteam$textSimReports[k] = getTextSim(probteam$team[k], probteam$problem[k], 'reports')
+        probteam$textSimResponses[k] = getTextSim(probteam$team[k], probteam$problem[k], 'responses')
+        probteam$AOMT[k] = getAOMT(probteam$team[k], probteam$problem[k])
+        probteam$divAOMT[k] = getDivAOMT(probteam$team[k], probteam$problem[k])
+        probteam$medianEdu[k] = getMedianEdu(probteam$team[k], probteam$problem[k])
+    }
+    
+    # probteam = probteam[!is.na(probteam$avgIC),]
+    
+    return(setDT(probteam))
+}
+
 
 
 compile_probteams = function(repo, path_to_data, instance_name) {
@@ -2301,7 +3357,8 @@ compile_probteams = function(repo, path_to_data, instance_name) {
     # data into a consistent format.
     compile_probteams = list(
         "x2018_SwarmChallengeExp1" = compile_probteams_2018_SwarmChallengeExp1,
-        "x2020_HuntChallenge" = compile_probteams_2020_HuntChallenge
+        "x2020_HuntChallenge" = compile_probteams_2020_HuntChallenge,
+        "x2020_PsychologyCapstone" = compile_probteams_2020_PsychologyCapstone
     )
     
     if (instance_name %in% names(compile_probteams)) {
@@ -2321,6 +3378,7 @@ compile_probparts = function(repo, nClusters, generatePlots = F) {
     anal = anal[0,]
     
     for (nm in names(repo)) {
+    # for (nm in c("x2020_HuntChallenge","x2018_SwarmChallengeExp1")) {
         analytics = repo[[nm]]$PlatformData$analytics
         probteams = repo[[nm]]$CoreData$probteams
         
@@ -2394,16 +3452,16 @@ compile_probparts = function(repo, nClusters, generatePlots = F) {
     # Stripcharts for k-means: 
     anal[['cluster']] = factor(fit.km$cluster)
     anal[['clusterLabel']] = character(nrow(anal))
-    anal[anal$cluster == 1,]$clusterLabel = 'Talkative Multi-talent (Tier 2)'
-    anal[anal$cluster == 2,]$clusterLabel = 'Talkative Multi-talent (Tier 1)' # 'Slow-rating Multi-talent (Tier 1)'
-    anal[anal$cluster == 3,]$clusterLabel = 'Resource Guru' # 'Speed-rating Multi-talent (Tier 1)'
-    anal[anal$cluster == 4,]$clusterLabel = 'Speed-rating Multi-talent (Tier 1)' # 'Allrounder (Tier 1)'
-    anal[anal$cluster == 5,]$clusterLabel = 'Report Guru' # 'Slow-rating Multi-talent (Tier 2)'
-    anal[anal$cluster == 6,]$clusterLabel = 'Allrounder' # 'Report Guru'
-    anal[anal$cluster == 7,]$clusterLabel = 'Slow-rating Multi-talent (Tier 1)' # 'Allrounder (Tier 2)'
-    anal[anal$cluster == 8,]$clusterLabel = 'Drop In' # 'Speed-rating Multi-talent (Tier 2)'
-    anal[anal$cluster == 9,]$clusterLabel = 'Speed-rating Multi-talent (Tier 2)' # 'Single-minded Raters'
-    anal[anal$cluster == 10,]$clusterLabel = 'Slow-rating Multi-talent (Tier 2)' # 'Drop In'
+    anal[anal$cluster == 1,]$clusterLabel = 'Report Guru' # 'Talkative Multi-talent (Tier 2)'
+    anal[anal$cluster == 2,]$clusterLabel = 'Allrounder' # 'Slow-rating Multi-talent (Tier 1)'
+    anal[anal$cluster == 3,]$clusterLabel = 'Slow-rating Multi-talent (Tier 2)' # 'Speed-rating Multi-talent (Tier 1)'
+    anal[anal$cluster == 4,]$clusterLabel = 'Drop In' # 'Speed-rating Multi-talent (Tier 1)' # 'Allrounder (Tier 1)'
+    anal[anal$cluster == 5,]$clusterLabel = 'Talkative Multi-talent (Tier 2)' # 'Report Guru' # 'Slow-rating Multi-talent (Tier 2)'
+    anal[anal$cluster == 6,]$clusterLabel = 'Slow-rating Multi-talent (Tier 1)' # 'Report Guru'
+    anal[anal$cluster == 7,]$clusterLabel = 'Speed-rating Multi-talent (Tier 2)' # 'Allrounder (Tier 2)'
+    anal[anal$cluster == 8,]$clusterLabel = 'Talkative Multi-talent (Tier 1)' # 'Slow-rating Multi-talent (Tier 1)' # 'Drop In' # 'Speed-rating Multi-talent (Tier 2)'
+    anal[anal$cluster == 9,]$clusterLabel = 'Resource Guru' # 'Slow-rating Multi-talent (Tier 2)' # 'Single-minded Raters'
+    anal[anal$cluster == 10,]$clusterLabel = 'Speed-rating Multi-talent (Tier 1)' # 'Drop In'
     
     D = anal
     for (cn in colnames(D)[4:10]) {
@@ -2426,7 +3484,7 @@ compile_probparts = function(repo, nClusters, generatePlots = F) {
     pw = P[[1]] + P[[2]] + P[[3]] + P[[4]] + P[[5]] + P[[6]] + P[[7]] + P[[8]] + P[[9]] + P[[10]]
     
     if (generatePlots) {
-        ggexport(pw,
+        ggpubr::ggexport(pw,
                  filename = "Cluster Overview.png",
                  width = 4181,
                  height = 2000,
@@ -2619,6 +3677,7 @@ compile_data = function(path = "data/",
     require(data.table)
     
     instances = c(
+        'x2020_PsychologyCapstone',
         'x2020_HuntChallenge',
         'x2018_SwarmChallengeExp1'
     )
@@ -2641,9 +3700,9 @@ compile_data = function(path = "data/",
         repo[[instance_name]][['CoreData']]$teamparts = compile_teamparts(repo, path, instance_name)
         repo[[instance_name]][['CoreData']]$teams = compile_teams(repo, path, instance_name)
         repo[[instance_name]][['CoreData']]$probteams = compile_probteams(repo, path, instance_name)
-        repo[[instance_name]][['CoreData']]$rates = compile_rates(repo, path, instance_name)
+        # repo[[instance_name]][['CoreData']]$rates = compile_rates(repo, path, instance_name)
     }
-    repo = compile_probparts(repo, nClusters = 10)
+    repo = compile_probparts(repo, nClusters = 10, generatePlots = F)
     
     # Reorder folders.
     for (instance_name in instances) {
@@ -2656,7 +3715,8 @@ compile_data = function(path = "data/",
     if (use_previous_redactions) {
         repo = apply_previous_redactions(
             repo,
-            instances = c('x2020_HuntChallenge'),
+            instances = c('x2020_HuntChallenge',
+                          'x2020_PsychologyCapstone'),
             path = 'experiment-data'
         )
     } else {

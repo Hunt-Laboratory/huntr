@@ -17,7 +17,7 @@
   \item{time_created}{Timestamp when the comment was first created}
   \item{time_last_changed}{Timestamp when the comment was last updated}
   \item{comment_text}{A unique filename of the comment content in markdown text format}
-  \item{comment_file}{A unique filename in the ""Comments"" subfolder that contains the HTML file of the comment}
+  \item{comment_file}{A unique filename in the 'Comments' subfolder that contains the HTML file of the comment}
   \item{problem}{Short title of the problem}
 }
 }

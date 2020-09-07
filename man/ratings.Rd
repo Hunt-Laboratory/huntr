@@ -7,14 +7,14 @@
 \describe{
   \item{problem_id}{Unique identifier of the problem}
   \item{team_id}{Unique identifier for the team that produced the report}
-  \item{content_type}{""report"", ""resource"", or ""comment"". Other types may be added in future.}
+  \item{content_type}{'report', 'resource', or 'comment'. Other types may be added in future.}
   \item{content_id}{Unique identifier for the content (content can be response or comment)}
   \item{author_id}{Unique identifier of the original author of the response}
   \item{author}{Name of the user who originally authored the response}
   \item{rater_id}{Unique identifier of a user who rated the response}
   \item{rater}{Name of the user who rated the response}
   \item{last_edited}{Timestamp when the rating was last updated}
-  \item{rating_type}{""thumbs"", ""simple"", ""detailed""}
+  \item{rating_type}{'thumbs', 'simple', 'detailed'}
   \item{rating_total}{1 or 0 for thumbs, number (0-100) for simple, aggregated number for detailed rating}
   \item{rating_sub_01_title}{The title of the ratings subfield}
   \item{rating_sub_01}{Number for detailed rating field 1}

@@ -9,7 +9,7 @@
   \item{problem}{Short title of the problem}
   \item{team_id}{Unique identifier for the team that produced the report}
   \item{team}{Screen name for the team_id}
-  \item{report_id}{Unique identifier for the report (response of type ""report"")}
+  \item{report_id}{Unique identifier for the report (response of type 'report')}
   \item{team_rating}{The aggregate rating of the report from the (internal) team at time of submission}
   \item{rating_count}{Number of received ratings}
   \item{origin_author_id}{Unique identifier of the user that first created the response that ultimately resulted in this top report}

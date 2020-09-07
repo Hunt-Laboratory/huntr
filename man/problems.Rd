@@ -11,7 +11,7 @@
   \item{start_date}{}
   \item{due_date}{}
   \item{problem_text}{A unique filename of the problem content in markdown text format}
-  \item{problem_file}{A unique filename in the ""Problems"" subfolder that contains the HTML file of the problem}
+  \item{problem_file}{A unique filename in the 'Problems' subfolder that contains the HTML file of the problem}
   \item{problem_template}{}
   \item{exercise}{}
 }

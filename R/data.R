@@ -94,7 +94,7 @@ NULL
 #'   \item{time_created}{Timestamp when the comment was first created}
 #'   \item{time_last_changed}{Timestamp when the comment was last updated}
 #'   \item{comment_text}{A unique filename of the comment content in markdown text format}
-#'   \item{comment_file}{A unique filename in the ""Comments"" subfolder that contains the HTML file of the comment}
+#'   \item{comment_file}{A unique filename in the 'Comments' subfolder that contains the HTML file of the comment}
 #'   \item{problem}{Short title of the problem}
 #' }
 #'
@@ -128,7 +128,7 @@ NULL
 #'   \item{start_date}{}
 #'   \item{due_date}{}
 #'   \item{problem_text}{A unique filename of the problem content in markdown text format}
-#'   \item{problem_file}{A unique filename in the ""Problems"" subfolder that contains the HTML file of the problem}
+#'   \item{problem_file}{A unique filename in the 'Problems' subfolder that contains the HTML file of the problem}
 #'   \item{problem_template}{}
 #'   \item{exercise}{}
 #' }
@@ -144,14 +144,14 @@ NULL
  #'\describe{
 #'   \item{problem_id}{Unique identifier of the problem}
 #'   \item{team_id}{Unique identifier for the team that produced the report}
-#'   \item{content_type}{""report"", ""resource"", or ""comment"". Other types may be added in future.}
+#'   \item{content_type}{'report', 'resource', or 'comment'. Other types may be added in future.}
 #'   \item{content_id}{Unique identifier for the content (content can be response or comment)}
 #'   \item{author_id}{Unique identifier of the original author of the response}
 #'   \item{author}{Name of the user who originally authored the response}
 #'   \item{rater_id}{Unique identifier of a user who rated the response}
 #'   \item{rater}{Name of the user who rated the response}
 #'   \item{last_edited}{Timestamp when the rating was last updated}
-#'   \item{rating_type}{""thumbs"", ""simple"", ""detailed""}
+#'   \item{rating_type}{'thumbs', 'simple', 'detailed'}
 #'   \item{rating_total}{1 or 0 for thumbs, number (0-100) for simple, aggregated number for detailed rating}
 #'   \item{rating_sub_01_title}{The title of the ratings subfield}
 #'   \item{rating_sub_01}{Number for detailed rating field 1}
@@ -208,9 +208,9 @@ NULL
 #'   \item{time_created}{Timestamp when the response was first created}
 #'   \item{time_last_changed}{Timestamp when the response was last updated}
 #'   \item{response_title}{The beginning of the response in plain text format}
-#'   \item{response_type}{Type of response, currently ""report"" or ""resource"". More types may be added in future}
+#'   \item{response_type}{Type of response, currently 'report' or 'resource'. More types may be added in future}
 #'   \item{response_text}{A unique filename of the response content in markdown text format}
-#'   \item{response_file}{A unique filename in the ""Responses"" subfolder that contains the HTML file of the response}
+#'   \item{response_file}{A unique filename in the 'Responses' subfolder that contains the HTML file of the response}
 #'   \item{problem}{Short title of the problem}
 #' }
 #'
@@ -248,7 +248,7 @@ NULL
 #'   \item{problem}{Short title of the problem}
 #'   \item{team_id}{Unique identifier for the team that produced the report}
 #'   \item{team}{Screen name for the team_id}
-#'   \item{report_id}{Unique identifier for the report (response of type ""report"")}
+#'   \item{report_id}{Unique identifier for the report (response of type 'report')}
 #'   \item{team_rating}{The aggregate rating of the report from the (internal) team at time of submission}
 #'   \item{rating_count}{Number of received ratings}
 #'   \item{origin_author_id}{Unique identifier of the user that first created the response that ultimately resulted in this top report}
@@ -268,13 +268,112 @@ NULL
 #'   \item{isOrg}{Logical. Equals TRUE if user participated as part of an organisational team.}
 #'   \item{gaveConsent2}{Gave consent to participate in the ‘Problem Solving In Online Groups’ experiment.}
 #'   \item{gaveConsent3}{Gave consent to participate in the ‘Identifying and Rating Quality of Reasoning’ experiment.}
+#'   \item{gaveConsent4}{Gave consent to proceed with the Entry Survey in the Psychology Capstone exercise.}
 #'   \item{agreedToTerms}{}
 #'   \item{agegroup}{Age group.}
 #'   \item{gender}{Gender.}
 #'   \item{occupation}{Occupation status.}
 #'   \item{education}{Highest education level.}
+#'   \item{major1, major2}{Subjects majored in.}
+#'   \item{minor1, minor2}{Subjects minored in.}
 #'   \item{studyarea}{Study area.}
 #'   \item{studyareaOtherInput}{Free text input for ‘Other’ study area, if selected.}
+#'   \item{englishProficiency}{Proficiency in English. Response options are: ‘No proficiency’, ‘Elementary proficiency’, ‘Limited working proficiency’, ‘Professional working proficiency’, ‘Full professional proficiency’, ‘Native or bilingual proficiency’}
+#'   \item{loteProficiency1-6}{Specified proficiency levels in up to 6 languages other than English.}
+#'   \item{loteProficiencyText1-6}{The languages for which the proficiency is specified in loteProficiency.}
+#'   \item{enjoyLogicProbs}{Response to the prompt: ‘How enjoyable do you find logic problems?’ Response options are: ‘Note at all enjoyable’, ‘A little bit enjoyable’, ‘Slightly enjoyable’, ‘Somewhat enjoyable’, ‘Quite enjoyable’, ‘Very enjoyable’, ‘Extremely enjoyable’}
+#'   \item{enjoyNumProbs}{Response to the prompt: ‘How enjoyable do you find number problems?’ Response options are: ‘Note at all enjoyable’, ‘A little bit enjoyable’, ‘Slightly enjoyable’, ‘Somewhat enjoyable’, ‘Quite enjoyable’, ‘Very enjoyable’, ‘Extremely enjoyable’}
+#'   \item{exp1}{Numerical encoding of the participant’s response to the prompt: ‘Please rate your level of technical expertise in the following areas: Mathematics (generally)’. 1 = ‘Not familiar with this domain’, 2 = ‘Studied in school, but don’t use it’, 3 = ‘Use this knowledge occasionally’, 4 = ‘Use this knowledge regularly’, 5 = ‘I am a recognized expert’, 6 = ‘I am an international authority’.}
+#'   \item{exp2}{Numerical encoding of the participant’s response to the prompt: ‘Please rate your level of technical expertise in the following areas: Quantitative  Modeling, Simulation’. 1 = ‘Not familiar with this domain’, 2 = ‘Studied in school, but don’t use it’, 3 = ‘Use this knowledge occasionally’, 4 = ‘Use this knowledge regularly’, 5 = ‘I am a recognized expert’, 6 = ‘I am an international authority’.}
+#'   \item{exp3}{Numerical encoding of the participant’s response to the prompt: ‘Please rate your level of technical expertise in the following areas: Statistics’. 1 = ‘Not familiar with this domain’, 2 = ‘Studied in school, but don’t use it’, 3 = ‘Use this knowledge occasionally’, 4 = ‘Use this knowledge regularly’, 5 = ‘I am a recognized expert’, 6 = ‘I am an international authority’.}
+#'   \item{exp4}{Numerical encoding of the participant’s response to the prompt: ‘Please rate your level of technical expertise in the following areas: Probability’. 1 = ‘Not familiar with this domain’, 2 = ‘Studied in school, but don’t use it’, 3 = ‘Use this knowledge occasionally’, 4 = ‘Use this knowledge regularly’, 5 = ‘I am a recognized expert’, 6 = ‘I am an international authority’.}
+#'   \item{exp5}{Numerical encoding of the participant’s response to the prompt: ‘Please rate your level of technical expertise in the following areas: Bayes Nets’. 1 = ‘Not familiar with this domain’, 2 = ‘Studied in school, but don’t use it’, 3 = ‘Use this knowledge occasionally’, 4 = ‘Use this knowledge regularly’, 5 = ‘I am a recognized expert’, 6 = ‘I am an international authority’.}
+#'   \item{exp6}{Numerical encoding of the participant’s response to the prompt: ‘Please rate your level of technical expertise in the following areas: Programming’. 1 = ‘Not familiar with this domain’, 2 = ‘Studied in school, but don’t use it’, 3 = ‘Use this knowledge occasionally’, 4 = ‘Use this knowledge regularly’, 5 = ‘I am a recognized expert’, 6 = ‘I am an international authority’.}
+#'   \item{exp7}{Numerical encoding of the participant’s response to the prompt: ‘Please rate your level of technical expertise in the following areas: Experimental Design’. 1 = ‘Not familiar with this domain’, 2 = ‘Studied in school, but don’t use it’, 3 = ‘Use this knowledge occasionally’, 4 = ‘Use this knowledge regularly’, 5 = ‘I am a recognized expert’, 6 = ‘I am an international authority’.}
+#'   \item{exp8}{Numerical encoding of the participant’s response to the prompt: ‘Please rate your level of technical expertise in the following areas: Risk Analysis’. 1 = ‘Not familiar with this domain’, 2 = ‘Studied in school, but don’t use it’, 3 = ‘Use this knowledge occasionally’, 4 = ‘Use this knowledge regularly’, 5 = ‘I am a recognized expert’, 6 = ‘I am an international authority’.}
+#'   \item{exp9}{Numerical encoding of the participant’s response to the prompt: ‘Please rate your level of technical expertise in the following areas: Forecasting’. 1 = ‘Not familiar with this domain’, 2 = ‘Studied in school, but don’t use it’, 3 = ‘Use this knowledge occasionally’, 4 = ‘Use this knowledge regularly’, 5 = ‘I am a recognized expert’, 6 = ‘I am an international authority’.}
+#'   \item{exp10}{Numerical encoding of the participant’s response to the prompt: ‘Please rate your level of technical expertise in the following areas: Decision Thoery (e.g. multi-attribute utility theory)’. 1 = ‘Not familiar with this domain’, 2 = ‘Studied in school, but don’t use it’, 3 = ‘Use this knowledge occasionally’, 4 = ‘Use this knowledge regularly’, 5 = ‘I am a recognized expert’, 6 = ‘I am an international authority’.}
+#'   \item{exp11}{Numerical encoding of the participant’s response to the prompt: ‘Please rate your level of technical expertise in the following areas: Game Theory’. 1 = ‘Not familiar with this domain’, 2 = ‘Studied in school, but don’t use it’, 3 = ‘Use this knowledge occasionally’, 4 = ‘Use this knowledge regularly’, 5 = ‘I am a recognized expert’, 6 = ‘I am an international authority’.}
+#'   \item{exp12}{Numerical encoding of the participant’s response to the prompt: ‘Please rate your level of technical expertise in the following areas: Structured Analytic Techniques’. 1 = ‘Not familiar with this domain’, 2 = ‘Studied in school, but don’t use it’, 3 = ‘Use this knowledge occasionally’, 4 = ‘Use this knowledge regularly’, 5 = ‘I am a recognized expert’, 6 = ‘I am an international authority’.}
+#'   \item{exp13}{Numerical encoding of the participant’s response to the prompt: ‘Please rate your level of technical expertise in the following areas: Argument Mapping’. 1 = ‘Not familiar with this domain’, 2 = ‘Studied in school, but don’t use it’, 3 = ‘Use this knowledge occasionally’, 4 = ‘Use this knowledge regularly’, 5 = ‘I am a recognized expert’, 6 = ‘I am an international authority’.}
+#'   \item{exp14}{Numerical encoding of the participant’s response to the prompt: ‘Please rate your level of technical expertise in the following areas: Informal Logic’. 1 = ‘Not familiar with this domain’, 2 = ‘Studied in school, but don’t use it’, 3 = ‘Use this knowledge occasionally’, 4 = ‘Use this knowledge regularly’, 5 = ‘I am a recognized expert’, 6 = ‘I am an international authority’.}
+#'   \item{exp15}{Numerical encoding of the participant’s response to the prompt: ‘Please rate your level of technical expertise in the following areas: Systems Thinking or Cognitive Mapping’. 1 = ‘Not familiar with this domain’, 2 = ‘Studied in school, but don’t use it’, 3 = ‘Use this knowledge occasionally’, 4 = ‘Use this knowledge regularly’, 5 = ‘I am a recognized expert’, 6 = ‘I am an international authority’.}
+#'   \item{exp16}{Numerical encoding of the participant’s response to the prompt: ‘Please rate your level of technical expertise in the following areas: Image Analysis’. 1 = ‘Not familiar with this domain’, 2 = ‘Studied in school, but don’t use it’, 3 = ‘Use this knowledge occasionally’, 4 = ‘Use this knowledge regularly’, 5 = ‘I am a recognized expert’, 6 = ‘I am an international authority’.}
+#'   \item{exp17}{Numerical encoding of the participant’s response to the prompt: ‘Please rate your level of technical expertise in the following areas: Link Analysis’. 1 = ‘Not familiar with this domain’, 2 = ‘Studied in school, but don’t use it’, 3 = ‘Use this knowledge occasionally’, 4 = ‘Use this knowledge regularly’, 5 = ‘I am a recognized expert’, 6 = ‘I am an international authority’.}
+#'   \item{exp18}{Numerical encoding of the participant’s response to the prompt: ‘Please rate your level of technical expertise in the following areas: Graphic Design’. 1 = ‘Not familiar with this domain’, 2 = ‘Studied in school, but don’t use it’, 3 = ‘Use this knowledge occasionally’, 4 = ‘Use this knowledge regularly’, 5 = ‘I am a recognized expert’, 6 = ‘I am an international authority’.}
+#'   \item{exp19}{Numerical encoding of the participant’s response to the prompt: ‘Please rate your level of technical expertise in the following areas: Technical Writing’. 1 = ‘Not familiar with this domain’, 2 = ‘Studied in school, but don’t use it’, 3 = ‘Use this knowledge occasionally’, 4 = ‘Use this knowledge regularly’, 5 = ‘I am a recognized expert’, 6 = ‘I am an international authority’.}
+#'   \item{pc…}{Probability coherence questions. The prompt is: ‘What is the probability that each of the following statements are true? If you are absolutely certain that the statement is true, you should enter 100. Likewise, if you are absolutely certain that the statement is false, you should enter 0. If you are uncertain, you should enter the probability that corresponds with what you think are the chances that the statement is true. When answering these questions, we ask that you do NOT consult with any outside sources.’ Respondents then select a probability as a percentage.}
+#'   \item{pc5A}{'HA is the postal abbreviation for Hawaii.'}
+#'   \item{pc5B}{'HI is the postal abbreviation for Hawaii.'}
+#'   \item{pc5Acomp}{'HA is NOT the postal abbreviation for Hawaii.'}
+#'   \item{pc5AUB}{'Either HA or HI is the postal abbreviation for Hawaii.'}
+#'   \item{pc14A}{'Michaelangelo painted the Sistine Chapel.'}
+#'   \item{pc14B}{'Raphael painted the Sistine Chapel.'}
+#'   \item{pc14Acomp}{'Michaelangelo did NOT paint the Sistine Chapel.'}
+#'   \item{pc14AUB}{'Either Michaelangelo or Raphael painted the Sistine Chapel.'}
+#'   \item{pc35A}{'The Pacific Ocean is the largest of Earth’s oceans.'}
+#'   \item{pc35B}{'The Indian Ocean is the largest of Earth’s oceans.'}
+#'   \item{pc35Acomp}{'The Pacific Ocean is NOT the largest of the Earth’s oceans.'}
+#'   \item{pc35AUB}{'Either the Pacific Ocean or the Indian Ocean is the largest of Earth’s oceans.'}
+#'   \item{pc57A}{'The term 'bounded rationality' was coined by Herbert Simon.'}
+#'   \item{pc57B}{'The term 'bounded rationality' was coined by Alan Turing.'}
+#'   \item{pc57Acomp}{'The term 'bounded rationality' was NOT coined by Herbert Simon.'}
+#'   \item{pc57AUB}{'The term 'bounded rationality' was coined either by Herbert Simon or Alan Turing.'}
+#'   \item{pc60A}{'The oldest brother of famous philosopher William James was famous politician Walter James.'}
+#'   \item{pc60B}{'The oldest brother of famous philosopher William James was famous writer Henry James.'}
+#'   \item{pc60Acomp}{'The oldest brother of famous philosopher William James was NOT the famous politician Walter James.'}
+#'   \item{pc60AUB}{'The oldest brother of famous philosopher William James was either famous politician Walter James or famous writer Henry James.'}
+#'   \item{pr1}{Probabilistic reasoning item. Prompt: 'A ball was drawn from a bag ontaning 10 red, 30 white, 20 blue, and 15 yellow balls. What is the probability that it is neither red nor blue?' Response options: '30/75', '10/75', '45.75'.}
+#'   \item{pr2}{Probabilistic reasoning item. Prompt: 'The proportion of left-handed people is 4 out of 100. In a school there are 300 students. How many left-handed students are there?' Response options: 20, 12, 25.}
+#'   \item{pr3}{Probabilistic reasoning item. Prompt: 'Smokers are about 35\% of the population. At the airport in the waiting room there are 200 passengers. How many smokers are there?' Response options: 70, 35, 20.}
+#'   \item{pr4}{Probabilistic reasoning item. Prompt: 'A fair coin is tossed nine times. Which of the following sequences of outcomes is a more likely result of nine flips of the fair coin? (H: Heads, T: Tails)'. Response options: 'THHTHTTHH', 'HTHTHTHTH', 'Both sequences are equally likely'}
+#'   \item{pr5}{Probabilistic reasoning item. Prompt: 'Two containers, labelled A and B, are filled with red and yellow tokens in the following quantities. Container A contains 100 tokens, 65 red and 35 yellow. Container B contains 10 tokens, 6 red and 4 yellow. Each container is shaken vigorously. After choosing one of the containers, you must draw a token (without peeking, of course). Which container gives you a better chance of drawing a yellow token?' Response options: 'Container A (with 65 red and 35 yellow)', 'Container B (with 6 red and 4 yellow)', 'Equal chances from each container'.}
+#'   \item{pr6}{Probabilistic reasoning item. Prompt: 'A marble bag contains 15 blue and 15 green marbles. After you drew 5 marbles (the marble draw was always put back into the bag), a sequence of five green marbles was obtained. What is the most likely outcome if a marble is drawn a sixth time?' Response options: 'A green marble', 'A blue marble', 'Blue and green are equally likely'.}
+#'   \item{pr7}{Probabilistic reasoning item. Prompt: 'A bingo game is played with 25 numbers (from 1 to 25). At the first draw, which of the following results is the most likely?' Response options: 'It is more likely to be an even number', 'It is more likely to be an odd number', 'It is just as likely to be an even or an odd number'.}
+#'   \item{pr8}{Probabilistic reasoning item. Prompt: 'Two decks, labelled A and B, are composed of cards with a star (star cards) and cards without any figure (white cards) on the reverse side. Deck A contains 100 cards, 80 white and 20 with a star. Deck B contains 10 cards, 8 white and 2 with a star. After choosing one of the decks, you must draw a card (without peeking, of course). Which deck gives you a better chance of drawing a star card?' Response options: 'Deck A (with 80 white and 20 star cards)', 'Deck B (with 8 white and 2 star cards', 'Equal chances from each deck'.}
+#'   \item{pr9}{Probabilistic reasoning item. Prompt: 'A marble bag contains 10 blue and 20 green marbles. After you drew 5 marbles (the marble draw was always put back into the bag), a sequence of five green marbles was obtained. What is the most likely outcome if a marble is drawn a sixth time?' Response options: 'A green marble', 'A blue marble', 'Blue and green are equally likely'.}
+#'   \item{pr10}{Probabilistic reasoning item. Prompt: '60\% of the population in a city are men and 40\% are women. 50\% of the men and 30\% of the women smoke. We select a person from the city at random. What is the probability that this person is a smoker?' Response options: 42\%, 50\%, 85\%.}
+#'   \item{pr11}{Probabilistic reasoning item. Prompt: 'According to a recent survey, 90\% of the population in a city usually lie and 30\% of those usually lie about important matters. If we pick a person at random from this city, what is the probability that the person usually lies about important matters?' Response options: 60\%, 30\%, 27\%.}
+#'   \item{pr12}{Probabilistic reasoning item. Prompt: 'In a choir there are 100 children: 30 boys and 70 girls. Half of the boys and 1 in 10 girls learn to play the piano. We select a child from the choir at random. What is the probability that he/she plays the piano?' Response options: '22 out of 100', '30 out of 100', '50 out of 100'.}
+#'   \item{pr13}{Probabilistic reasoning item. Prompt: 'A village has 1000 inhabitants. 600 people own a pet, and amongst pet owners 1 in 3 owns more than one pet. If we select one person from this village at random, what is the probability that they own more than one pet' Response options: '333 out of 1000', '500 out of 1000', '200 out of 1000'.}
+#'   \item{pr14}{Probabilistic reasoning item. Prompt: 'In a medical center a group of people were interviewed with the following results: (a table: ((,55 years old or younger,Over 55 years old, Total),(Previous heart attack, 29, 75, 104),(No previous heart attack, 401, 275, 676),(Total, 430, 350, 780))). Suppose we select a person from this group at random. Based on the table: What is the probability that the person has had a heart attack?' Response options: '104 out of 780', '104 out of 676', '390 out fo 780'.}
+#'   \item{pr15}{Probabilistic reasoning item. Prompt: 'What is the probability that the person has had a heart attack and, at the same time is older than 55?' Response options: '104 out of 350', '75 out of 350', '75 out of 780'.}
+#'   \item{pr16}{Probabilistic reasoning item. Prompt: 'When the person had a heart attack, what is the probability that they are over 55?' Response options: '75 out of 780', '75 out of 104', '104 out of 350'.}
+#'   \item{mat1-mat11}{Responses to ICAR matrix reasoning questions.}
+#'   \item{crt1}{Cognitive reflection task item. Prompt: 'A bat and a ball cost $1.10 in total. The bat costs a dollar more than the ball. How much does the ball cost? (Please enter a number in dollars, excluding the dollar sign.' }
+#'   \item{crt2}{Cognitive reflection task item. Prompt: 'If it takes 5 machines 5 minutes to make 5 widgets, how long would it take for 100 machines to make 100 widgets? (Please enter a number in minutes)'}
+#'   \item{crt3}{Cognitive reflection task item. Prompt: 'In a lake, there is a patch of lily pads. Every day, the patch doubles in size. If it takes 48 days for the patch to cover the entire lake, how long would it take for the patch to cover half the lake? (Please enter a number in days)'}
+#'   \item{crt4}{Cognitive reflection task item. Prompt: 'If it takes 2 nurses 2 minutes to measure the blood pressure of 2 patients, how long would it take 200 nurses to measure the blood pressure of 200 patients? (Please enter a number in minutes)'}
+#'   \item{crt5}{Cognitive reflection task item. Prompt: 'Soup and salad costs $5.50 in total. The soup costs a dollar more than the salad. How much does the salad cost? (Please enter a number in dollars, excluding the dollar sign)'}
+#'   \item{crt6}{Cognitive reflection task item. Prompt: 'Sally is making sun tea. Every hour, the concentration of the tea doubles. If it takes 6 hours for the tea to be ready, how long would it take for the tea to reach half of the final concentration? (Please enter a number in hours)'}
+#'   \item{crtSeenBefore}{Cognitive reflection task supplementary-item. 'Have you seen any of these 6 questions before?' Response options: Yes, No.}
+#'   \item{crtSeenBeforeText}{Cognitive reflection task supplementary-item. 'Which ones?'}
+#'   \item{bfi1}{Big Five Inventory item. Prompt: 'Below are a number of characteristics that may or may not apply to you. For example, do you agree that you are someone who likes to spend time with others? Please rate the extent to which you agree or disagree with each statement. I am someone who is reserved.' 1 = ‘Strongly disagree’, 2 = ‘Disagree’, 3 = ‘Somewhat disagree’, 4 = ‘Neither agree nor disagree’, 5 = ‘Somewhat agree’, 6 = ‘Agree’, 7 = ‘Strongly agree’.}
+#'   \item{bfi2}{Big Five Inventory item. Prompt: 'I am someone who is generally trusting.' 1 = ‘Strongly disagree’, 2 = ‘Disagree’, 3 = ‘Somewhat disagree’, 4 = ‘Neither agree nor disagree’, 5 = ‘Somewhat agree’, 6 = ‘Agree’, 7 = ‘Strongly agree’.}
+#'   \item{bfi3}{Big Five Inventory item. Prompt: 'I am someone who tends to be lazy.' 1 = ‘Strongly disagree’, 2 = ‘Disagree’, 3 = ‘Somewhat disagree’, 4 = ‘Neither agree nor disagree’, 5 = ‘Somewhat agree’, 6 = ‘Agree’, 7 = ‘Strongly agree’.}
+#'   \item{bfi4}{Big Five Inventory item. Prompt: 'I am someone who is relaxed, handles stress well.' 1 = ‘Strongly disagree’, 2 = ‘Disagree’, 3 = ‘Somewhat disagree’, 4 = ‘Neither agree nor disagree’, 5 = ‘Somewhat agree’, 6 = ‘Agree’, 7 = ‘Strongly agree’.}
+#'   \item{bfi5}{Big Five Inventory item. Prompt: 'I am someone who has few artistic interests.' 1 = ‘Strongly disagree’, 2 = ‘Disagree’, 3 = ‘Somewhat disagree’, 4 = ‘Neither agree nor disagree’, 5 = ‘Somewhat agree’, 6 = ‘Agree’, 7 = ‘Strongly agree’.}
+#'   \item{bfi6}{Big Five Inventory item. Prompt: 'I am someone who is outgoing, sociable.' 1 = ‘Strongly disagree’, 2 = ‘Disagree’, 3 = ‘Somewhat disagree’, 4 = ‘Neither agree nor disagree’, 5 = ‘Somewhat agree’, 6 = ‘Agree’, 7 = ‘Strongly agree’.}
+#'   \item{bfi7}{Big Five Inventory item. Prompt: 'I am someone who tends to find faults with others.' 1 = ‘Strongly disagree’, 2 = ‘Disagree’, 3 = ‘Somewhat disagree’, 4 = ‘Neither agree nor disagree’, 5 = ‘Somewhat agree’, 6 = ‘Agree’, 7 = ‘Strongly agree’.}
+#'   \item{bfi8}{Big Five Inventory item. Prompt: 'I am someone who does a thorough job.' 1 = ‘Strongly disagree’, 2 = ‘Disagree’, 3 = ‘Somewhat disagree’, 4 = ‘Neither agree nor disagree’, 5 = ‘Somewhat agree’, 6 = ‘Agree’, 7 = ‘Strongly agree’.}
+#'   \item{bfi9}{Big Five Inventory item. Prompt: 'I am someone who gets nervous easily.' 1 = ‘Strongly disagree’, 2 = ‘Disagree’, 3 = ‘Somewhat disagree’, 4 = ‘Neither agree nor disagree’, 5 = ‘Somewhat agree’, 6 = ‘Agree’, 7 = ‘Strongly agree’.}
+#'   \item{bfi10}{Big Five Inventory item. Prompt: 'I am someone who has an active imagination.' 1 = ‘Strongly disagree’, 2 = ‘Disagree’, 3 = ‘Somewhat disagree’, 4 = ‘Neither agree nor disagree’, 5 = ‘Somewhat agree’, 6 = ‘Agree’, 7 = ‘Strongly agree’.}
+#'   \item{tp1}{Teamwork Perceptions item. Prompt: 'I have found working as part of a team in my classes to be a valuable experience.' 1 = ‘Strongly disagree’, 2 = ‘Somewhat disagree’, 3 = ‘Neither agree nor disagree’, 4 = ‘Somewhat agree’, 5 = ‘Strongly agree’.}
+#'   \item{tp2}{Teamwork Perceptions item. Prompt: 'In most of the teams I have been on, the other team members have generally contributed as much as I have.' 1 = ‘Strongly disagree’, 2 = ‘Somewhat disagree’, 3 = ‘Neither agree nor disagree’, 4 = ‘Somewhat agree’, 5 = ‘Strongly agree’.}
+#'   \item{tp3}{Teamwork Perceptions item. Prompt: 'In most of the teams I have been on, I felt the other team members respected me.' 1 = ‘Strongly disagree’, 2 = ‘Somewhat disagree’, 3 = ‘Neither agree nor disagree’, 4 = ‘Somewhat agree’, 5 = ‘Strongly agree’.}
+#'   \item{tp4}{Teamwork Perceptions item. Prompt: 'In most of the teams I have been on, the team has worked well together.' 1 = ‘Strongly disagree’, 2 = ‘Somewhat disagree’, 3 = ‘Neither agree nor disagree’, 4 = ‘Somewhat agree’, 5 = ‘Strongly agree’.}
+#'   \item{tp5}{Teamwork Perceptions item. Prompt: 'I have found teamwork to be a productive use of course time.' 1 = ‘Strongly disagree’, 2 = ‘Somewhat disagree’, 3 = ‘Neither agree nor disagree’, 4 = ‘Somewhat agree’, 5 = ‘Strongly agree’.}
+#'   \item{tp6}{Teamwork Perceptions item. Prompt: 'I have found that teams help me learn course material more than if I just studied alone.' 1 = ‘Strongly disagree’, 2 = ‘Somewhat disagree’, 3 = ‘Neither agree nor disagree’, 4 = ‘Somewhat agree’, 5 = ‘Strongly agree’.}
+#'   \item{tp7}{Teamwork Perceptions item. Prompt: 'I have learned more in courses where I have been a member of a team.' 1 = ‘Strongly disagree’, 2 = ‘Somewhat disagree’, 3 = ‘Neither agree nor disagree’, 4 = ‘Somewhat agree’, 5 = ‘Strongly agree’.}
+#'   \item{tp8}{Teamwork Perceptions item. Prompt: 'I have found being part of a team improved my course grades.' 1 = ‘Strongly disagree’, 2 = ‘Somewhat disagree’, 3 = ‘Neither agree nor disagree’, 4 = ‘Somewhat agree’, 5 = ‘Strongly agree’.}
+#'   \item{tp9}{Teamwork Perceptions item. Prompt: 'I have found that working with a team helps me develop skills in working with others.' 1 = ‘Strongly disagree’, 2 = ‘Somewhat disagree’, 3 = ‘Neither agree nor disagree’, 4 = ‘Somewhat agree’, 5 = ‘Strongly agree’.}
+#'   \item{tp10}{Teamwork Perceptions item. Prompt: 'I have found that working with a team has helped me develop cooperative leadership skills.' 1 = ‘Strongly disagree’, 2 = ‘Somewhat disagree’, 3 = ‘Neither agree nor disagree’, 4 = ‘Somewhat agree’, 5 = ‘Strongly agree’.}
+#'   \item{tp11}{Teamwork Perceptions item. Prompt: 'I have found that working with a team has helped me develop more respect for the opinion of others.' 1 = ‘Strongly disagree’, 2 = ‘Somewhat disagree’, 3 = ‘Neither agree nor disagree’, 4 = ‘Somewhat agree’, 5 = ‘Strongly agree’.}
+#'   \item{tp12}{Teamwork Perceptions item. Prompt: 'I have found that working with a team has enhanced my sense of who I am.' 1 = ‘Strongly disagree’, 2 = ‘Somewhat disagree’, 3 = ‘Neither agree nor disagree’, 4 = ‘Somewhat agree’, 5 = ‘Strongly agree’.}
+#'   \item{tp13}{Teamwork Perceptions item. Prompt: 'I have found that teams make good decisions.' 1 = ‘Strongly disagree’, 2 = ‘Somewhat disagree’, 3 = ‘Neither agree nor disagree’, 4 = ‘Somewhat agree’, 5 = ‘Strongly agree’.}
+#'   \item{tp14}{Teamwork Perceptions item. Prompt: 'I have found that being on a team has helped me become better at problem solving.' 1 = ‘Strongly disagree’, 2 = ‘Somewhat disagree’, 3 = ‘Neither agree nor disagree’, 4 = ‘Somewhat agree’, 5 = ‘Strongly agree’.}
+#'   \item{tp15}{Teamwork Perceptions item. Prompt: 'Being part of a team discussion has improved my ability to think through a problem.' 1 = ‘Strongly disagree’, 2 = ‘Somewhat disagree’, 3 = ‘Neither agree nor disagree’, 4 = ‘Somewhat agree’, 5 = ‘Strongly agree’.}
+#'   \item{tp16}{Teamwork Perceptions item. Prompt: 'I feel that team-based learning has improved my reasoning skills.' 1 = ‘Strongly disagree’, 2 = ‘Somewhat disagree’, 3 = ‘Neither agree nor disagree’, 4 = ‘Somewhat agree’, 5 = ‘Strongly agree’.}
 #'   \item{int1}{Logical. Indicates whether the participant selected ‘What the problems will be like’ among their responses to the prompt: ‘Thinking about the Hunt Challenge, what are you most interested in?’.}
 #'   \item{int2}{Logical. Indicates whether the participant selected ‘Platform functionality’ among their responses to the prompt: ‘Thinking about the Hunt Challenge, what are you most interested in?’.}
 #'   \item{int3}{Logical. Indicates whether the participant selected ‘How reports are created’ among their responses to the prompt: ‘Thinking about the Hunt Challenge, what are you most interested in?’.}
