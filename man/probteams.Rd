@@ -8,7 +8,7 @@
   \item{team}{Team name.}
   \item{problem}{Problem title.}
   \item{probNum}{Position of the problem in the sequence of problems attempted by this team in this exercise.}
-  \item{type}{Team type. PT = Public Team; ST = Superteam; OT = Organisational Team; AA = Agency Analyst (2018 SWARM Challenge); PA = Public Analyst (2018 SWARM Challenge); GP = General Public (2018 SWARM Challenge).}
+  \item{type}{Team type. PT = Public Team; ST = Superteam; OT = Organisational Team; AA = Agency Analyst (2018 SWARM Challenge); PA = Public Analyst (2018 SWARM Challenge); GP = General Public (2018 SWARM Challenge); UT = Undergraduate Team (Psychology Capstone).}
   \item{avgIC}{Quality of reasoning score on the IC Rating Scale for the team’s top report. This is usually the average of independent ratings by at least 3 external raters.}
   \item{nIC}{Number of external raters who independently rated the report on the IC Rating Scale.}
   \item{rankIC}{The teams rank on this problem, when all teams who submitted a report for the problem are ranked from best to worst by avgIC. If there are ties, all tied teams receive the best (lowest integer) rank applicable.}

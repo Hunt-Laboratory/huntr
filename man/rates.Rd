@@ -28,12 +28,12 @@
   \item{geo2}{Rater’s determination of whether the team successfully identified the geolocation problem 2 (Yes, Partial Credit, No).}
   \item{geo3}{Rater’s determination of whether the team successfully identified the geolocation problem 3 (Yes, Partial Credit, No).}
   \item{geo4}{Rater’s determination of whether the team successfully identified the geolocation problem 4 (Yes, Partial Credit, No).}
-  \item{ODNI}{Total score on the IC Rating Scale (c1 + c2 + c3 + c4 + c5 + c6 + c7 + c8).}
+  \item{IC}{Total score on the IC Rating Scale (c1 + c2 + c3 + c4 + c5 + c6 + c7 + c8).}
   \item{geo1score}{Numerical score for geolocation problem 1 (Yes, Partial Credit = 1, No = 0).}
   \item{geo2score}{Numerical score for geolocation problem 2 (Yes, Partial Credit = 1, No = 0).}
   \item{geo3score}{Numerical score for geolocation problem 3 (Yes, Partial Credit = 1, No = 0).}
   \item{geo4score}{Numerical score for geolocation problem 4 (Yes, Partial Credit = 1, No = 0).}
-  \item{geoOverall}{geo1score + geo2score + geo3score + geo4score}
+  \item{nGeoCorrect}{geo1score + geo2score + geo3score + geo4score}
   \item{isRedactionTestRating}{Yes/No indicating whether the rating is a redaction test rating for tightness (rather than, say, a quality of reasoning rating using the IC Rating Scale).}
   \item{raterProbabilityEstimate}{The rater’s probability estimate in a redaction test to measure tightness.}
   \item{estTimeTaken}{Rater’s estimate of the time it took them to estimate the probability in a redaction test for tightness.}
@@ -45,6 +45,7 @@
   \item{bayes1score}{Numerical score for Bayesian problem 1 (Yes = 1, No = 0).}
   \item{bayes2score}{Numerical score for Bayesian problem 2 (Yes = 1, No = 0).}
   \item{bayes3score}{Numerical score for Bayesian problem 3 (Yes = 1, No = 0).}
+  \item{nBayesCorrect}{bayes1score + bayes2score + bayes3score}
   \item{flaw1}{Rater’s determination of whether the team successfully identified reasoning flaw 1 (Yes/No).}
   \item{flaw2}{Rater’s determination of whether the team successfully identified reasoning flaw 2 (Yes/No).}
   \item{flaw3}{Rater’s determination of whether the team successfully identified reasoning flaw 3 (Yes/No).}

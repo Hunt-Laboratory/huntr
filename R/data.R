@@ -579,7 +579,7 @@ NULL
 #'   \item{team}{Team name.}
 #'   \item{problem}{Problem title.}
 #'   \item{probNum}{Position of the problem in the sequence of problems attempted by this team in this exercise.}
-#'   \item{type}{Team type. PT = Public Team; ST = Superteam; OT = Organisational Team; AA = Agency Analyst (2018 SWARM Challenge); PA = Public Analyst (2018 SWARM Challenge); GP = General Public (2018 SWARM Challenge).}
+#'   \item{type}{Team type. PT = Public Team; ST = Superteam; OT = Organisational Team; AA = Agency Analyst (2018 SWARM Challenge); PA = Public Analyst (2018 SWARM Challenge); GP = General Public (2018 SWARM Challenge); UT = Undergraduate Team (Psychology Capstone).}
 #'   \item{avgIC}{Quality of reasoning score on the IC Rating Scale for the team’s top report. This is usually the average of independent ratings by at least 3 external raters.}
 #'   \item{nIC}{Number of external raters who independently rated the report on the IC Rating Scale.}
 #'   \item{rankIC}{The teams rank on this problem, when all teams who submitted a report for the problem are ranked from best to worst by avgIC. If there are ties, all tied teams receive the best (lowest integer) rank applicable.}
@@ -628,12 +628,12 @@ NULL
 #'   \item{geo2}{Rater’s determination of whether the team successfully identified the geolocation problem 2 (Yes, Partial Credit, No).}
 #'   \item{geo3}{Rater’s determination of whether the team successfully identified the geolocation problem 3 (Yes, Partial Credit, No).}
 #'   \item{geo4}{Rater’s determination of whether the team successfully identified the geolocation problem 4 (Yes, Partial Credit, No).}
-#'   \item{ODNI}{Total score on the IC Rating Scale (c1 + c2 + c3 + c4 + c5 + c6 + c7 + c8).}
+#'   \item{IC}{Total score on the IC Rating Scale (c1 + c2 + c3 + c4 + c5 + c6 + c7 + c8).}
 #'   \item{geo1score}{Numerical score for geolocation problem 1 (Yes, Partial Credit = 1, No = 0).}
 #'   \item{geo2score}{Numerical score for geolocation problem 2 (Yes, Partial Credit = 1, No = 0).}
 #'   \item{geo3score}{Numerical score for geolocation problem 3 (Yes, Partial Credit = 1, No = 0).}
 #'   \item{geo4score}{Numerical score for geolocation problem 4 (Yes, Partial Credit = 1, No = 0).}
-#'   \item{geoOverall}{geo1score + geo2score + geo3score + geo4score}
+#'   \item{nGeoCorrect}{geo1score + geo2score + geo3score + geo4score}
 #'   \item{isRedactionTestRating}{Yes/No indicating whether the rating is a redaction test rating for tightness (rather than, say, a quality of reasoning rating using the IC Rating Scale).}
 #'   \item{raterProbabilityEstimate}{The rater’s probability estimate in a redaction test to measure tightness.}
 #'   \item{estTimeTaken}{Rater’s estimate of the time it took them to estimate the probability in a redaction test for tightness.}
@@ -645,6 +645,7 @@ NULL
 #'   \item{bayes1score}{Numerical score for Bayesian problem 1 (Yes = 1, No = 0).}
 #'   \item{bayes2score}{Numerical score for Bayesian problem 2 (Yes = 1, No = 0).}
 #'   \item{bayes3score}{Numerical score for Bayesian problem 3 (Yes = 1, No = 0).}
+#'   \item{nBayesCorrect}{bayes1score + bayes2score + bayes3score}
 #'   \item{flaw1}{Rater’s determination of whether the team successfully identified reasoning flaw 1 (Yes/No).}
 #'   \item{flaw2}{Rater’s determination of whether the team successfully identified reasoning flaw 2 (Yes/No).}
 #'   \item{flaw3}{Rater’s determination of whether the team successfully identified reasoning flaw 3 (Yes/No).}
@@ -677,7 +678,7 @@ NULL
 #'   \item{AOMT}{Median Actively Open-Minded Thinking score for team members. Missing values are excluded from the calculation. Note that this statistic even includes team members who may not have been active on a particular problem. For a problem-specific version, see the probteams table.}
 #'   \item{divAOMT}{Average pairwise difference in AOMT scores across all team members for whom the AOMT score is available. Note that this statistic even includes team members who may not have been active on a particular problem. For a problem-specific version, see the probteams table.}
 #'   \item{medianEdu}{Median education level for the team, where education levels are encoded as follows. 1 = ‘High School’; 2 = ‘Trade or Technical Qualification’; 3 = ‘Bachelors’; 4 = ‘Graduate Certificate, Diploma or equivalent’; 5 = ‘Masters’; 6 = ‘Phd’. Missing values excluded from calculation. Note that this statistic even includes team members who may not have been active on a particular problem. For a problem-specific version, see the probteams table.}
-#'   \item{type}{Team type. PT = Public Team; ST = Superteam; OT = Organisational Team; AA = Agency Analyst (2018 SWARM Challenge); PA = Public Analyst (2018 SWARM Challenge); GP = General Public (2018 SWARM Challenge).}
+#'   \item{type}{Team type. PT = Public Team; ST = Superteam; OT = Organisational Team; AA = Agency Analyst (2018 SWARM Challenge); PA = Public Analyst (2018 SWARM Challenge); GP = General Public (2018 SWARM Challenge); UT = Undergraduate Team (Psychology Capstone).}
 #' }
 #'
 #' @name teams

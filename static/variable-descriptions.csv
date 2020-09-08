@@ -169,11 +169,11 @@ CoreData,teams,team,Team name.
 CoreData,teams,AOMT,"Median Actively Open-Minded Thinking score for team members. Missing values are excluded from the calculation. Note that this statistic even includes team members who may not have been active on a particular problem. For a problem-specific version, see the probteams table."
 CoreData,teams,divAOMT,"Average pairwise difference in AOMT scores across all team members for whom the AOMT score is available. Note that this statistic even includes team members who may not have been active on a particular problem. For a problem-specific version, see the probteams table."
 CoreData,teams,medianEdu,"Median education level for the team, where education levels are encoded as follows. 1 = ‘High School’; 2 = ‘Trade or Technical Qualification’; 3 = ‘Bachelors’; 4 = ‘Graduate Certificate, Diploma or equivalent’; 5 = ‘Masters’; 6 = ‘Phd’. Missing values excluded from calculation. Note that this statistic even includes team members who may not have been active on a particular problem. For a problem-specific version, see the probteams table."
-CoreData,teams,type,Team type. PT = Public Team; ST = Superteam; OT = Organisational Team; AA = Agency Analyst (2018 SWARM Challenge); PA = Public Analyst (2018 SWARM Challenge); GP = General Public (2018 SWARM Challenge).
+CoreData,teams,type,Team type. PT = Public Team; ST = Superteam; OT = Organisational Team; AA = Agency Analyst (2018 SWARM Challenge); PA = Public Analyst (2018 SWARM Challenge); GP = General Public (2018 SWARM Challenge); UT = Undergraduate Team (Psychology Capstone).
 CoreData,probteams,team,Team name.
 CoreData,probteams,problem,Problem title.
 CoreData,probteams,probNum,Position of the problem in the sequence of problems attempted by this team in this exercise.
-CoreData,probteams,type,Team type. PT = Public Team; ST = Superteam; OT = Organisational Team; AA = Agency Analyst (2018 SWARM Challenge); PA = Public Analyst (2018 SWARM Challenge); GP = General Public (2018 SWARM Challenge).
+CoreData,probteams,type,Team type. PT = Public Team; ST = Superteam; OT = Organisational Team; AA = Agency Analyst (2018 SWARM Challenge); PA = Public Analyst (2018 SWARM Challenge); GP = General Public (2018 SWARM Challenge); UT = Undergraduate Team (Psychology Capstone).
 CoreData,probteams,avgIC,Quality of reasoning score on the IC Rating Scale for the team’s top report. This is usually the average of independent ratings by at least 3 external raters.
 CoreData,probteams,nIC,Number of external raters who independently rated the report on the IC Rating Scale.
 CoreData,probteams,rankIC,"The teams rank on this problem, when all teams who submitted a report for the problem are ranked from best to worst by avgIC. If there are ties, all tied teams receive the best (lowest integer) rank applicable."
@@ -213,12 +213,12 @@ CoreData,rates,geo1,"Rater’s determination of whether the team successfully id
 CoreData,rates,geo2,"Rater’s determination of whether the team successfully identified the geolocation problem 2 (Yes, Partial Credit, No)."
 CoreData,rates,geo3,"Rater’s determination of whether the team successfully identified the geolocation problem 3 (Yes, Partial Credit, No)."
 CoreData,rates,geo4,"Rater’s determination of whether the team successfully identified the geolocation problem 4 (Yes, Partial Credit, No)."
-CoreData,rates,ODNI,Total score on the IC Rating Scale (c1 + c2 + c3 + c4 + c5 + c6 + c7 + c8).
+CoreData,rates,IC,Total score on the IC Rating Scale (c1 + c2 + c3 + c4 + c5 + c6 + c7 + c8).
 CoreData,rates,geo1score,"Numerical score for geolocation problem 1 (Yes, Partial Credit = 1, No = 0)."
 CoreData,rates,geo2score,"Numerical score for geolocation problem 2 (Yes, Partial Credit = 1, No = 0)."
 CoreData,rates,geo3score,"Numerical score for geolocation problem 3 (Yes, Partial Credit = 1, No = 0)."
 CoreData,rates,geo4score,"Numerical score for geolocation problem 4 (Yes, Partial Credit = 1, No = 0)."
-CoreData,rates,geoOverall,geo1score + geo2score + geo3score + geo4score
+CoreData,rates,nGeoCorrect,geo1score + geo2score + geo3score + geo4score
 CoreData,rates,isRedactionTestRating,"Yes/No indicating whether the rating is a redaction test rating for tightness (rather than, say, a quality of reasoning rating using the IC Rating Scale)."
 CoreData,rates,raterProbabilityEstimate,The rater’s probability estimate in a redaction test to measure tightness.
 CoreData,rates,estTimeTaken,Rater’s estimate of the time it took them to estimate the probability in a redaction test for tightness.
@@ -230,6 +230,7 @@ CoreData,rates,bayes3,Yes/No indicating whether the team successfully solved Bay
 CoreData,rates,bayes1score,"Numerical score for Bayesian problem 1 (Yes = 1, No = 0)."
 CoreData,rates,bayes2score,"Numerical score for Bayesian problem 2 (Yes = 1, No = 0)."
 CoreData,rates,bayes3score,"Numerical score for Bayesian problem 3 (Yes = 1, No = 0)."
+CoreData,rates,nBayesCorrect,bayes1score + bayes2score + bayes3score
 CoreData,rates,flaw1,Rater’s determination of whether the team successfully identified reasoning flaw 1 (Yes/No).
 CoreData,rates,flaw2,Rater’s determination of whether the team successfully identified reasoning flaw 2 (Yes/No).
 CoreData,rates,flaw3,Rater’s determination of whether the team successfully identified reasoning flaw 3 (Yes/No).

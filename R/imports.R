@@ -3122,111 +3122,28 @@ compile_probteams_2020_HuntChallenge = function(repo, path_to_data, instance_nam
 
 compile_probteams_2020_PsychologyCapstone = function(repo, path_to_data, instance_name) {
     
-    # ratings = fread(paste0(path, "ratings2020challenge.csv"))
-    # colnames(ratings) = c(
-    #     "reportID",
-    #     "password1",
-    #     "password2",
-    #     "password3",
-    #     "problem",
-    #     "team",
-    #     "participant",
-    #     "created",
-    #     "rater",
-    #     "c1", "c1comment", "c1distinction",
-    #     "c2", "c2comment", "c2distinction",
-    #     "c3", "c3distinction", "c3comment",
-    #     "c4", "c4comment",
-    #     "c5", "c5comment",
-    #     "c6", "c6comment",
-    #     "c7", "c7comment",
-    #     "c8",
-    #     "geo1",
-    #     "geo2",
-    #     "geo3",
-    #     "geo4",
-    #     "c8comment",
-    #     "c1score",
-    #     "c2score",
-    #     "c3score",
-    #     "c4score",
-    #     "c5score",
-    #     "c6score",
-    #     "c7score",
-    #     "c8score",
-    #     "IC",
-    #     "c1na",
-    #     "c2na",
-    #     "c3na",
-    #     "c4na",
-    #     "c5na",
-    #     "c6na",
-    #     "c7na",
-    #     "c8na",
-    #     "ruleBased",
-    #     "ruleBasedScore",
-    #     "ruleBaseAlexAns",
-    #     "c4distinction",
-    #     "c5distinction",
-    #     "c6distinction",
-    #     "c7distinction",
-    #     "c8distinction",
-    #     "lensKit",
-    #     "geo1score",
-    #     "geo2score",
-    #     "geo3score",
-    #     "geo4score",
-    #     "geoOverall",
-    #     "isRedactionTestRating",
-    #     "raterProbabilityEstimate",
-    #     "estTimeTaken",
-    #     "estJustification",
-    #     "estComments",
-    #     "bayes1",
-    #     "bayes2",
-    #     "bayes3",
-    #     "bayes1score",
-    #     "bayes2score",
-    #     "bayes3score",
-    #     "flaw1",
-    #     "flaw2",
-    #     "flaw3",
-    #     "flaw4"
-    # )
-    # ratings[ratings == ""] = NA
-    # ratings[IC == 0,"IC"] = NA
-    # ratings = ratings[,.(
-    #     problem,
-    #     team,
-    #     participant,
-    #     rater,
-    #     geo1,
-    #     geo2,
-    #     geo3,
-    #     geo4,
-    #     IC,
-    #     geo1score,
-    #     geo2score,
-    #     geo3score,
-    #     geo4score,
-    #     geoOverall,
-    #     isRedactionTestRating,
-    #     raterProbabilityEstimate,
-    #     estTimeTaken,
-    #     estJustification,
-    #     estComments,
-    #     bayes1,
-    #     bayes2,
-    #     bayes3,
-    #     bayes1score,
-    #     bayes2score,
-    #     bayes3score,
-    #     flaw1,
-    #     flaw2,
-    #     flaw3,
-    #     flaw4
-    # )]
-    # ratings[,bayesScore := bayes1score + bayes2score + bayes3score]
+    path = paste0(path_to_data, instance_name, "/AdminData/")
+    
+    R = fread(paste0(path, "ratings.csv"))
+    R[R == ""] = NA
+    
+    scores = list(
+        Poor = 1,
+        Fair = 2,
+        Good = 3,
+        Excellent = 4
+    )
+    
+    for (k in 1:nrow(R)) {
+        R$IC[k] = scores[[R$c1[k]]] +
+            scores[[R$c2[k]]] +
+            scores[[R$c3[k]]] +
+            scores[[R$c4[k]]] +
+            scores[[R$c5[k]]] +
+            scores[[R$c6[k]]] +
+            scores[[R$c7[k]]] +
+            scores[[R$c8[k]]]
+    }
     
     parts = repo[[instance_name]]$CoreData$parts
     teams = repo[[instance_name]]$CoreData$teams
@@ -3324,16 +3241,15 @@ compile_probteams_2020_PsychologyCapstone = function(repo, path_to_data, instanc
     }
     
     for (k in 1:nrow(probteam)) {
-        # i = which(K$team == probteam$team[k])
         probteam$type[k] = "UT"
-        # probteam$avgIC[k] = K[[paste0("avg", probteam$probNum[k])]][i]
-        # probteam$nIC[k] = K[[paste0("nRatings", probteam$probNum[k])]][i]
+        probteam$avgIC[k] = mean(R[team == probteam$team[k] & problem == probteam$problem[k]]$IC)
+        probteam$nIC[k] = nrow(R[team == probteam$team[k] & problem == probteam$problem[k]])
         # probteam$rankIC[k] = rank(-K[[paste0("avg", probteam$probNum[k])]], ties.method = "min")[i]
         if (probteam$problem[k] == "Foreign Fighters") {
-            # probteam$nGeoCorrect[k] = K$nGeoCorrect[i]
+            probteam$nGeoCorrect[k] = round(mean(R[team == probteam$team[k] & problem == probteam$problem[k]]$nGeoCorrect))
         }
         if (probteam$problem[k] == "Corporate Espionage" & !is.na(probteam$avgIC[k])) {
-            # probteam$nBayesCorrect[k] = round(mean(ratings[team == probteam$team[k] & problem == "Corporate Espionage"]$bayesScore))
+            probteam$nBayesCorrect[k] = round(mean(R[team == probteam$team[k] & problem == probteam$problem[k]]$nBayesCorrect))
         }
         probteam$activeUsers[k] = getActiveUsers(probteam$team[k], probteam$problem[k])
         probteam$textSimReports[k] = getTextSim(probteam$team[k], probteam$problem[k], 'reports')
@@ -3573,7 +3489,7 @@ compile_rates_2020_HuntChallenge = function(repo, path_to_data, instance_name) {
         "geo2score",
         "geo3score",
         "geo4score",
-        "geoOverall",
+        "nGeoCorrect",
         "isRedactionTestRating",
         "raterProbabilityEstimate",
         "estTimeTaken",
@@ -3613,7 +3529,7 @@ compile_rates_2020_HuntChallenge = function(repo, path_to_data, instance_name) {
         geo2score,
         geo3score,
         geo4score,
-        geoOverall,
+        nGeoCorrect,
         isRedactionTestRating,
         raterProbabilityEstimate,
         estTimeTaken,
@@ -3636,13 +3552,59 @@ compile_rates_2020_HuntChallenge = function(repo, path_to_data, instance_name) {
     return(ratings)
 }
 
+compile_rates_2020_PsychologyCapstone = function(repo, path_to_data, instance_name) {
+    
+    path = paste0(path_to_data, instance_name, "/AdminData/")
+    
+    ratings = fread(paste0(path, "ratings.csv"))
+    ratings[ratings == ""] = NA
+    
+    scores = list(
+        Poor = 1,
+        Fair = 2,
+        Good = 3,
+        Excellent = 4
+    )
+    
+    for (k in 1:nrow(ratings)) {
+        ratings$IC[k] = scores[[ratings$c1[k]]] +
+            scores[[ratings$c2[k]]] +
+            scores[[ratings$c3[k]]] +
+            scores[[ratings$c4[k]]] +
+            scores[[ratings$c5[k]]] +
+            scores[[ratings$c6[k]]] +
+            scores[[ratings$c7[k]]] +
+            scores[[ratings$c8[k]]]
+    }
+    
+    ratings = ratings[,.(
+        problem,
+        team,
+        rater,
+        c1, c1comment,
+        c2, c2comment,
+        c3, c3comment,
+        c4, c4comment,
+        c5, c5comment,
+        c6, c6comment,
+        c7, c7comment,
+        c8, c8comment,
+        IC,
+        nGeoCorrect,
+        nBayesCorrect
+    )]
+    
+    return(ratings)
+}
+
 compile_rates = function(repo, path_to_data, instance_name) {
     
     # Lookup table for relevant functions. This is required because ratings format differ
     # syntactically across different experiements, and so each require custom code to tidy the
     # data into a consistent format.
     compile_rates = list(
-        "x2020_HuntChallenge" = compile_rates_2020_HuntChallenge
+        "x2020_HuntChallenge" = compile_rates_2020_HuntChallenge,
+        "x2020_PsychologyCapstone" = compile_rates_2020_PsychologyCapstone
     )
     
     if (instance_name %in% names(compile_rates)) {
@@ -3700,7 +3662,7 @@ compile_data = function(path = "data/",
         repo[[instance_name]][['CoreData']]$teamparts = compile_teamparts(repo, path, instance_name)
         repo[[instance_name]][['CoreData']]$teams = compile_teams(repo, path, instance_name)
         repo[[instance_name]][['CoreData']]$probteams = compile_probteams(repo, path, instance_name)
-        # repo[[instance_name]][['CoreData']]$rates = compile_rates(repo, path, instance_name)
+        repo[[instance_name]][['CoreData']]$rates = compile_rates(repo, path, instance_name)
     }
     repo = compile_probparts(repo, nClusters = 10, generatePlots = F)
     
