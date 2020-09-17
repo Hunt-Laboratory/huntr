@@ -1586,16 +1586,11 @@ compile_parts_2020_PsychologyCapstone = function(path_to_data, instance_name) {
     
     entrySurvey = fread(paste0(path, "EntrySurvey-noPII.csv"))
     entrySurveySupplement = fread(paste0(path, "EntrySurveySupplement-noPII.csv"))
-    
-    # exitSurveyPub = fread(paste0(path, "HC2020_ExitSurvey_Public.csv"))
-    # exitSurveyOrg = fread(paste0(path, "HC2020_ExitSurvey_Organisations.csv"))
+    exitSurvey = fread(paste0(path, "ExitSurvey-noPII.csv"))
     
     entrySurvey = entrySurvey[3:nrow(entrySurvey)]
     entrySurveySupplement = entrySurveySupplement[3:nrow(entrySurveySupplement)]
-    # exitSurveyPub = exitSurveyPub[3:nrow(exitSurveyPub)]
-    # exitSurveyOrg = exitSurveyOrg[3:nrow(exitSurveyOrg)]
-    
-    # exitSurveyPub = exitSurveyPub[,1:101]
+    exitSurvey = exitSurvey[3:nrow(exitSurvey)]
     
     colnames(entrySurvey) <- c("startDate",
                                   "endDate",
@@ -1808,19 +1803,6 @@ compile_parts_2020_PsychologyCapstone = function(path_to_data, instance_name) {
     # Remove empty 
     ES = entrySurvey[,1:(152-16)]
     
-    
-    
-    # ExS = rbind(exitSurveyPub,
-    #             exitSurveyOrg,
-    #             use.names = TRUE,
-    #             fill = TRUE)
-    
-    # for (k in 1:nrow(ExS)) {
-    #     if (!ExS$isOrg[k]) {
-    #         ExS$user[k] = as.character(ES[recipientEmail == ExS$recipientEmail[k]]$user[1])
-    #     }
-    # }
-    
     colsToRemove = c("startDate",
                      "endDate",
                      "status",
@@ -1839,33 +1821,92 @@ compile_parts_2020_PsychologyCapstone = function(path_to_data, instance_name) {
     )
     ES = ES[,!..colsToRemove]
     
-    # colsToRemove <- c("startDate",
-    #                   "endDate",
-    #                   "status",
-    #                   "IPaddress",
-    #                   "duration",
-    #                   "recordedDate",
-    #                   "responseID",
-    #                   "recipientLastName",
-    #                   "recipientFirstName",
-    #                   "recipientEmail",
-    #                   "externalReference",
-    #                   "latitude",
-    #                   "longitude",
-    #                   "distributionChannel",
-    #                   "userLanguage",
-    #                   "recaptcha",
-    #                   "username",
-    #                   "career2"
-    # )
-    # ExS = ExS[,!..colsToRemove]
-    
     ES[ES == ""] <- NA
     
     # Add in missing team perceptions component.
     for (k in 1:nrow(entrySurveySupplement)) {
         ES[user == entrySurveySupplement$user[k],paste0('tp',1:16)] = entrySurveySupplement[k,paste0('tp',1:16)]
     }
+    
+    colnames(exitSurvey) <- c("startDate",
+                             "endDate",
+                             "status",
+                             "IPaddress",
+                             "progress",
+                             "duration",
+                             "finished",
+                             "recordedDate",
+                             "responseID",
+                             "recipientLastName",
+                             "recipientFirstName",
+                             "recipientEmail",
+                             "externalReference",
+                             "latitude",
+                             "longitude",
+                             "distributionChannel",
+                             "userLanguage",
+                             
+                             "user",
+                             "deg",
+                             "degOther",
+                             "workExp",
+                             
+                             "tps1",
+                             "tps2",
+                             "tps3",
+                             "tps4",
+                             "tps5",
+                             "tps6",
+                             "tps7",
+                             "tps8",
+                             "tps9",
+                             "tps10",
+                             "tps11",
+                             "tps12",
+                             "tps13",
+                             "tps14",
+                             "tps15",
+                             "tps16",
+                             
+                             "tmcoh1",
+                             "tmcoh2",
+                             "tmcoh3",
+                             "tmcoh4",
+                             
+                             "swed1",
+                             "swed2",
+                             
+                             paste0("BFI", 1:60),
+                             paste0("jpc", 1:15)
+    )
+    
+    colsToRemove = c("startDate",
+                     "endDate",
+                     "status",
+                     "IPaddress",
+                     "duration",
+                     "externalReference",
+                     "latitude",
+                     "longitude",
+                     "distributionChannel",
+                     "userLanguage",
+                     "responseID",
+                     "recipientLastName",
+                     "recipientFirstName",
+                     "recipientEmail"
+    )
+    ExS = exitSurvey
+    ExS = ExS[,!..colsToRemove]
+    
+    ExS[ExS == ""] <- NA
+    
+    users = unique(ExS$user)
+    rowsToKeep = c()
+    for (u in users) {
+        temp = which(ExS$user == u)
+        rowsToKeep = c(rowsToKeep, temp[length(temp)])
+    }
+    ExS = ExS[rowsToKeep]
     
     ES[age >= 18 & age <= 25, agegroup := "18-25"]
     ES[age >= 26 & age <= 35, agegroup := "26-35"]
@@ -1878,6 +1919,9 @@ compile_parts_2020_PsychologyCapstone = function(path_to_data, instance_name) {
              finished = (finished == "True"),
              gaveConsent4 = (gaveConsent4 == "I am happy to participate")
     )]
+    ExS[,`:=`(progress = as.numeric(progress),
+             finished = (finished == "True")
+    )]
     
     for (cl in paste0('exp', 1:19)) {
         ES[get(cl) == "Not familiar with this domain", (cl) := 1]
@@ -1886,6 +1930,7 @@ compile_parts_2020_PsychologyCapstone = function(path_to_data, instance_name) {
         ES[get(cl) == "Use this knowledge regularly", (cl) := 4]
         ES[get(cl) == "I am a recognized expert", (cl) := 5]
         ES[get(cl) == "I am an international authority", (cl) := 6]
+        # ExS[[cl]] = as.numeric(ExS[[cl]])
     }
     
     for (cl in paste0('aomt', 1:11)) {
@@ -1909,6 +1954,7 @@ compile_parts_2020_PsychologyCapstone = function(path_to_data, instance_name) {
         ES[get(cl) == "Somewhat agree", (cl) := 5]
         ES[get(cl) == "Agree", (cl) := 6]
         ES[get(cl) == "Strongly agree", (cl) := 7]
+        # ExS[[cl]] = as.numeric(ExS[[cl]])
     }
     
     for (cl in paste0('tp', 1:16)) {
@@ -1917,120 +1963,60 @@ compile_parts_2020_PsychologyCapstone = function(path_to_data, instance_name) {
         ES[get(cl) == "Neither agree nor disagree", (cl) := 3]
         ES[get(cl) == "Somewhat agree", (cl) := 4]
         ES[get(cl) == "Strongly agree", (cl) := 5]
+        # ExS[[cl]] = as.numeric(ExS[[cl]])
     }
     
+    for (cl in paste0('tps', 1:16)) {
+        ExS[get(cl) == "Strongly disagree", (cl) := 1]
+        ExS[get(cl) == "Somewhat disagree", (cl) := 2]
+        ExS[get(cl) == "Neither agree nor disagree", (cl) := 3]
+        ExS[get(cl) == "Somewhat agree", (cl) := 4]
+        ExS[get(cl) == "Strongly agree", (cl) := 5]
+        # ExS[[cl]] = as.numeric(ExS[[cl]])
+    }
     
-    # ExS[ExS == ""] <- NA
-    # ExS[timeWellSpent == "No", timeWellSpent := 1]
-    # ExS[timeWellSpent == "Unsure", timeWellSpent := 2]
-    # ExS[timeWellSpent == "Yes", timeWellSpent := 3]
-    # 
-    # for (cl in paste0('rate', 1:5)) {
-    #     ExS[get(cl) == "Poor", (cl) := 1]
-    #     ExS[get(cl) == "Average", (cl) := 2]
-    #     ExS[get(cl) == "Good", (cl) := 3]
-    # }
-    # 
-    # for (cl in paste0('exExpct', 1:10)) {
-    #     ExS[get(cl) == "Below", (cl) := 1]
-    #     ExS[get(cl) == "Below ", (cl) := 1]
-    #     ExS[get(cl) == "Met", (cl) := 2]
-    #     ExS[get(cl) == "Exceeded", (cl) := 3]
-    #     ExS[get(cl) == "I had no expectations", (cl) := 4]
-    # }
-    # 
-    # for (cl in paste0('tw', 1:7)) {
-    #     ExS[get(cl) == "Disagree", (cl) := 1]
-    #     ExS[get(cl) == "Neutral", (cl) := 2]
-    #     ExS[get(cl) == "Agree", (cl) := 3]
-    # }
-    # 
-    # for (cl in paste0('pf', 1:14)) {
-    #     ExS[get(cl) == "No", (cl) := 1]
-    #     ExS[get(cl) == "Yes", (cl) := 2]
-    #     ExS[get(cl) == "Not sure", (cl) := 3]
-    # }
-    # 
-    # for (cl in paste0('fb', 1:4)) {
-    #     ExS[get(cl) == "Disagree", (cl) := 1]
-    #     ExS[get(cl) == "Neutral", (cl) := 2]
-    #     ExS[get(cl) == "Agree", (cl) := 3]
-    # }
-    # 
-    # for (cl in paste0('exCap', 1:7)) {
-    #     ExS[get(cl) == "No", (cl) := 1]
-    #     ExS[get(cl) == "Somewhat", (cl) := 2]
-    #     ExS[get(cl) == "Significantly", (cl) := 3]
-    # }
-    # 
-    # for (cl in paste0('cha', 1:3)) {
-    #     ExS[get(cl) == "Disagree", (cl) := 1]
-    #     ExS[get(cl) == "Neutral", (cl) := 2]
-    #     ExS[get(cl) == "Agree", (cl) := 3]
-    # }
-    # 
-    # for (cl in paste0('career', 1)) {
-    #     ExS[get(cl) == "No change", (cl) := 1]
-    #     ExS[get(cl) == "Not changed", (cl) := 1]
-    #     ExS[get(cl) == "No change\t", (cl) := 1]
-    #     ExS[get(cl) == "Positively\t", (cl) := 2]
-    #     ExS[get(cl) == "Increased", (cl) := 2]
-    # }
-    # 
-    # for (cl in paste0('ca', 1:4)) {
-    #     ExS[get(cl) == "No", (cl) := 1]
-    #     ExS[get(cl) == "Yes", (cl) := 2]
-    #     ExS[get(cl) == "Not Sure", (cl) := 3]
-    # }
-    # 
-    # for (cl in paste0('swarm', 1:4)) {
-    #     ExS[get(cl) == "Strongly disagree", (cl) := 1]
-    #     ExS[get(cl) == "Disagree", (cl) := 2]
-    #     ExS[get(cl) == "Neutral", (cl) := 3]
-    #     ExS[get(cl) == "Agree", (cl) := 4]
-    #     ExS[get(cl) == "Strongly agree", (cl) := 5]
-    # }
-    # 
-    # for (cl in paste0('lk', 1:6)) {
-    #     ExS[get(cl) == "Disagree", (cl) := 1]
-    #     ExS[get(cl) == "Neutral", (cl) := 2]
-    #     ExS[get(cl) == "Agree", (cl) := 3]
-    # }
-    # 
-    # ExS[ratingTool == "No", ratingTool := 1]
-    # ExS[ratingTool == "Yes", ratingTool := 2]
-    # 
-    # ExS[externalTools == "No", externalTools := 1]
-    # ExS[externalTools == "Yes", externalTools := 2]
-    # 
-    # ExS[enoughTime == "No", enoughTime := 1]
-    # ExS[enoughTime == "Yes", enoughTime := 2]
-    # 
-    # ExS[,`:=`(progress = as.numeric(progress),
-    #           finished = (finished == "True"),
-    #           starRating = as.integer(substr(starRating,1,1)),
-    #           responseStatements = lapply(strsplit(responseStatements, ","), trimws),
-    #           ratingToolPurpose = lapply(strsplit(ratingToolPurpose, ","), trimws)
-    # )]
-    # 
-    # # Separate out responseStatements into own column.
-    # suppressWarnings(ExS[,`:=`(
-    #     res1 = stringr::str_detect(responseStatements, "The resources were an important contribution to problem solving"),
-    #     res2 = stringr::str_detect(responseStatements, "It was easy to keep track of all the resources posted on the Platform"),
-    #     res3 = stringr::str_detect(responseStatements, "My team created a lot of resources"),
-    #     res4 = stringr::str_detect(responseStatements, "It was too time consuming to read through everyone's resources.")
-    # )])
-    # 
-    # # Seperate out analytical experience into own column.
-    # suppressWarnings(ExS[,`:=`(
-    #     whyRate1 = stringr::str_detect(ratingToolPurpose, "I used rating to fairly indicate the readiness or quality of a report"),
-    #     whyRate2 = stringr::str_detect(ratingToolPurpose, "I used rating to give guidance to the author"),
-    #     whyRate3 = stringr::str_detect(ratingToolPurpose, "I used rating to push my prefered report to the top")
-    # )])
-    # 
-    # colsToRemove = c("responseStatements",
-    #                  "ratingToolPurpose")
-    # ExS = ExS[,!..colsToRemove]
+    for (cl in paste0('tmcoh', 1:4)) {
+        ExS[get(cl) == "Strongly Disagree", (cl) := 1]
+        ExS[get(cl) == "Strongly disagree", (cl) := 1]
+        ExS[get(cl) == "Disagree", (cl) := 2]
+        ExS[get(cl) == "Somewhat disagree", (cl) := 3]
+        ExS[get(cl) == "Neither agree nor disagree", (cl) := 4]
+        ExS[get(cl) == "Somewhat agree", (cl) := 5]
+        ExS[get(cl) == "Agree", (cl) := 6]
+        ExS[get(cl) == "Strongly agree", (cl) := 7]
+        # ExS[[cl]] = as.numeric(ExS[[cl]])
+    }
+    
+    for (cl in paste0('swed', 1:2)) {
+        ExS[get(cl) == "Improved collaboration", (cl) := 3]
+        ExS[get(cl) == "Increased engagement", (cl) := 3]
+        ExS[get(cl) == "Made no difference", (cl) := 2]
+        ExS[get(cl) == "Hampered collaboration", (cl) := 1]
+        ExS[get(cl) == "Hampered engagement", (cl) := 1]
+        # ExS[[cl]] = as.numeric(ExS[[cl]])
+    }
+    
+    for (cl in paste0('BFI', 1:60)) {
+        ExS[get(cl) == "Disagree strongly", (cl) := 1]
+        ExS[get(cl) == "Disagree a little", (cl) := 2]
+        ExS[get(cl) == "Neutral; no opinion", (cl) := 3]
+        ExS[get(cl) == "Agree a little", (cl) := 4]
+        ExS[get(cl) == "Agree strongly", (cl) := 5]
+        # ExS[[cl]] = as.numeric(ExS[[cl]])
+    }
+    
+    for (cl in paste0('jpc', 1:15)) {
+        ExS[get(cl) == "Strongly Disagree", (cl) := 1]
+        ExS[get(cl) == "Strongly disagree", (cl) := 1]
+        ExS[get(cl) == "Disagree", (cl) := 2]
+        ExS[get(cl) == "Somewhat disagree", (cl) := 3]
+        ExS[get(cl) == "Neither agree nor disagree", (cl) := 4]
+        ExS[get(cl) == "Somewhat agree", (cl) := 5]
+        ExS[get(cl) == "Agree", (cl) := 6]
+        ExS[get(cl) == "Strongly agree", (cl) := 7]
+        # ExS[[cl]] = as.numeric(ExS[[cl]])
+    }
+    
     
     
     # REORDER COLUMNS
@@ -2186,135 +2172,135 @@ compile_parts_2020_PsychologyCapstone = function(path_to_data, instance_name) {
         tp16
     )]
     
-    # ExS = ExS[, .(
-    #     progress,
-    #     finished,
-    #     isOrg,
-    #     user,
-    #     starRating,
-    #     timeWellSpent,
-    #     bestThing,
-    #     worstThing,
-    #     
-    #     hoursPerWeek,
-    #     enoughTime,
-    #     proportionOwnTime,
-    #     
-    #     rate1,
-    #     rate2,
-    #     rate3,
-    #     rate4,
-    #     rate5,
-    #     
-    #     exExpct1,
-    #     exExpct2,
-    #     exExpct3,
-    #     exExpct4,
-    #     exExpct5,
-    #     exExpct6,
-    #     exExpct7,
-    #     exExpct8,
-    #     exExpct9,
-    #     exExpct10,
-    #     
-    #     tw1,
-    #     tw2,
-    #     tw3,
-    #     tw4,
-    #     tw5,
-    #     tw6,
-    #     tw7,
-    #     
-    #     pf1,
-    #     pf2,
-    #     pf3,
-    #     pf4,
-    #     pf5,
-    #     pf6,
-    #     pf7,
-    #     pf8,
-    #     pf9,
-    #     pf10,
-    #     pf11,
-    #     pf12,
-    #     pf13,
-    #     pf14,
-    #     pfComments,
-    #     
-    #     fb1,
-    #     fb2,
-    #     fb3,
-    #     fb4,
-    #     
-    #     exCap1,
-    #     exCap2,
-    #     exCap3,
-    #     exCap4,
-    #     exCap5,
-    #     exCap6,
-    #     exCap7,
-    #     
-    #     mostValuable,
-    #     
-    #     cha1,
-    #     cha2,
-    #     cha3,
-    #     
-    #     career1,
-    #     
-    #     ca1,
-    #     ca2,
-    #     ca3,
-    #     ca4,
-    #     
-    #     swarm1,
-    #     swarm2,
-    #     swarm3,
-    #     swarm4,
-    #     
-    #     lk1,
-    #     lk2,
-    #     lk3,
-    #     lk4,
-    #     lk5,
-    #     lk6,
-    #     lkSuggestions,
-    #     
-    #     res1,
-    #     res2,
-    #     res3,
-    #     res4,
-    #     
-    #     whyRate1,
-    #     whyRate2,
-    #     whyRate3,
-    #     
-    #     ratingTool,
-    #     ratingToolWhyNot,
-    #     featureRequests,
-    #     externalTools,
-    #     externalToolsComments,
-    #     bestQuestionNotAsked,
-    #     testimonial,
-    #     otherComments
-    # )]
+    ExS = ExS[, .(
+        progress,
+        finished,
+        user,
+        deg,
+        degOther,
+        workExp,
+        
+        tps1,
+        tps2,
+        tps3,
+        tps4,
+        tps5,
+        tps6,
+        tps7,
+        tps8,
+        tps9,
+        tps10,
+        tps11,
+        tps12,
+        tps13,
+        tps14,
+        tps15,
+        tps16,
+        
+        tmcoh1,
+        tmcoh2,
+        tmcoh3,
+        tmcoh4,
+        
+        swed1,
+        swed2,
+        
+        BFI1,
+        BFI2,
+        BFI3,
+        BFI4,
+        BFI5,
+        BFI6,
+        BFI7,
+        BFI8,
+        BFI9,
+        BFI10,
+        BFI11,
+        BFI12,
+        BFI13,
+        BFI14,
+        BFI15,
+        BFI16,
+        BFI17,
+        BFI18,
+        BFI19,
+        BFI20,
+        BFI21,
+        BFI22,
+        BFI23,
+        BFI24,
+        BFI25,
+        BFI26,
+        BFI27,
+        BFI28,
+        BFI29,
+        BFI30,
+        BFI31,
+        BFI32,
+        BFI33,
+        BFI34,
+        BFI35,
+        BFI36,
+        BFI37,
+        BFI38,
+        BFI39,
+        BFI40,
+        BFI41,
+        BFI42,
+        BFI43,
+        BFI44,
+        BFI45,
+        BFI46,
+        BFI47,
+        BFI48,
+        BFI49,
+        BFI50,
+        BFI51,
+        BFI52,
+        BFI53,
+        BFI54,
+        BFI55,
+        BFI56,
+        BFI57,
+        BFI58,
+        BFI59,
+        BFI60,
+        
+        jpc1,
+        jpc2,
+        jpc3,
+        jpc4,
+        jpc5,
+        jpc6,
+        jpc7,
+        jpc8,
+        jpc9,
+        jpc10,
+        jpc11,
+        jpc12,
+        jpc13,
+        jpc14,
+        jpc15
+    )]
     
     ES <- ES[finished & ((gaveConsent4 == TRUE) | is.na(gaveConsent4))]
     ES = ES[!is.na(ES$user)]
     
-    # ExS <- ExS[(finished)]
-    # ExS = ExS[!is.na(ExS$user)]
+    ExS <- ExS[(finished)]
+    ExS = ExS[!is.na(ExS$user)]
     
-    # ES = merge(ES, ExS, by = c("user", "isOrg"), all = T)
+    
+    
+    ES = merge(ES, ExS, by = c("user"), all = T)
     ES = as.data.frame(ES)
     
     ES$user = tolower(ES$user)
     
-    # colsToRemove = c('finished.x', 'progress.x',
-    #                  'finished.y', 'progress.y')
-    # for (cl in colsToRemove) {
-    #     ES[[cl]] = NULL
-    # }
+    colsToRemove = c('finished.x', 'progress.x',
+                     'finished.y', 'progress.y')
+    for (cl in colsToRemove) {
+        ES[[cl]] = NULL
+    }
     
     # Compute AOMT construct.
     ES = computeAOMT(ES)
