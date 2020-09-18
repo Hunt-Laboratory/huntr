@@ -178,6 +178,21 @@ computeAOMT = function(dt) {
     return(dt)
 }
 
+computeMatrixReasoning = function(dt) {
+    dt$matrix = (dt$mat1 == "D") +
+        (dt$mat2 == "C") +
+        (dt$mat3 == "E") +
+        (dt$mat4 == "B") +
+        (dt$mat5 == "B") +
+        (dt$mat6 == "D") +
+        (dt$mat7 == "E") +
+        (dt$mat8 == "C") +
+        (dt$mat9 == "A") +
+        (dt$mat10 == "D") +
+        (dt$mat11 == "E")
+    return(dt)
+}
+
 compile_parts_2018_SwarmChallengeExp1 = function(path_to_data, instance_name) {
     path = paste0(path_to_data, instance_name, '/QualtricsData/')
     
@@ -453,6 +468,18 @@ compile_parts_2018_SwarmChallengeExp1 = function(path_to_data, instance_name) {
     # ES[ES == "Agree"] <- 6
     # ES[ES == "Strongly agree"] <- 7
     
+    
+    for (cl in paste0('mat', 1:11)) {
+        ES[[cl]] = as.character(ES[[cl]])
+        ES[get(cl) == 1, (cl) := "A"]
+        ES[get(cl) == 4, (cl) := "B"]
+        ES[get(cl) == 5, (cl) := "C"]
+        ES[get(cl) == 6, (cl) := "D"]
+        ES[get(cl) == 7, (cl) := "E"]
+        ES[get(cl) == 8, (cl) := "F"]
+    }
+    
+    
     ES$finished = (ES$finished == 1)
     
     ES$user = NA
@@ -673,6 +700,9 @@ compile_parts_2018_SwarmChallengeExp1 = function(path_to_data, instance_name) {
     
     # Compute AOMT construct.
     ES = computeAOMT(ES)
+    
+    # Compute matrix reasoning score.
+    ES = computeMatrixReasoning(ES)
     
     return(setDT(ES))
 }
@@ -2304,6 +2334,9 @@ compile_parts_2020_PsychologyCapstone = function(path_to_data, instance_name) {
     
     # Compute AOMT construct.
     ES = computeAOMT(ES)
+    
+    # Compute matrix reasoning score.
+    ES = computeMatrixReasoning(ES)
     
     # Add in participants who didn't complete the entry survey.
     users = c("gecko307","flyingfox753","koala806","fairywren473","thornydevil258","dingo367","pademelon117","goanna424","kookaburra542","galah431","corella928","currawong437","budgerigar571","echidna358","magpie806","kiwi231","emu750","quokka744","tassiedevil533","quoll339","sugarglider399","boobook990","cassowary120","numbat535","bilby505","blackswan808","kangaroo331","blackswan705","possum193","wombat650","bluewhale248","blackcockatoo586","flyingfox651","pobblebonk917","gecko593","crocodile147","wallaby468","frogmouth979","pharlap649","cockatoo319","kangaroo384","platypus604","wallaroo177","galah361","tassiedevil576","flyingfox488","cassowary792","budgerigar439","kiwi471","fairywren318","frogmouth679","kangaroo769")
